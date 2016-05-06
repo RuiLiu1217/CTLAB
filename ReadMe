@@ -1,0 +1,5 @@
+# This is a GPU based projection backprojection library.
+# Author: Rui Liu
+# Date: May 5, 2016
+
+# Use CMake to compile the library
