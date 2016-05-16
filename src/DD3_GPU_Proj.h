@@ -45,7 +45,7 @@ void DD3ProjHelical_3GPU(
 	int XN, int YN, int ZN,
 	float* hvol, float* hprj,
 	float dx, float dz,
-	byte* mask, int gpunum, int (&startPN)[3]);
+	byte* mask, int methodId, int (&startPN)[3]);
 
 extern "C"
 void DD3ProjHelical_4GPU(
@@ -57,7 +57,7 @@ void DD3ProjHelical_4GPU(
 	int XN, int YN, int ZN,
 	float* hvol, float* hprj,
 	float dx, float dz,
-	byte* mask, int gpunum, int (&startPN)[4]);
+	byte* mask, int methodId, int (&startPN)[4]);
 
 
 
