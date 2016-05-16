@@ -41,7 +41,7 @@ void DD3BackHelical_3GPU(
 	int XN, int YN, int ZN,
 	float* hvol, float* hprj,
 	float dx, float dz,
-	byte* mask, int gpunum, int (&startVOL)[3]);
+	byte* mask, int methodId, int (&startVOL)[3]);
 
 
 extern "C"
@@ -54,7 +54,7 @@ void DD3BackHelical_4GPU(
 	int XN, int YN, int ZN,
 	float* hvol, float* hprj,
 	float dx, float dz,
-	byte* mask, int gpunum, int (&startVOL)[4]);
+	byte* mask, int methodId, int (&startVOL)[4]);
 
 #endif /* DD3_GPU_BACK_H_ */
 
