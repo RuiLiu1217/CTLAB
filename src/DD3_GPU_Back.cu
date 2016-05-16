@@ -2068,7 +2068,7 @@ void DD3BackHelical_3GPU(
 	int XN, int YN, int ZN,
 	float* hvol, float* hprj,
 	float dx, float dz,
-	byte* mask, int gpunum, int (&startVOL)[3])
+	byte* mask, int methodId, int (&startVOL)[3])
 {
 	thrust::host_vector<float> h_angs(hangs,hangs+PN);
 	thrust::host_vector<float> h_zPos(hzPos,hzPos+PN);
@@ -2118,7 +2118,7 @@ void DD3BackHelical_3GPU(
 				imgXCenter, imgYCenter, subImgZCenter[i],
 				hangs + prefixSPN[i] , hzPos + prefixSPN[i],
 				SPN[i],	XN, YN, SZN[i], subVol[i],
-				hprj + DNU * DNV * prefixSPN[i],dx,dz,mask,i,0,0);
+				hprj + DNU * DNV * prefixSPN[i],dx,dz,mask,i,0,methodId);
 	}
 
 	//Gather the volumes together
@@ -2142,7 +2142,7 @@ void DD3BackHelical_4GPU(
 	int XN, int YN, int ZN,
 	float* hvol, float* hprj,
 	float dx, float dz,
-	byte* mask, int gpunum, int (&startVOL)[4])
+	byte* mask, int methodId, int (&startVOL)[4])
 {
 	thrust::host_vector<float> h_angs(hangs,hangs+PN);
 	thrust::host_vector<float> h_zPos(hzPos,hzPos+PN);
@@ -2193,7 +2193,7 @@ void DD3BackHelical_4GPU(
 				imgXCenter, imgYCenter, subImgZCenter[i],
 				hangs + prefixSPN[i] , hzPos + prefixSPN[i],
 				SPN[i],	XN, YN, SZN[i], subVol[i],
-				hprj + DNU * DNV * prefixSPN[i],dx,dz,mask,i,0,0);
+				hprj + DNU * DNV * prefixSPN[i],dx,dz,mask,i,0,methodId);
 	}
 
 	//Gather the volumes together
