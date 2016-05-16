@@ -1792,7 +1792,7 @@ void DD3ProjHelical_3GPU(
 	int XN, int YN, int ZN,
 	float* hvol, float* hprj,
 	float dx, float dz,
-	byte* mask, int gpunum, int (&startPN)[3])
+	byte* mask, int methodId, int (&startPN)[3])
 {
 	thrust::host_vector<float> h_angs(hangs,hangs+PN);
 	thrust::host_vector<float> h_zPos(hzPos,hzPos+PN);
@@ -1829,7 +1829,7 @@ void DD3ProjHelical_3GPU(
 
 		DD3Proj_gpu(x0, y0, z0, DNU, DNV, xds, yds, zds,
 				imgXCenter, imgYCenter, subImgZCenter[i], hangs + prefixSPN[i] , hzPos + prefixSPN[i], SPN[i],
-				XN, YN, SZN[i], subVol[i], hprj + DNU * DNV * prefixSPN[i],dx,dz,mask,i,0);
+				XN, YN, SZN[i], subVol[i], hprj + DNU * DNV * prefixSPN[i],dx,dz,mask,i, methodId);
 	}
 
 	delete[] subVol[0];
@@ -1850,7 +1850,7 @@ void DD3ProjHelical_4GPU(
 	int XN, int YN, int ZN,
 	float* hvol, float* hprj,
 	float dx, float dz,
-	byte* mask, int gpunum, int (&startPN)[4])
+	byte* mask, int methodId, int (&startPN)[4])
 {
 	thrust::host_vector<float> h_angs(hangs,hangs+PN);
 	thrust::host_vector<float> h_zPos(hzPos,hzPos+PN);
@@ -1887,7 +1887,7 @@ void DD3ProjHelical_4GPU(
 
 		DD3Proj_gpu(x0, y0, z0, DNU, DNV, xds, yds, zds,
 				imgXCenter, imgYCenter, subImgZCenter[i], hangs + prefixSPN[i] , hzPos + prefixSPN[i], SPN[i],
-				XN, YN, SZN[i], subVol[i], hprj + DNU * DNV * prefixSPN[i],dx,dz,mask,i,0);
+				XN, YN, SZN[i], subVol[i], hprj + DNU * DNV * prefixSPN[i],dx, dz, mask, i, methodId);
 	}
 
 	delete[] subVol[0];
