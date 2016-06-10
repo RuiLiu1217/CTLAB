@@ -33,7 +33,7 @@ SET(CTLAB_HEADERS
 	DD3_GPU_Proj.h   	# The Branchless DD projection
 	DD3_GPU_Back.h   	# The Branchless DD backprojection
 	DD3_GPU_demo.h		# Demo of using the DD3 lib
-
+	DD3_GPU_recon.h         # GPU based reconstruction methods
 	DDM_proj.h       	# The conventional DD projection/backprojeciton head file
 	SF_proj.hpp	        # The head file interface for the Separable footprint implementation
 	differentialFuncs.hpp 	# The interface of the differential operation
@@ -48,7 +48,7 @@ SET(CTLAB_SRC
         DD3_GPU_Proj.cu 	# implementation of branchless DD projection
 	DD3_GPU_Back.cu 	# implementation of branchless DD backprojection
 	DD3_GPU_demo.cu   	# Demo of using the DD3 lib
-
+	DD3_GPU_recon.cu         # GPU based reconstruction methods
 	DDM_proj.cpp    	# conventional DD projection/backprojection in CPU
 	DDM_proj.cu		# conventional DD projectoin/backprojection in GPU
 	SF_proj.cpp		# The CPU implementation of the SF projection and backprojection
