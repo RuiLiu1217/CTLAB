@@ -33,6 +33,8 @@ SET(CTLAB_HEADERS
 	DD3_GPU_Proj.h   	# The Branchless DD projection
 	DD3_GPU_Back.h   	# The Branchless DD backprojection
 	DD3_GPU_demo.h		# Demo of using the DD3 lib
+	FastIterativeShrinkageAlgorithm.h # Fast Iterative Shrinkage Algorithm
+	SARTWeighting.h         # SART weighting algorithm
 	DD3_GPU_recon.h         # GPU based reconstruction methods
 	DDM_proj.h       	# The conventional DD projection/backprojeciton head file
 	SF_proj.hpp	        # The head file interface for the Separable footprint implementation
