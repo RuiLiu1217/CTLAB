@@ -1,6 +1,6 @@
 #include "DD3_GPU_recon.h"
-#include "DD3_GPU_proj.h"
-#include "DD3_GPU_back.h"
+#include "DD3_GPU_Proj.h"
+#include "DD3_GPU_Back.h"
 #include "FastIterativeShrinkageAlgorithm.h"
 #include "SARTWeighting.h"
 
