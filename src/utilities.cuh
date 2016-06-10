@@ -824,6 +824,8 @@ inline __device__ float calSiddonOneRayKer(
 }
 
 
+enum ForwardDDMethod{PROJ_BRANCHLESS=0,PROJ_PSEUDODISTANCE=2};
+enum BackwardDDMethod{BACK_BRANCHLESS=0,BACK_PSEUDODISTANCE=2,BACK_ZLINEBRANCHLESS=3};
 
 #endif /* UTILITIES_CUH_ */
 
