@@ -46,6 +46,7 @@ SET(CTLAB_HEADERS
 	#DD3_demo.hpp	# The interface of the demo of the Branchless DD
 	readwrite.hpp           # Read and write the raw data (in GPU or CPU) from/to disk
 	FastMatrixVectorMultiplication.hpp # Fast Matrix-Vector multiplication function in GPU
+	genModifiedPhantom.hpp  # Generate modified Shepp-Logan phantom in GPU
 )
 
 SET(CTLAB_SRC 
@@ -68,6 +69,7 @@ SET(CTLAB_SRC
 #	DD3_demo.cu	# The interface of the demo of the Branchless DD
 	FastMatrixVectorMultiplication.cu # Fast Matrix-Vector multiplication function in GPU
 	readwrite.cpp           # Read and write the raw data (in GPU or CPU) from/to disk
+	genModifiedPhantom.cu   # Generate modified Shepp-Logan phantom in GPU
 )
 
 
