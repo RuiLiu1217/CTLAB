@@ -44,6 +44,7 @@ SET(CTLAB_HEADERS
 	threeGPUHouseholder.hpp # The interface of GPU Based Householder transform, it requires three GPUs
 	spectralCTscan.hpp      # The interface of spectral CT projection simulation
 	#DD3_demo.hpp	# The interface of the demo of the Branchless DD
+	readwrite.hpp           # Read and write the raw data (in GPU or CPU) from/to disk
 	FastMatrixVectorMultiplication.hpp # Fast Matrix-Vector multiplication function in GPU
 )
 
@@ -66,6 +67,7 @@ SET(CTLAB_SRC
 	spectralCTscan.cu 	# The spectral CT projection simulation in GPU
 #	DD3_demo.cu	# The interface of the demo of the Branchless DD
 	FastMatrixVectorMultiplication.cu # Fast Matrix-Vector multiplication function in GPU
+	readwrite.cpp           # Read and write the raw data (in GPU or CPU) from/to disk
 )
 
 
