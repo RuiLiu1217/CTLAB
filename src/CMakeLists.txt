@@ -47,6 +47,9 @@ SET(CTLAB_HEADERS
 	readwrite.hpp           # Read and write the raw data (in GPU or CPU) from/to disk
 	FastMatrixVectorMultiplication.hpp # Fast Matrix-Vector multiplication function in GPU
 	genModifiedPhantom.hpp  # Generate modified Shepp-Logan phantom in GPU
+	Ellipsoid.h             # kernel function for generation Shepp-Logan projection
+	genSheppLoganProjection.h # Generate Shepp Logan phantom based projection
+	
 )
 
 SET(CTLAB_SRC 
@@ -70,6 +73,7 @@ SET(CTLAB_SRC
 	FastMatrixVectorMultiplication.cu # Fast Matrix-Vector multiplication function in GPU
 	readwrite.cpp           # Read and write the raw data (in GPU or CPU) from/to disk
 	genModifiedPhantom.cu   # Generate modified Shepp-Logan phantom in GPU
+	genSheppLoganProjection.cpp # Generate Shepp Logan phantom based projection
 )
 
 
