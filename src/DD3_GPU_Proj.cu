@@ -1758,7 +1758,7 @@ void DD3Proj_gpu(
 			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
 		break;
 	case 2:
-		break;
+	
 	case 3:
 		DD3_gpu_proj_pseudodistancedriven(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
 			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
