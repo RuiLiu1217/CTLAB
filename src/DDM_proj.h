@@ -93,34 +93,6 @@ void DDM3D_ED_proj(std::vector<double>& proj, const std::vector<double>& vol,
 	const std::vector<double>& angs);
 
 
-
-void DDM_ED_bproj(const std::vector<double>& proj, std::vector<double>& img,
-	const double S2O, const double O2D, const double objSizeX, const double objSizeY,
-	const double detSize, const double detCntIdx, const int XN, const int YN, const int DN, const int PN,
-	const std::vector<double>& angs);
-void DDM_ED_bproj(const std::vector<float>& proj, std::vector<float>& img,
-	const float S2O, const float O2D, const float objSizeX, const float objSizeY,
-	const float detSize, const float detCntIdx, const int XN, const int YN, const int DN, const int PN,
-	const std::vector<float>& angs);
-
-
-
-void DDM3D_bproj(const std::vector<double>& proj, std::vector<double>& vol,
-	const double S2O, const double O2D,
-	const double objSizeX, const double objSizeY, const double objSizeZ,
-	const double detSizeU, const double detSizeV,
-	const double detCntIdU, const double detCntIdV,
-	const int XN, const int YN, const int ZN, const int DNU, const int DNV, const int PN,
-	const std::vector<double>& angs);
-
-void DDM3D_bproj(const std::vector<float>& proj, std::vector<float>& vol,
-	const float S2O, const float O2D,
-	const float objSizeX, const float objSizeY, const float objSizeZ,
-	const float detSizeU, const float detSizeV,
-	const float detCntIdU, const float detCntIdV,
-	const int XN, const int YN, const int ZN, const int DNU, const int DNV, const int PN,
-	const std::vector<float>& angs);
-
 // \brief Equal distance detector DD projection in GPU in Fan Beam Geometry (all data are all in GPU). NOTE: pointers represent in device memory
 // \param proj projection data
 // \param img image volume
