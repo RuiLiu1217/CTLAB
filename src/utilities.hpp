@@ -288,7 +288,7 @@ public:
 template<typename T>
 inline __host__ __device__ bool IS_ZERO(const T& x)
 {
-	return (x < CONSTVAL<T>::_EPSILON) && (x > -CONSTVAL<T>::_EPSILON);
+	return (x < 1.0E-9) && (x > -1.0E-9);
 }
 
 
