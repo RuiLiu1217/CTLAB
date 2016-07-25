@@ -1,15 +1,15 @@
-
 /*
-* \file BruteForceDDBack.hpp
+* \file DDM_back.h
 * \brief The head file of brute force backprojection
 *
 * \date Mar 4, 2016
-* \author liurui
+* \author Rui Liu
+* \email liurui1217@gmail.com
 * \version 1.0
 */
 
-#ifndef BRUTEFORCEDDBACK_HPP_
-#define BRUTEFORCEDDBACK_HPP_
+#ifndef _DDM_BACK_H_
+#define _DDM_BACK_H_
 
 #include <vector>
 #include <thrust/device_vector.h>
@@ -49,9 +49,6 @@ void DDM3D_ED_bproj_GPU(const float* proj, float* vol,
 	const float ddu, const float ddv, const float dx, const float dy, const float dz,
 	const float hfXN, const float hfYN, const float hfZN, const float S2D,
 	const float* angs, const dim3 blk, const dim3 gid);
-
-
-
 
 // \brief Equal Distance DD Backprojection in Fan Beam Geometry
 // \param proj projection data
@@ -540,4 +537,4 @@ void DDM3D_EA_helical_bproj(const thrust::device_vector<double>& proj, thrust::d
 	const thrust::device_vector<double>& zShifts,
 	const thrust::device_vector<double>& angs, const dim3 blk, const dim3 gid);
 
-#endif /* BRUTEFORCEDDBACK_HPP_ */
+#endif /* _DDM_BACK_H_ */
