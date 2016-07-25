@@ -3,7 +3,7 @@
 #include "spectralCTscan.hpp"
 enum{ZERO=0,ONE=1,NUM_OF_CYLINDER=17,NUM_OF_ENERGYCHANNEL=801};
 
-static const double PI = 3.14159265358979323846264;
+//static const double PI = 3.14159265358979323846264;
 namespace SPECTRALCT{
 	template<typename T>
 	struct T3
