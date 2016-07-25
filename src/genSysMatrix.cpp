@@ -2599,7 +2599,7 @@ namespace genSysMatrix
 		const int XN, const int YN, const int DN, const int PN,
 		const std::vector<T>& angs)
 	{
-		//这个函数以x轴正方向为0度方向
+		
 		int angIdx(0), detIdx(0);
 		T curang(0), cosT(0), sinT(0);
 		T cursourx(0), cursoury(0);
@@ -2614,16 +2614,16 @@ namespace genSysMatrix
 			cursourx = S2O * cosT; //以X轴为准;
 			cursoury = S2O * sinT;
 
-			if (curang > PI * 0.25 && curang <= PI * 0.75 || curang >= PI * 1.25 && curang < PI * 1.75) //按照角度来计算;
+			if (curang > PI * 0.25 && curang <= PI * 0.75 || curang >= PI * 1.25 && curang < PI * 1.75)
 			{
-				//光源沿y方向走
+				
 				pushCase1<T>(rowIdx, colIdx, weight, cursourx, cursoury, S2O, O2D,
 					objSizeX, objSizeY, detSize, detCntIdx,
 					XN, YN, DN, PN, dx, dy, dd, curang, cosT, sinT, angIdx);
 			}
 			else
 			{
-				//光线沿x方向走;
+				
 				pushCase4<T>(rowIdx, colIdx, weight, cursourx, cursoury, S2O, O2D,
 					objSizeX, objSizeY, detSize, detCntIdx,
 					XN, YN, DN, PN, dx, dy, dd, curang, cosT, sinT, angIdx);
