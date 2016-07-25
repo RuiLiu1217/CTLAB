@@ -4,7 +4,7 @@
  * All rights reserved
  *
  * @file DDM_proj.cu
- * @brief The GPU based DD projection in conventional method
+ * @brief The GPU based DD projection in brute force method
  *
  * @version 1.0
  * @author Rui Liu
