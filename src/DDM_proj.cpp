@@ -17,6 +17,7 @@
 #include "utilities.hpp"
 
 
+
 template<typename T>
 inline T intersectLength(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax)
 {
@@ -280,7 +281,7 @@ void DDM_ED_proj_template(std::vector<T>& proj, const std::vector<T>& img,
 		cursourx = S2O * cosT; //以X轴为准;
 		cursoury = S2O * sinT;
 
-		if ((curang > CONSTVAL<T>::_PI_4 && curang <= CONSTVAL<T>::_3PI_4) || (curang >= CONSTVAL<T>::_5PI_4 && curang < CONSTVAL<T>::_7PI_4)) //按照角度来计算;
+		if ((curang > _PI_4 && curang <= _3PI_4) || (curang >= _5PI_4 && curang < _7PI_4)) //按照角度来计算;
 		{
 			//the ray propagate along Y axis
 			projCase1<T>(proj, img, cursourx, cursoury, S2O, O2D,
@@ -355,7 +356,7 @@ void DDM3D_ED_proj_template(std::vector<T>& proj, const std::vector<T>& vol,
 		T cursoury = S2O * sinT;
 		T cursourz = 0;
 
-		if ((curang > CONSTVAL<T>::_PI_4 && curang <= CONSTVAL<T>::_3PI_4) || (curang >= CONSTVAL<T>::_5PI_4 && curang < CONSTVAL<T>::_7PI_4))
+		if ((curang > _PI_4 && curang <= _3PI_4) || (curang >= _5PI_4 && curang < _7PI_4))
 		{
 			for (int detIdV = 0; detIdV < DNV; ++detIdV)
 			{
@@ -1923,7 +1924,7 @@ void genMatrix_DDM_ED_template(
 		cursourx = S2O * cosT;
 		cursoury = S2O * sinT;
 
-		if ((curang > CONSTVAL<T>::_PI_4 && curang <= CONSTVAL<T>::_3PI_4) || (curang >= CONSTVAL<T>::_5PI_4 && curang < CONSTVAL<T>::_7PI_4))
+		if ((curang > _PI_4 && curang <= _3PI_4) || (curang >= _5PI_4 && curang < _7PI_4))
 		{
 			pushCase1<T>(rowIdx, colIdx, weight, cursourx, cursoury, S2O, O2D,
 				objSizeX, objSizeY, detSize, detCntIdx,
