@@ -480,9 +480,9 @@ void _GradientOfTV_CPU(T* f, T* d, const T coef, cuint L, cuint W)
 			fij_1 = f[((idy + W - 1) % W) * L + idx];
 			fi_1j1 = f[((idy + 1) % W) * L + (idx + L - 1) % L];
 			fi1j_1 = f[((idy + W - 1) % W) * L + (idx + 1) % L];
-			dom1 = 1.0f / (std::sqrt((fi1j - fij)*(fi1j - fij) + (fij1 - fij) * (fij1 - fij) + CONSTVAL<T>::_EPSILON));
-			dom2 = 1.0f / (std::sqrt((fij - fi_1j)*(fij - fi_1j) + (fi_1j1 - fi_1j)*(fi_1j1 - fi_1j) + CONSTVAL<T>::_EPSILON));
-			dom3 = 1.0f / (std::sqrt((fi1j_1 - fij_1) * (fi1j_1 - fij_1) + (fij - fij_1)*(fij - fij_1) + CONSTVAL<T>::_EPSILON));
+			dom1 = 1.0f / (std::sqrt((fi1j - fij)*(fi1j - fij) + (fij1 - fij) * (fij1 - fij) + _EPSILON));
+			dom2 = 1.0f / (std::sqrt((fij - fi_1j)*(fij - fi_1j) + (fi_1j1 - fi_1j)*(fi_1j1 - fi_1j) + _EPSILON));
+			dom3 = 1.0f / (std::sqrt((fi1j_1 - fij_1) * (fi1j_1 - fij_1) + (fij - fij_1)*(fij - fij_1) + _EPSILON));
 			d[curid] = ((2.0 * fij - fi1j - fij1) * dom1 + (fij - fi_1j) * dom2 + (fij - fij_1) * dom3) * coef;
 		}
 	}
@@ -519,10 +519,10 @@ void _GradientOfTV_CPU(T* f, T* d, const T coef, cuint L, cuint W, cuint H)
 				f_i1jk_1 = f[(((idz + H - 1) % H) * W + idy) * L + ((idx + 1) % L)];
 				f_ij1k_1 = f[(((idz + H - 1) % H) * W + ((idy + 1) % W)) * L + idx];
 
-				dom1 = 1.0f / std::sqrt((f_i1jk - f_ijk)*(f_i1jk - f_ijk) + (f_ij1k - f_ijk)*(f_ij1k - f_ijk) + (f_ijk1 - f_ijk)*(f_ijk1 - f_ijk) + CONSTVAL<T>::_EPSILON);
-				dom2 = 1.0f / std::sqrt((f_ijk - f_i_1jk)*(f_ijk - f_i_1jk) + (f_i_1j1k - f_i_1jk)*(f_i_1j1k - f_i_1jk) + (f_i_1jk1 - f_i_1jk)*(f_i_1jk1 - f_i_1jk) + CONSTVAL<T>::_EPSILON);
-				dom3 = 1.0f / std::sqrt((f_i1j_1k - f_ij_1k)*(f_i1j_1k - f_ij_1k) + (f_ijk - f_ij_1k)*(f_ijk - f_ij_1k) + (f_ij_1k1 - f_ij_1k)*(f_ij_1k1 - f_ij_1k) + CONSTVAL<T>::_EPSILON);
-				dom4 = 1.0f / std::sqrt((f_i1jk_1 - f_ijk_1)*(f_i1jk_1 - f_ijk_1) + (f_ij1k_1 - f_ijk_1)*(f_ij1k_1 - f_ijk_1) + (f_ijk - f_ijk_1)*(f_ijk - f_ijk_1) + CONSTVAL<T>::_EPSILON);
+				dom1 = 1.0f / std::sqrt((f_i1jk - f_ijk)*(f_i1jk - f_ijk) + (f_ij1k - f_ijk)*(f_ij1k - f_ijk) + (f_ijk1 - f_ijk)*(f_ijk1 - f_ijk) + _EPSILON);
+				dom2 = 1.0f / std::sqrt((f_ijk - f_i_1jk)*(f_ijk - f_i_1jk) + (f_i_1j1k - f_i_1jk)*(f_i_1j1k - f_i_1jk) + (f_i_1jk1 - f_i_1jk)*(f_i_1jk1 - f_i_1jk) + _EPSILON);
+				dom3 = 1.0f / std::sqrt((f_i1j_1k - f_ij_1k)*(f_i1j_1k - f_ij_1k) + (f_ijk - f_ij_1k)*(f_ijk - f_ij_1k) + (f_ij_1k1 - f_ij_1k)*(f_ij_1k1 - f_ij_1k) + _EPSILON);
+				dom4 = 1.0f / std::sqrt((f_i1jk_1 - f_ijk_1)*(f_i1jk_1 - f_ijk_1) + (f_ij1k_1 - f_ijk_1)*(f_ij1k_1 - f_ijk_1) + (f_ijk - f_ijk_1)*(f_ijk - f_ijk_1) + _EPSILON);
 
 				d[curId] = ((3.0f * f_ijk - f_i1jk - f_ij1k - f_ijk1) * dom1 + (f_ijk - f_i_1jk) * dom2 + (f_ijk - f_ij_1k) * dom3 + (f_ijk - f_ijk_1) * dom4) * coef;
 				return;
