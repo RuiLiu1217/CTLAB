@@ -91,6 +91,84 @@ namespace genSysMatrix
 		m_DetCntIdx(DetN * 0.5f - 0.5f) {}
 
 
+	class FanEDGeo
+	{
+	public:
+		float m_S2O; ///< Source to Object distance
+		float m_O2D; ///< Object to Detector distance
+		float m_S2D; ///< Source to Detector distance
+
+		int m_ViwN; ///< view number
+		float m_ViwBeg;///< View begin
+		float m_ViwStp; ///< View Step
+
+		float m_DetSize; ///< Detector size;
+		int m_DetN; ///< How many detector cells
+		float m_DetStp; ///< detector cells size;
+		float m_DetCntIdx; ///< detector center index;
+	public:
+		/// \brief constructor
+		FanEDGeo(void);
+		/// \brief destructor
+		~FanEDGeo(){};
+		/// \brief copy constructor
+		FanEDGeo(const FanEDGeo& rhs);
+		/// \brief Constructor
+		/// \param S2O source to object distance
+		/// \param O2D object to detector distance
+		/// \param ViwN View number
+		/// \param ViwBeg The begin of the view
+		/// \param ViwEnd The end of the view
+		/// \param DetSize Detector size
+		/// \param DetN detector cells number on one row
+		FanEDGeo(const float S2O, const float O2D, const  int ViwN,
+			const float ViwBeg, const float ViwEnd, const float DetSize,
+			const  int DetN);
+
+	};
+
+
+	FanEDGeo::FanEDGeo(void)
+	{
+		m_S2O = 40.0f;
+		m_O2D = 40.0f;
+		m_S2D = 80.0f;
+
+		m_ViwN = 720; // view number
+		m_ViwBeg = 0.0f;
+		m_ViwStp = 3.14159265358979323846264f * 2.0f / m_ViwN;
+
+		m_DetSize = 24.0f; // Detector size;
+		m_DetN = 888; // How many detector cells
+		m_DetStp = m_DetSize / m_DetN; // detector cells size;
+		m_DetCntIdx = m_DetN * 0.5f - 0.5f; //detector center index;
+	}
+
+	FanEDGeo::FanEDGeo(const FanEDGeo& rhs)
+	{
+		m_S2O = rhs.m_S2O;
+		m_O2D = rhs.m_O2D;
+		m_S2D = rhs.m_S2D;
+
+		m_ViwN = rhs.m_ViwN;
+		m_ViwBeg = rhs.m_ViwBeg;
+		m_ViwStp = rhs.m_ViwStp;
+
+		m_DetSize = rhs.m_DetSize;
+		m_DetN = rhs.m_DetN;
+		m_DetStp = rhs.m_DetStp;
+		m_DetCntIdx = rhs.m_DetCntIdx;
+	}
+
+
+	FanEDGeo::FanEDGeo(const float S2O, const float O2D, const  int ViwN,
+		const float ViwBeg, const float ViwEnd, const float DetSize,
+		const  int DetN) :m_S2O(S2O), m_O2D(O2D), m_S2D(S2O + O2D),
+		m_ViwN(ViwN), m_ViwBeg(ViwBeg), m_ViwStp((ViwEnd - ViwBeg) / ViwN),
+		m_DetSize(DetSize), m_DetN(DetN), m_DetStp(DetSize / DetN),
+		m_DetCntIdx(DetN * 0.5f - 0.5f){}
+
+
 
 	/// \brief Image configuration class
 	class Image
@@ -1921,6 +1999,1020 @@ namespace genSysMatrix
 		coeFile.close();
 		std::cout << coeffs.size() << std::endl;
 
+	}
+
+
+
+
+
+	template<typename T>
+	void genProj_AIM_template(
+		std::vector<int>& rowIdx,
+		std::vector<int>& colIdx,
+		std::vector<T>& weight,
+		const T S2O, const T O2D,
+		const T detCntIdx,
+		const T detStp, const int DN,
+		const T ObjStpx, const T ObjStpy,
+		const int XN, const int YN,
+		const T objCntIdxx, const T objCntIdxy,
+		const std::vector<T>& angs)
+	{
+		const int PN = angs.size();
+		T Grid[4][3];
+		T SVA[3], SVB[3];
+		const T area = ObjStpx * ObjStpy;
+		T SPoint[2];
+
+		for (unsigned int angIdx = 0; angIdx != PN; ++angIdx)
+		{
+			for (unsigned int yIdx = 0; yIdx != YN; ++yIdx)
+			{
+				for (unsigned int xIdx = 0; xIdx != XN; ++xIdx)
+				{
+					//Fetch the four points of the pixel and their projection positions
+					Grid[0][0] = (xIdx - objCntIdxx - 0.5) * ObjStpx;
+					Grid[0][1] = (yIdx - objCntIdxy - 0.5) * ObjStpy;
+					//Grid[0][2] = PosAry[yi*(XN + 1) + xi];
+					Grid[1][0] = (xIdx - objCntIdxx + 0.5) * ObjStpx;
+					Grid[1][1] = (yIdx - objCntIdxy - 0.5) * ObjStpy;
+					//Grid[1][2] = PosAry[yi*(XN + 1) + xi + 1];
+					Grid[2][0] = (xIdx - objCntIdxx + 0.5) * ObjStpx;
+					Grid[2][1] = (yIdx - objCntIdxy + 0.5) * ObjStpy;
+					//Grid[2][2] = PosAry[(yi + 1)*(XN + 1) + xi + 1];
+					Grid[3][0] = (xIdx - objCntIdxx - 0.5) * ObjStpx;
+					Grid[3][1] = (yIdx - objCntIdxy + 0.5) * ObjStpy;
+					//Grid[3][2] = PosAry[(yi + 1)*(XN + 1) + xi];
+					SortProjection<T>(Grid);//Sort the projection psotion
+
+					for (unsigned int detIdx = 0; detIdx != DN; ++detIdx)
+					{
+
+					}
+				}
+			}
+		}
+	}
+
+
+	//一个角度的投影;
+	template<typename T>
+	void genProj_AIM(
+		std::vector<int>& rowIdx,
+		std::vector<int>& colIdx,
+		std::vector<T>& coeffs,
+		int angIdx,
+		const T ang,
+		const FanEDGeo FanGeo,
+		const Image Img)
+	{
+		int pubIdx = 0;
+		const T ScanR = FanGeo.m_S2O;
+
+		const int XN = Img.m_Reso.x;
+		const int YN = Img.m_Reso.y;
+		//const int imgReso = XN * YN;
+		//const int PN = FanGeo.m_ViwN;
+		const int DN = FanGeo.m_DetN;
+		//const int prjReso = PN * DN;
+
+		T* PosAry = new T[(XN + 1) * (YN + 1)];
+		for (pubIdx = 0; pubIdx != (XN + 1) * (YN + 1); ++pubIdx)
+		{
+			PosAry[pubIdx] = 0;
+		}
+		const T dx = Img.m_Step.x;
+		const T dy = Img.m_Step.y;
+		const T area = dx * dy;
+		const T DLen = FanGeo.m_DetSize;
+		const T dd = DLen / DN;
+		const T xctr = XN * 0.5; //图像中心偏移半个像素的位置;
+		const T yctr = YN * 0.5;
+		const T dctr = FanGeo.m_DetCntIdx;// (FanGeo.m_DetN) * 0.5; //探测器中心位置; 是否要减1 有待调试!!;
+		const T cosAng = cos(ang);
+		const T sinAng = sin(ang);
+
+		T Ew[2]; T Ed[2];
+		Ew[0] = -cosAng;
+		Ew[1] = -sinAng;
+		Ed[0] = -sinAng;
+		Ed[1] = cosAng;
+		T SPoint[2]; //光源的位置;
+		SPoint[0] = ScanR * cosAng; // 这个可能会改，因为这时候算的光源坐标是以X轴位置为;
+		SPoint[1] = ScanR * sinAng; // 起始点;
+
+		int xi(0), yi(0);
+		T xcor(0), ycor(0), dcor(0);
+		T Grid[4][3];
+
+		//计算所有拐点处的投影位置;
+		for (yi = 0; yi <= YN; ++yi)
+		{
+			ycor = (yi - yctr) * dy - SPoint[1];
+			for (xi = 0; xi <= XN; ++xi)
+			{
+				xcor = (xi - xctr) * dx - SPoint[0];
+				dcor = ScanR * (xcor* Ed[0] + ycor * Ed[1]) / (xcor * Ew[0] + ycor * Ew[1]);
+				dcor = dcor / dd;
+				PosAry[yi* (XN + 1) + xi] = dcor + dctr;
+			}
+		}
+
+		//计算投影，但是遍历以图像像素为框架;
+		int posim(0);
+		T pvalue(0);
+		T pcfun(0);
+		T pdist(0);
+		int MinBV(0);
+		int MaxBV(0);
+		T temp(0);
+		T SVA[3], SVB[3];
+		T pangle(0);
+		int di(0);
+		T coef(0);
+		for (yi = 0; yi < YN; ++yi)
+		{
+			for (xi = 0; xi < XN; ++xi)
+			{
+				//Fetch the four points of the pixel and their projection positions
+				Grid[0][0] = (xi - xctr)*dx;
+				Grid[0][1] = (yi - yctr)*dy;
+				Grid[0][2] = PosAry[yi*(XN + 1) + xi];
+				Grid[1][0] = (xi - xctr + 1)*dx;
+				Grid[1][1] = (yi - yctr)*dy;
+				Grid[1][2] = PosAry[yi*(XN + 1) + xi + 1];
+				Grid[2][0] = (xi - xctr + 1)*dx;
+				Grid[2][1] = (yi - yctr + 1)*dy;
+				Grid[2][2] = PosAry[(yi + 1)*(XN + 1) + xi + 1];
+				Grid[3][0] = (xi - xctr)*dx;
+				Grid[3][1] = (yi - yctr + 1)*dy;
+				Grid[3][2] = PosAry[(yi + 1)*(XN + 1) + xi];
+				SortProjection<T>(Grid);//Sort the projection psotion
+
+				posim = yi*XN + xi;
+				pvalue = 0.0;
+				pdist = hypot((xi + 0.5 - xctr)*dx - SPoint[0], (yi + 0.5 - yctr) * dy - SPoint[1]);
+
+				MinBV = int(Grid[0][2] + 10) - 10;
+				MaxBV = int(Grid[3][2] + 10) - 9;
+				if (MinBV < 0)   MinBV = 0;
+				if (MaxBV > DN)  MaxBV = DN;
+				// Compute the directions of the two lines for the projections 
+				for (di = MinBV; di < MaxBV; di++)
+				{
+					temp = (di - dctr) * dd;
+					SVA[0] = -temp * sinAng - SPoint[0];
+					SVA[1] = temp * cosAng - SPoint[1];
+					SVA[2] = di;
+					temp = hypot(SVA[0], SVA[1]); // sqrt(pow(SVA[0], 2) + pow(SVA[1], 2));
+					SVA[0] = SVA[0] / temp;
+					SVA[1] = SVA[1] / temp;
+
+					temp = (di - dctr + 1)*dd;
+					SVB[0] = -temp * sinAng - SPoint[0];
+					SVB[1] = temp * cosAng - SPoint[1];
+					SVB[2] = di + 1;
+					temp = hypot(SVB[0], SVB[1]); // sqrt(pow(SVB[0], 2) + pow(SVB[1], 2));
+					SVB[0] = SVB[0] / temp;
+					SVB[1] = SVB[1] / temp;
+
+					pangle = SVA[0] * SVB[0] + SVA[1] * SVB[1];
+					pangle = sqrt(1 - pow(pangle, 2));
+					//compute the weighting coefficient for a special projection data
+					coef = ComputeCoefficient<T>(Grid, SVA, SVB, SPoint, area);
+					coef = coef / (pdist*pangle);
+					//Main code to forward projection and back projection
+					rowIdx.push_back(angIdx * DN + di);
+					colIdx.push_back(posim);
+					coeffs.push_back(coef);
+				}
+			}
+		}
+		delete [] PosAry;
+	}
+
+
+
+
+	void genMatrix_ED_AIM()
+	{
+		FanEDGeo FanGeo;
+		Image Img;
+		//读取配置文件;
+		std::ifstream fin("configurationFile.txt", std::ios::in);
+
+		if (!fin.is_open())
+		{
+			std::cout << "Cannot Find configuration file\n";
+			std::cout << "Would you like to use the default configuration?[y/n]";
+			char yes;
+			std::cin >> yes;
+			if (yes == 'y' || yes == 'Y')
+			{
+				FanGeo.m_S2O = 5.385200195312500e+02;
+				FanGeo.m_O2D = 4.082259521484375e+02;
+				FanGeo.m_ViwN = 360;
+				FanGeo.m_ViwBeg = 0;
+				FanGeo.m_ViwStp = 3.14159265358979323846264*2.0 / 359.0;
+				FanGeo.m_DetSize = 500.0;
+				FanGeo.m_DetN = 888;
+				FanGeo.m_DetStp = FanGeo.m_DetSize / FanGeo.m_DetN;
+				FanGeo.m_S2D = FanGeo.m_S2O + FanGeo.m_O2D;
+				FanGeo.m_DetCntIdx = 444;
+
+				Img.m_Size.x = 4.484740011196460e+02;
+				Img.m_Size.y = 4.484740011196460e+02;
+				Img.m_Reso.x = 256;
+				Img.m_Reso.y = 256;
+				Img.m_Bias.x = 0;
+				Img.m_Bias.y = 0;
+				Img.m_Step.x = Img.m_Size.x / Img.m_Reso.x;
+				Img.m_Step.y = Img.m_Size.y / Img.m_Reso.y;
+				int angIdx;
+				std::vector<int> rowIdx;
+				std::vector <int> colIdx;
+				std::vector <double> coeffs;
+
+				std::stringstream nonZ;
+
+				for (angIdx = 0; angIdx < FanGeo.m_ViwN; angIdx++)
+				{
+					double ang = FanGeo.m_ViwBeg + angIdx* FanGeo.m_ViwStp;
+
+					genProj_AIM<double>(rowIdx, colIdx, coeffs, angIdx, ang, FanGeo, Img);
+					std::cout << angIdx << std::endl;
+				}
+				nonZ << rowIdx.size();
+				std::string F1 = "prjAIM" + nonZ.str() + ".row";
+				std::string F2 = "prjAIM" + nonZ.str() + ".col";
+				std::string F3 = "prjAIM" + nonZ.str() + ".cof";
+				std::ofstream rowFile(F1.c_str(), std::ios::binary);
+				std::ofstream colFile(F2.c_str(), std::ios::binary);
+				std::ofstream coeFile(F3.c_str(), std::ios::binary);
+
+				rowFile.write((char*) &(rowIdx[0]), sizeof(int) * rowIdx.size());
+				rowFile.close();
+				colFile.write((char*) &(colIdx[0]), sizeof(int) * colIdx.size());
+				colFile.close();
+				coeFile.write((char*) &(coeffs[0]), sizeof(double) * coeffs.size());
+				coeFile.close();
+				std::cout << coeffs.size() << std::endl;
+			}
+			else
+			{
+				std::cout << "Exit without generating\n";
+				exit(-1);
+			}
+		}
+		std::string s;
+		double val[14];
+		int i = 0;
+		while (fin >> s)
+		{
+			if ((i % 2))
+			{
+				std::stringstream ss;
+				ss << s;
+				ss >> val[i / 2];
+				std::cout << val[i / 2] << std::endl;
+			}
+			++i;
+		}
+
+		FanGeo.m_S2O = val[0];
+		FanGeo.m_O2D = val[1];
+		FanGeo.m_ViwN = val[2];
+		FanGeo.m_ViwBeg = val[3];
+		FanGeo.m_ViwStp = val[4];
+		FanGeo.m_DetSize = val[5];
+		FanGeo.m_DetN = val[6];
+		FanGeo.m_DetCntIdx = val[7];
+
+		FanGeo.m_DetStp = val[5] / val[6];
+		FanGeo.m_S2D = val[0] + val[1];
+		Img.m_Size.x = val[8];
+		Img.m_Size.y = val[9];
+		Img.m_Reso.x = val[10];
+		Img.m_Reso.y = val[11];
+		Img.m_Bias.x = val[12];
+		Img.m_Bias.y = val[13];
+		Img.m_Step.x = Img.m_Size.x / Img.m_Reso.x;
+		Img.m_Step.y = Img.m_Size.y / Img.m_Reso.y;
+
+		int angIdx;
+		std::vector<int> rowIdx;
+		std::vector <int> colIdx;
+		std::vector <double> coeffs;
+
+		std::stringstream nonZ;
+
+		for (angIdx = 0; angIdx < FanGeo.m_ViwN; angIdx++)
+		{
+			double ang = FanGeo.m_ViwBeg + angIdx* FanGeo.m_ViwStp;
+
+			genProj_AIM<double>(rowIdx, colIdx, coeffs, angIdx, ang, FanGeo, Img);
+			std::cout << angIdx << std::endl;
+		}
+
+		nonZ << rowIdx.size();
+		std::string F1 = "prjAIM" + nonZ.str() + ".row";
+		std::string F2 = "prjAIM" + nonZ.str() + ".col";
+		std::string F3 = "prjAIM" + nonZ.str() + ".cof";
+		std::ofstream rowFile(F1.c_str(), std::ios::binary);
+		std::ofstream colFile(F2.c_str(), std::ios::binary);
+		std::ofstream coeFile(F3.c_str(), std::ios::binary);
+
+		rowFile.write((char*) &(rowIdx[0]), sizeof(int) * rowIdx.size());
+		rowFile.close();
+		colFile.write((char*) &(colIdx[0]), sizeof(int) * colIdx.size());
+		colFile.close();
+		coeFile.write((char*) &(coeffs[0]), sizeof(double) * coeffs.size());
+		coeFile.close();
+		std::cout << coeffs.size() << std::endl;
+	}
+
+
+
+
+
+
+	void genMatrix_DDM_ED(
+		std::vector<int>& rowIdx,
+		std::vector<int>& colIdx,
+		std::vector<double>& weight,
+		const double S2O, const double O2D,
+		const double objSizeX, const double objSizeY,
+		const double detSize,
+		const double detCntIdx,
+		const int XN, const int YN, const int DN, const int PN,
+		const std::vector<double>& angs);
+
+
+
+
+	template<typename T>
+	inline T intersectLength(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax)
+	{
+		const T left = (fixedmin > varimin) ? fixedmin : varimin;
+		const T right = (fixedmax < varimax) ? fixedmax : varimax;
+		return abs(right - left) * static_cast<double>(right > left);
+	}
+
+
+
+
+	//沿Y轴传播;
+	template<typename T>
+	void pushCase4(std::vector<int>& rowIdx,
+		std::vector<int>& colIdx,
+		std::vector<T>& weight,
+		const T cursourX, const T cursourY, const T S2O, const T O2D, const T objSizeX, const T objSizeY, const T detSize, const T detCntIdx, const int XN, const int YN, const int DN, const int PN,
+		const T dx, const T dy, const T dd, const T curAng, const T cosT, const T sinT, const int angIdx)
+	{
+		T summ = 0;
+		T initX, initY, initYLeft, initYRight, curDetXLeft, curDetXRight, curDetYLeft, curDetYRight;
+		T curDetX, curDetY, dirX, dirY, legth, cosAng, detPosLeft, detPosRight;
+		T detprojLength;
+		T objX;
+
+		T minY, maxY;
+		int minYIdx, maxYIdx, detIdx, ii, jj;
+		T curminy, curmaxy;
+		initX = -O2D;
+		int ridx;
+
+		T w;
+		initYLeft = -(0 - detCntIdx - 0.5) * dd; //初始det左边Y坐标
+		curDetXLeft = initX * cosT - initYLeft * sinT; //当前det左边X坐标
+		curDetYLeft = initX * sinT + initYLeft * cosT; //当前det左边Y坐标
+
+		for (detIdx = 0; detIdx != DN; ++detIdx)
+		{
+			ridx = angIdx * DN + detIdx;
+
+			summ = 0;
+
+			initYRight = -(detIdx - detCntIdx - 0.5 + 1) * dd; //初始det右边Y坐标;
+			initY = -(detIdx - detCntIdx) * dd; //初始det中心Y坐标;
+			curDetXRight = initX * cosT - initYRight * sinT; //当前det右边X坐标
+			curDetYRight = initX * sinT + initYRight * cosT; //当前det右边Y坐标
+			curDetX = initX * cosT - initY * sinT; //当前det中心X坐标
+			curDetY = initX * sinT + initY * cosT; //当前det中心Y坐标
+			dirX = curDetX - cursourX;
+			dirY = curDetY - cursourY;
+			legth = hypot(dirX, dirY);
+			dirX /= legth;
+			dirY /= legth;
+			cosAng = abs(dirX); //与Case1区别;
+
+			//这里是从X坐标算Y坐标;
+
+			detPosLeft = (0 - cursourX) / (curDetXLeft - cursourX) * (curDetYLeft - cursourY) + cursourY; //det左边界X轴上的坐标;
+			detPosRight = (0 - cursourX) / (curDetXRight - cursourX) * (curDetYRight - cursourY) + cursourY;//det右边界在x轴上的坐标;
+			detprojLength = abs(detPosRight - detPosLeft);
+
+			//沿X方向扫描;
+			for (ii = 0; ii < XN; ++ii)
+			{
+
+				objX = (ii - YN / 2.0 + 0.5) * dy;
+				minY = (objX - cursourX) / (curDetXLeft - cursourX) * (curDetYLeft - cursourY) + cursourY;
+				maxY = (objX - cursourX) / (curDetXRight - cursourX) *  (curDetYRight - cursourY) + cursourY;
+				if (minY > maxY)
+				{
+					std::swap(minY, maxY);
+				}
+
+				minYIdx = floor(minY / dy + YN / 2.0);
+				maxYIdx = ceil(maxY / dy + YN / 2.0);
+
+				if (maxYIdx <= 0)
+				{
+					continue;
+				}
+				else if (minYIdx > XN)
+				{
+					continue;
+				}
+
+				if (minYIdx < 0)
+				{
+					minYIdx = 0;
+				}
+				if (maxYIdx > YN)
+				{
+					maxYIdx = YN;
+				}
+
+
+				curminy = (-cursourX) / (objX - cursourX) * ((0 - YN / 2.0) * dy - cursourY) + cursourY;
+				for (jj = minYIdx; jj < maxYIdx; ++jj)
+				{
+					curmaxy = (-cursourX) / (objX - cursourX) * ((jj + 1 - YN / 2.0) * dy - cursourY) + cursourY;
+					if (detPosLeft > detPosRight)
+					{
+						std::swap(detPosLeft, detPosRight);
+					}
+
+					w = intersectLength<double>(detPosLeft, detPosRight, curminy, curmaxy);
+					if (w > 0)
+					{
+						rowIdx.push_back(ridx);
+						colIdx.push_back(jj * XN + ii);
+						weight.push_back(w * dx / (cosAng * detprojLength));
+					}
+					//summ += img[jj * XN + ii] * * dx;
+					curminy = curmaxy;
+				}
+			}
+
+			//proj[angIdx * DN + detIdx] = summ / (cosAng * detprojLength);
+			initYLeft = initYRight;
+			curDetXLeft = curDetXRight;
+			curDetYLeft = curDetYRight;
+		}
+	}
+
+	//沿X轴传播;
+	template<typename T>
+	void pushCase1(std::vector<int>& rowIdx,
+		std::vector<int>& colIdx,
+		std::vector<T>& weight,
+		const T cursourX, const T cursourY, const T S2O, const T O2D, const T objSizeX, const T objSizeY, const T detSize, const T detCntIdx, const int XN, const int YN, const int DN, const int PN,
+		const T dx, const T dy, const T dd, const T curAng, const T cosT, const T sinT, const int angIdx)
+	{
+		int detIdx = 0;
+		int ii = 0, jj = 0;
+		T initX, initYLeft, initYRight;
+		T curDetXLeft, curDetYLeft;
+		T curDetXRight, curDetYRight;
+		T minX, maxX;
+		int minXIdx, maxXIdx;
+		T detPosLeft;
+		T detPosRight;
+		T initY;
+		T curDetX, curDetY;
+		T dirX, dirY;
+		T legth;
+		T cosAng;
+		T detprojLength = 0;
+		T objY;
+		T summ = 0;
+		T curminx, curmaxx;
+		int ridx;
+		T w;
+		initX = -O2D;
+		initYLeft = -(0 - detCntIdx - 0.5) * dd; //初始det左边Y坐标
+		curDetXLeft = initX * cosT - initYLeft * sinT; //当前det左边X坐标
+		curDetYLeft = initX * sinT + initYLeft * cosT; //当前det左边Y坐标
+		for (detIdx = 0; detIdx != DN; ++detIdx)
+		{
+			ridx = angIdx * DN + detIdx;
+			summ = 0;
+			initYRight = initYLeft - dd;// -(detIdx - detCntIdx - 0.5 + 1) * dd; //初始det右边Y坐标;
+			initY = -(detIdx - detCntIdx) * dd; //初始det中心Y坐标;
+			curDetXRight = initX * cosT - initYRight * sinT; //当前det右边X坐标
+			curDetYRight = initX * sinT + initYRight * cosT; //当前det右边Y坐标
+			curDetX = initX * cosT - initY * sinT; //当前det中心X坐标
+			curDetY = initX * sinT + initY * cosT; //当前det中心Y坐标
+			dirX = curDetX - cursourX;
+			dirY = curDetY - cursourY;
+			legth = hypot(dirX, dirY);
+			dirX /= legth;
+			dirY /= legth;
+			cosAng = abs(dirY); //当前光线和Y轴夹角余弦
+
+			detPosLeft = (0 - cursourY) / (curDetYLeft - cursourY) * (curDetXLeft - cursourX) + cursourX; //det左边界X轴上的坐标;
+			detPosRight = (0 - cursourY) / (curDetYRight - cursourY) * (curDetXRight - cursourX) + cursourX;//det右边界在x轴上的坐标;
+			detprojLength = abs(detPosRight - detPosLeft);
+
+			for (jj = 0; jj < YN; jj++)
+			{
+				objY = (jj - YN / 2.0 + 0.5) * dy;
+				minX = (objY - cursourY) / (curDetYLeft - cursourY) * (curDetXLeft - cursourX) + cursourX;
+				maxX = (objY - cursourY) / (curDetYRight - cursourY) *  (curDetXRight - cursourX) + cursourX;
+				if (minX > maxX)
+				{
+					std::swap(minX, maxX);
+				}
+
+				minXIdx = floor(minX / dx + XN / 2.0);
+				maxXIdx = ceil(maxX / dx + XN / 2.0);
+
+				if (maxXIdx <= 0)
+				{
+					continue;
+				}
+				else if (minXIdx > XN)
+				{
+					continue;
+				}
+
+				if (minXIdx < 0)
+				{
+					minXIdx = 0;
+				}
+				if (maxXIdx > XN)
+				{
+					maxXIdx = XN;
+				}
+				curminx = (-cursourY) / (objY - cursourY) * ((minXIdx - XN / 2.0) * dx - cursourX) + cursourX;
+				for (ii = minXIdx; ii < maxXIdx; ++ii)
+				{
+
+					curmaxx = (-cursourY) / (objY - cursourY) * ((ii + 1 - XN / 2.0) * dx - cursourX) + cursourX;
+					if (detPosLeft > detPosRight)
+					{
+						std::swap(detPosLeft, detPosRight);
+					}
+
+					w = intersectLength<double>(detPosLeft, detPosRight, curminx, curmaxx);
+					if (w > 0)
+					{
+						rowIdx.push_back(ridx);
+						colIdx.push_back(jj * XN + ii);
+						weight.push_back(w * dx / (cosAng * detprojLength));
+					}
+
+					//summ += img[jj * XN + ii] * intersectLength<double>(detPosLeft, detPosRight, curminx, curmaxx) * dy;
+					curminx = curmaxx;
+				}
+			}
+			//proj[angIdx * DN + detIdx] = summ / (cosAng * detprojLength);
+			initYLeft = initYRight;
+			curDetXLeft = curDetXRight;
+			curDetYLeft = curDetYRight;
+		}
+	}
+
+
+
+	template<typename T>
+	void genMatrix_DDM_ED_template(
+		std::vector<int>& rowIdx,
+		std::vector<int>& colIdx,
+		std::vector<T>& weight,
+		const T S2O, const T O2D,
+		const T objSizeX, const T objSizeY,
+		const T detSize,
+		const T detCntIdx,
+		const int XN, const int YN, const int DN, const int PN,
+		const std::vector<T>& angs)
+	{
+		//这个函数以x轴正方向为0度方向
+		int angIdx(0), detIdx(0);
+		T curang(0), cosT(0), sinT(0);
+		T cursourx(0), cursoury(0);
+		const T dd = detSize / static_cast<T>(DN);
+		const T dx = objSizeX / static_cast<T>(XN);
+		const T dy = objSizeY / static_cast<T>(YN);
+		for (angIdx = 0; angIdx < PN; ++angIdx)
+		{
+			curang = angs[angIdx];// angBeg + angIdx * angStp;
+			cosT = cos(curang);
+			sinT = sin(curang);
+			cursourx = S2O * cosT; //以X轴为准;
+			cursoury = S2O * sinT;
+
+			if (curang > PI * 0.25 && curang <= PI * 0.75 || curang >= PI * 1.25 && curang < PI * 1.75) //按照角度来计算;
+			{
+				//光源沿y方向走
+				pushCase1<T>(rowIdx, colIdx, weight, cursourx, cursoury, S2O, O2D,
+					objSizeX, objSizeY, detSize, detCntIdx,
+					XN, YN, DN, PN, dx, dy, dd, curang, cosT, sinT, angIdx);
+			}
+			else
+			{
+				//光线沿x方向走;
+				pushCase4<T>(rowIdx, colIdx, weight, cursourx, cursoury, S2O, O2D,
+					objSizeX, objSizeY, detSize, detCntIdx,
+					XN, YN, DN, PN, dx, dy, dd, curang, cosT, sinT, angIdx);
+			}
+		}
+
+
+	}
+
+
+
+
+	void genMatrix_DDM_ED(
+		std::vector<int>& rowIdx,
+		std::vector<int>& colIdx,
+		std::vector<double>& weight,
+		const double S2O, const double O2D,
+		const double objSizeX, const double objSizeY,
+		const double detSize,
+		const double detCntIdx,
+		const int XN, const int YN, const int DN, const int PN,
+		const std::vector<double>& angs)
+	{
+		genMatrix_DDM_ED_template<double>(rowIdx, colIdx, weight, S2O, O2D, objSizeX, objSizeY, detSize, detCntIdx, XN, YN, DN, PN, angs);
+	}
+
+
+	void genMatrix_ED_DDM()
+	{
+		std::ifstream fin("configurationFile.txt", std::ios::in);
+		std::vector<int> rowIdx;
+		std::vector<int> colIdx;
+		std::vector<double> weight;
+		std::vector<double> angs;
+		double S2O;
+		double O2D;
+		double detCntIdx;
+		double detStp;
+		int DN;
+		double ObjStpx, ObjStpy;
+		int XN, YN;
+		double objCntIdxx, objCntIdxy;
+
+		if (!fin.is_open())
+		{
+			std::cout << "Cannot Find configuration file\n";
+			std::cout << "Would you like to use the default configuration?[y/n]";
+			char yes;
+			std::cin >> yes;
+			if (yes == 'y' || yes == 'Y')
+			{
+				S2O = 53.85200195312500;
+				O2D = 40.82259521484375;
+				DN = 888;
+				detCntIdx = DN / 2.0 - 0.5;
+				detStp = 45.0 / DN;
+				XN = 256;
+				YN = 256;
+				ObjStpx = 20.0 / XN;
+				ObjStpy = 20.0 / YN;
+				objCntIdxx = XN / 2.0 - 0.5;
+				objCntIdxy = YN / 2.0 - 0.5;
+				angs.resize(360);
+				for (unsigned int i = 0; i != 360; ++i)
+				{
+					angs[i] = i * 0.01745329251994329576923688888889;
+				}
+
+				int angIdx;
+				std::stringstream nonZ;
+
+				//genProj_SIDDONV2(rowIdx, colIdx, weight, S2O, O2D, detCntIdx, detStp, DN, ObjStpx, ObjStpy, XN, YN, objCntIdxx, objCntIdxy, angs);
+				genMatrix_DDM_ED(rowIdx, colIdx, weight, S2O, O2D, 20.0, 20.0, 45.0,
+					444, 256, 256, 888, 360, angs);
+
+				nonZ << rowIdx.size();
+				std::string F1 = "prjDDM" + nonZ.str() + ".row";
+				std::string F2 = "prjDDM" + nonZ.str() + ".col";
+				std::string F3 = "prjDDM" + nonZ.str() + ".cof";
+				std::ofstream rowFile(F1.c_str(), std::ios::binary);
+				std::ofstream colFile(F2.c_str(), std::ios::binary);
+				std::ofstream coeFile(F3.c_str(), std::ios::binary);
+
+				rowFile.write((char*) &(rowIdx[0]), sizeof(int) * rowIdx.size());
+				rowFile.close();
+				colFile.write((char*) &(colIdx[0]), sizeof(int) * colIdx.size());
+				colFile.close();
+				coeFile.write((char*) &(weight[0]), sizeof(double) * weight.size());
+				coeFile.close();
+				std::cout << weight.size() << std::endl;
+				return;
+			}
+			else
+			{
+				std::cout << "Exit without generating\n";
+				exit(-1);
+			}
+		}
+		std::string s;
+		double val[14];
+		int i = 0;
+		while (fin >> s)
+		{
+			if ((i % 2))
+			{
+				std::stringstream ss;
+				ss << s;
+				ss >> val[i / 2];
+				std::cout << val[i / 2] << std::endl;
+			}
+			++i;
+		}
+
+
+
+
+
+		S2O = val[0];
+		O2D = val[1];
+		double ViwN = val[2];
+		double ViwBeg = val[3];
+		double ViwStp = val[4];
+		double DetSize = val[5];
+
+		DN = val[6];
+		detCntIdx = val[7];
+		detStp = val[5] / val[6];
+		double S2D = val[0] + val[1];
+
+		double Sizex = val[8];
+		double Sizey = val[9];
+
+		XN = val[10];
+		YN = val[11];
+
+		double Biasx = val[12];
+		double Biasy = val[13];
+
+		ObjStpx = Sizex / XN;
+		ObjStpy = Sizey / YN;
+
+		angs.resize(ViwN);
+
+		for (unsigned int i = 0; i != ViwN; ++i)
+		{
+			angs[i] = ViwBeg + i * ViwStp;
+		}
+
+		objCntIdxx = XN / 2.0 - 0.5;
+		objCntIdxy = YN / 2.0 - 0.5;
+
+		//int angIdx;
+
+		std::stringstream nonZ;
+
+
+		//genProj_SIDDONV2(rowIdx, colIdx, weight, S2O, O2D, detCntIdx, detStp, DN, ObjStpx, ObjStpy, XN, YN, objCntIdxx, objCntIdxy, angs);
+		genMatrix_DDM_ED(rowIdx, colIdx, weight, S2O, O2D, Sizex, Sizey, DetSize, detCntIdx, XN, YN, DN, ViwN, angs);
+
+		//genProj_SIDDON(rowIdx, colIdx, coeffs, FanGeo, Img);
+		nonZ << rowIdx.size();
+		std::string F1 = "prjDDM" + nonZ.str() + ".row";
+		std::string F2 = "prjDDM" + nonZ.str() + ".col";
+		std::string F3 = "prjDDM" + nonZ.str() + ".cof";
+		std::ofstream rowFile(F1.c_str(), std::ios::binary);
+		std::ofstream colFile(F2.c_str(), std::ios::binary);
+		std::ofstream coeFile(F3.c_str(), std::ios::binary);
+
+		rowFile.write((char*) &(rowIdx[0]), sizeof(int) * rowIdx.size());
+		rowFile.close();
+		colFile.write((char*) &(colIdx[0]), sizeof(int) * colIdx.size());
+		colFile.close();
+		coeFile.write((char*) &(weight[0]), sizeof(double) * weight.size());
+		coeFile.close();
+		std::cout << weight.size() << std::endl;
+	}
+
+
+
+
+	void genProj_SIDDONV2(std::vector<int>& rowIdx, std::vector<int>& colIdx, std::vector<double>& weight,
+		const double S2O, const double O2D,
+		const double detCntIdx,
+		const double detStp,
+		const int DN,
+		const double ObjStpx, const double ObjStpy,
+		const int XN, const int YN,
+		const double objCntIdxx, const double objCntIdxy,
+		const std::vector<double> angs)
+	{
+		const unsigned int PN = angs.size();
+		double cosT, sinT;
+		double sourx, soury;
+		double initDetx, initDety;
+		double detx, dety;
+		double dirx, diry, rleng;
+		double boxminx, boxminy, boxmaxx, boxmaxy;
+		bool intersected;
+		double tnear, tfar, ww;
+		for (unsigned int angIdx = 0; angIdx != PN; ++angIdx)
+		{
+			cosT = cos(angs[angIdx]);
+			sinT = sin(angs[angIdx]);
+			sourx = -S2O * sinT;
+			soury = S2O * cosT;
+			for (unsigned int detIdx = 0; detIdx != DN; ++detIdx)
+			{
+				initDetx = (detIdx - detCntIdx) * detStp;
+				initDety = -O2D;
+				detx = initDetx * cosT - initDety * sinT;
+				dety = initDetx * sinT + initDety * cosT;
+				dirx = detx - sourx;
+				diry = dety - soury;
+				rleng = sqrt(dirx * dirx + diry * diry);
+				dirx /= rleng;
+				diry /= rleng;
+
+				for (unsigned int yIdx = 0; yIdx != YN; ++yIdx)
+				{
+					boxminy = (yIdx - objCntIdxy - 0.5) * ObjStpy;
+					boxmaxy = (yIdx - objCntIdxy + 0.5) * ObjStpy;
+					for (unsigned int xIdx = 0; xIdx != XN; ++xIdx)
+					{
+						boxminx = (xIdx - objCntIdxx - 0.5) * ObjStpx;
+						boxmaxx = (xIdx - objCntIdxx + 0.5) * ObjStpx;
+
+						intersected = intersectBox<double>(sourx, soury,
+							dirx, diry, boxminx, boxminy,
+							boxmaxx, boxmaxy, tnear, tfar);
+						if (intersected)
+						{
+							rowIdx.push_back(angIdx * DN + detIdx);
+							colIdx.push_back(yIdx * XN + xIdx);
+							weight.push_back(tfar - tnear);
+						}
+
+					}
+				}
+
+
+			}
+			std::cout << angIdx << std::endl;
+		}
+	}
+
+
+
+	void genMatrix_ED_SIDDON()
+	{
+		std::ifstream fin("configurationFile.txt", std::ios::in);
+		std::vector<int> rowIdx;
+		std::vector<int> colIdx;
+		std::vector<double> weight;
+		std::vector<double> angs;
+		double S2O;
+		double O2D;
+		double detCntIdx;
+		double detStp;
+		int DN;
+		double ObjStpx, ObjStpy;
+		int XN, YN;
+		double objCntIdxx, objCntIdxy;
+
+		if (!fin.is_open())
+		{
+			std::cout << "Cannot Find configuration file\n";
+			std::cout << "Would you like to use the default configuration?[y/n]";
+			char yes;
+			std::cin >> yes;
+			if (yes == 'y' || yes == 'Y')
+			{
+				S2O = 53.85200195312500;
+				O2D = 40.82259521484375;
+				DN = 888;
+				detCntIdx = DN / 2.0 - 0.5;
+				detStp = 45.0 / DN;
+				XN = 256;
+				YN = 256;
+				ObjStpx = 20.0 / XN;
+				ObjStpy = 20.0 / YN;
+				objCntIdxx = XN / 2.0 - 0.5;
+				objCntIdxy = YN / 2.0 - 0.5;
+				angs.resize(360);
+				for (unsigned int i = 0; i != 360; ++i)
+				{
+					angs[i] = i * 0.01745329251994329576923688888889;
+				}
+
+				int angIdx;
+				std::stringstream nonZ;
+
+				genProj_SIDDONV2(rowIdx, colIdx, weight, S2O, O2D, detCntIdx, detStp, DN, ObjStpx, ObjStpy, XN, YN, objCntIdxx, objCntIdxy, angs);
+				nonZ << rowIdx.size();
+				std::string F1 = "prjSIDDON" + nonZ.str() + ".row";
+				std::string F2 = "prjSIDDON" + nonZ.str() + ".col";
+				std::string F3 = "prjSIDDON" + nonZ.str() + ".cof";
+				std::ofstream rowFile(F1.c_str(), std::ios::binary);
+				std::ofstream colFile(F2.c_str(), std::ios::binary);
+				std::ofstream coeFile(F3.c_str(), std::ios::binary);
+
+				rowFile.write((char*) &(rowIdx[0]), sizeof(int) * rowIdx.size());
+				rowFile.close();
+				colFile.write((char*) &(colIdx[0]), sizeof(int) * colIdx.size());
+				colFile.close();
+				coeFile.write((char*) &(weight[0]), sizeof(double) * weight.size());
+				coeFile.close();
+				std::cout << weight.size() << std::endl;
+				return ;
+			}
+			else
+			{
+				std::cout << "Exit without generating\n";
+				exit(-1);
+			}
+		}
+		std::string s;
+		double val[14];
+		int i = 0;
+		while (fin >> s)
+		{
+			if ((i % 2))
+			{
+				std::stringstream ss;
+				ss << s;
+				ss >> val[i / 2];
+				std::cout << val[i / 2] << std::endl;
+			}
+			++i;
+		}
+
+
+
+
+
+		S2O = val[0];
+		O2D = val[1];
+		double ViwN = val[2];
+		double ViwBeg = val[3];
+		double ViwStp = val[4];
+		double DetSize = val[5];
+
+		DN = val[6];
+		detCntIdx = val[7];
+		detStp = val[5] / val[6];
+		double S2D = val[0] + val[1];
+
+		double Sizex = val[8];
+		double Sizey = val[9];
+
+		XN = val[10];
+		YN = val[11];
+
+		double Biasx = val[12];
+		double Biasy = val[13];
+
+		ObjStpx = Sizex / XN;
+		ObjStpy = Sizey / YN;
+
+		angs.resize(ViwN);
+
+		for (unsigned int i = 0; i != ViwN; ++i)
+		{
+			angs[i] = ViwBeg + i * ViwStp;
+		}
+
+		objCntIdxx = XN / 2.0 - 0.5;
+		objCntIdxy = YN / 2.0 - 0.5;
+
+		//int angIdx;
+
+		std::stringstream nonZ;
+		genProj_SIDDONV2(rowIdx, colIdx, weight, S2O, O2D, detCntIdx, detStp, DN, ObjStpx, ObjStpy, XN, YN, objCntIdxx, objCntIdxy, angs);
+
+		//genProj_SIDDON(rowIdx, colIdx, coeffs, FanGeo, Img);
+		nonZ << rowIdx.size();
+		std::string F1 = "prjSIDDON" + nonZ.str() + ".row";
+		std::string F2 = "prjSIDDON" + nonZ.str() + ".col";
+		std::string F3 = "prjSIDDON" + nonZ.str() + ".cof";
+		std::ofstream rowFile(F1.c_str(), std::ios::binary);
+		std::ofstream colFile(F2.c_str(), std::ios::binary);
+		std::ofstream coeFile(F3.c_str(), std::ios::binary);
+
+		rowFile.write((char*) &(rowIdx[0]), sizeof(int) * rowIdx.size());
+		rowFile.close();
+		colFile.write((char*) &(colIdx[0]), sizeof(int) * colIdx.size());
+		colFile.close();
+		coeFile.write((char*) &(weight[0]), sizeof(double) * weight.size());
+		coeFile.close();
+		std::cout << weight.size() << std::endl;
 	}
 
 };
