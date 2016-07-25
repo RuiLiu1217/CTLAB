@@ -15,6 +15,10 @@
 #include "utilities.hpp"
 #include "projbackproj.hpp"
 
+#ifndef MYEPSILON
+#define MYEPSILON 1.0E-9
+#endif
+
 // y = Ax
 // A : m-by-n matrix, x : n elements vector, y : m elements vector
 // m and n are arbitrary positive integers.
@@ -369,9 +373,9 @@ __global__ void _GradientOfTV_ker(T* f, T* d, const T coef, cuint L, cuint W)
 		const T fij_1 = f[((idy + W - 1) % W) * L + idx];
 		const T fi_1j1 = f[((idy + 1) % W) * L + (idx + L - 1) % L];
 		const T fi1j_1 = f[((idy + W - 1) % W) * L + (idx + 1) % L];
-		const T dom1 = 1.0f / (sqrtf((fi1j - fij)*(fi1j - fij) + (fij1 - fij) * (fij1 - fij) + CONSTVAL<T>::_EPSILON));
-		const T dom2 = 1.0f / (sqrtf((fij - fi_1j)*(fij - fi_1j) + (fi_1j1 - fi_1j)*(fi_1j1 - fi_1j) + CONSTVAL<T>::_EPSILON));
-		const T dom3 = 1.0f / (sqrtf((fi1j_1 - fij_1) * (fi1j_1 - fij_1) + (fij - fij_1)*(fij - fij_1) + CONSTVAL<T>::_EPSILON));
+		const T dom1 = 1.0f / (sqrtf((fi1j - fij)*(fi1j - fij) + (fij1 - fij) * (fij1 - fij) + MYEPSILON));
+		const T dom2 = 1.0f / (sqrtf((fij - fi_1j)*(fij - fi_1j) + (fi_1j1 - fi_1j)*(fi_1j1 - fi_1j) + MYEPSILON));
+		const T dom3 = 1.0f / (sqrtf((fi1j_1 - fij_1) * (fi1j_1 - fij_1) + (fij - fij_1)*(fij - fij_1) + MYEPSILON));
 		d[curid] = ((2.0 * fij - fi1j - fij1) * dom1 + (fij - fi_1j) * dom2 + (fij - fij_1)*dom3) * coef;
 
 		return;
@@ -2218,7 +2222,7 @@ void DEMO5_1()
 void DEMO7()
 {
 	checkCudaErrors(cudaDeviceReset());
-	ConeEDGeo ConeGeo(85.0f, 15.0f, 360, 0.0f, CONSTVAL<float>::_TWOPI, make_float2(34.0f, 34.0f), make_int2(1024, 1024));
+	ConeEDGeo ConeGeo(85.0f, 15.0f, 360, 0.0f, _TWOPI, make_float2(34.0f, 34.0f), make_int2(1024, 1024));
 	Volume Vol(512, 512, 512, 20.0f, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f);
 
 
@@ -2262,7 +2266,7 @@ void DEMO7()
 void DEMO7_1()
 {
 	checkCudaErrors(cudaDeviceReset());
-	ConeEDGeo ConeGeo(85.0f, 15.0f, 360, 0.0f, CONSTVAL<float>::_TWOPI, make_float2(34.0f, 3.4f), make_int2(512, 512));
+	ConeEDGeo ConeGeo(85.0f, 15.0f, 360, 0.0f, _TWOPI, make_float2(34.0f, 3.4f), make_int2(512, 512));
 	Volume Vol(512, 512, 512, 20.0f, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f);
 
 
@@ -2583,7 +2587,7 @@ void DEMO9_1()
 	FanGeo.m_S2D = FanGeo.m_S2O + FanGeo.m_O2D;
 	FanGeo.m_ViwBeg = 0.0f;// (-2.668082275390625e+02 / 180.0* 3.14159265358979323846264);
 	FanGeo.m_ViwN = 2200;
-	FanGeo.m_ViwStp = CONSTVAL<float>::_TWOPI / FanGeo.m_ViwN;
+	FanGeo.m_ViwStp = _TWOPI / FanGeo.m_ViwN;
 
 	Img.m_Bias.x = 0.0f;
 	Img.m_Bias.y = 0.0f;  //ÕâžöÆ«ÒÆµÄµ¥Î»ÊÇÕæÊµÎïÀíµ¥Î»;
@@ -2651,7 +2655,7 @@ void DEMO10()
 		static_cast<float>(4.082259521484375e+02), // O2D
 		2200,				   // viwNum
 		0.0f,				   // Viw Begin
-		CONSTVAL<float>::_TWOPI,   // Viw End
+		_TWOPI,   // Viw End
 		0.95928517242269f,      // Detector Arc,
 		888);    			   // Detector Element Num
 	FanGeo.m_DetCntIdx = 444.75f;
@@ -2730,7 +2734,7 @@ void DEMO11()
 		static_cast<float>(4.082259521484375e+02),
 		2200,
 		0.0f,
-		CONSTVAL<float>::_TWOPI,
+		_TWOPI,
 		0.95928517242269f,
 		888);
 	FanGeo.m_DetCntIdx = 444.75f;
@@ -2939,7 +2943,7 @@ void DEMO12()
 		static_cast<float>(4.082259521484375e+02),
 		2200,
 		0.0f,
-		CONSTVAL<float>::_TWOPI,
+		_TWOPI,
 		0.95928517242269f,
 		888);
 	FanGeo.m_DetCntIdx = 444.75f;
@@ -3051,7 +3055,7 @@ void DEMO13()
 		static_cast<float>(4.082259521484375e+02),
 		2200,
 		0.0f,
-		CONSTVAL<float>::_TWOPI,
+		_TWOPI,
 		0.95928517242269f,
 		888);
 	FanGeo.m_DetCntIdx = 444.75f;
