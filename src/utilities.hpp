@@ -144,156 +144,161 @@ typedef thrust::host_vector<float> h_vec_t;
 #define _EPSILON (1.0E-9)
 #endif
 
-//
-///// \brief Define the constant values (CONSTVAL) that will be used in this library
-//template<typename T>
-//class CONSTVAL
-//{
-//public:
-//	static const T _E; ///< The natural logarithm
-//	static const T _LOG2E; ///< \f$log_{2}e\f$
-//	static const T _LOG10E; ///< \f$log_{10}e\f$
-//	static const T _LN2; ///< \f$ln_{2}\f$
-//	static const T _LN10;///< \f$ln_{10}\f$
-//	static const T _PI; ///< \f$\pi\f$
-//	static const T _TWOPI; ///< \f$2\pi\f$
-//	static const T _PI_2;///< \f$\pi / 2\f$
-//	static const T _1_PI; ///< \f$1 / \pi\f$
-//	static const T _2_PI;///< \f$2 / \pi\f$
-//	static const T _RAD_PER_DEG; ///< 0.01745329222
-//	static const T _DEG_PER_RAD; ///< 57.2957804904
-//	static const T _INV_E; ///< \f$ 1/e \f$
-//	static const T _SQRT_2; ///< \f$\sqrt{2}\f$
-//	static const T _INV_SQRT_2; ///< \f$1/\sqrt{2}\f$
-//	static const T _SQRT_3; ///< \f$\sqrt{3}\f$
-//	static const T _INV_SQRT_3; ///< \f$1/\sqrt{3}\f$
-//	static const T _PI_4; ///< \f$\pi / 4\f$
-//	static const T _3PI_4;///< \f$3\pi / 4\f$
-//	static const T _5PI_4; ///< \f$5\pi / 4\$
-//	static const T _7PI_4; ///< \f$5\pi / 4\$
-//
-//	static const T _SQRTPI;///< \f$\sqrt{\pi}\f$
-//	static const T _2_SQRTPI;///< \f$2\sqrt{\pi}\f$
-//	static const T _LN2LO;///< I forgot
-//	static const T _LN2HI; ///< I forgot
-//	static const T _LOG2_E;///< \f$log_{2}e\f$
-//	static const T _1_LN10;///< \f$1 / ln_{10}\f$
-//	static const T _1_LN2; ///< \f$1 / ln_{2}\f$
-//	static const T _1_SQRT2;///< \f$1 / \sqrt{2}\f$
-//	static const T _1_SQRT3;///< \f$1 / \sqrt{3}\f$
-//	static const T _MAX_ITERATION_FOR_SOLVERS;
-//	static const T _ABS_TOLERANCE_FOR_SOLVERS;
-//	static const T _FACTOR_FOR_SOLVERS;
-//	static const T _2_PI_3_FOR_SOLVERS;
-//	static const T _4_PI_3_FOR_SOLVERS;
-//	static const T _SMALL_ENOUGH_FOR_SOLVERS;
-//	static const T _WATER;
-//	static const T _LIVER;                 //65  +/- 5
-//	static const T _KIDNEY;                 //30  +/- 10
-//	static const T _AORTA;                 //55  +/- 5
-//	static const T _PANCREAS;                 //40  +/- 10
-//	static const T _BRAIN;                 //50  +/- 5
-//	static const T _HEART;                 //50  +/- 5
-//	static const T _MUSCLE;                 //45  +/- 5
-//	static const T _FAT;                 //-65  +/- 10
-//	static const T _BONEMARROW;                 //-30  +/- 5
-//	static const T _LUNG;                 //-770 +/- 20
-//	static const T _URINE;                 //20  +/- 5
-//	static const T _SPONGIOSA;                 //130 +/- 100
-//	static const T _STERNUM;                 //ca. 400
-//	static const T _RIPS_2ND;                 //ca. 665
-//	static const T _RIPS_10TH;                 //ca. 840
-//	static const T _FEMUR;                 //ca. 720
-//	static const T _HUMERUS;                 //ca. 765
-//	static const T _CLAVICULUM;                 //ca. 765
-//	static const T _SKAPULUM;                 //ca. 765
-//	static const T _CRANIUM;                 //ca. 1020
-//	static const T _MANDIBULA;                 //ca. 1130
-//	static const T _KORTIKALIS;                 //ca. 1500
-//	static const T _TEETH;                   //2000-3000
-//	static const T _CROWN;
-//	static const T _METAL;                  //depends on type of metal
-//	static const T _AIR;
-//	static const T _MAXIMUM_VAL;
-//	static const T _MINIMUM_VAL;
-//	static const T _EPSILON;
-//	CONSTVAL()
-//	{
-//	}
-//
-//	~CONSTVAL()
-//	{
-//	}
-//};
-//
-//template<typename T> const T CONSTVAL<T>::_E = 2.7182818284590452354; // e value
-//template<typename T> const T CONSTVAL<T>::_LOG2E = 1.4426950408889634074;
-//template<typename T> const T CONSTVAL<T>::_LOG10E = 0.43429448190325182765;
-//template<typename T> const T CONSTVAL<T>::_LN2 = 0.69314718055994530942;
-//template<typename T> const T CONSTVAL<T>::_LN10 = 2.30258509299404568402;
-//template<typename T> const T CONSTVAL<T>::_PI = 3.14159265358979323846f;  //! define PI
-//template<typename T> const T CONSTVAL<T>::_TWOPI = 6.28318530717958647692f;  //! define 2PI
-//template<typename T> const T CONSTVAL<T>::_PI_2 = 1.57079632679489661923f;  //! define half of PI
-//template<typename T> const T CONSTVAL<T>::_1_PI = 0.31830988618379067153776786954292; //! define inverse of PI
-//template<typename T> const T CONSTVAL<T>::_2_PI = 0.15915494309189533576888393477146; //! define 2 / pi
-//template<typename T> const T CONSTVAL<T>::_RAD_PER_DEG = 0.0174532925199432957692368;  //! define rad per degree
-//template<typename T> const T CONSTVAL<T>::_DEG_PER_RAD = 57.295779513082320876798216;  //! define degree per rad
-//template<typename T> const T CONSTVAL<T>::_INV_E = 0.36787944117144232159552377981799;  //! define inverse of the base of natural logarithm
-//template<typename T> const T CONSTVAL<T>::_SQRT_2 = 1.4142135623730950488016887242097;  //! define sqrt(2)
-//template<typename T> const T CONSTVAL<T>::_INV_SQRT_2 = 0.70710678118654752440084436210485;  //! define 1/sqrt(2)
-//template<typename T> const T CONSTVAL<T>::_SQRT_3 = 1.7320508075688772935274463415059;
-//template<typename T> const T CONSTVAL<T>::_INV_SQRT_3 = 0.57735026918962576450914878050195;  //! define 1/sqrt(3)
-//template<typename T> const T CONSTVAL<T>::_PI_4 = 0.78539816339744830962;
-//template<typename T> const T CONSTVAL<T>::_3PI_4 = 2.3561944901923448370E0;
-//template<typename T> const T CONSTVAL<T>::_5PI_4 = 3.926990816987241;
-//template<typename T> const T CONSTVAL<T>::_7PI_4 = 5.497787143782138;
-//template<typename T> const T CONSTVAL<T>::_SQRTPI = 1.77245385090551602792981;
-//template<typename T> const T CONSTVAL<T>::_2_SQRTPI = 1.12837916709551257390;
-//template<typename T> const T CONSTVAL<T>::_LN2LO = 1.9082149292705877000E-10;
-//template<typename T> const T CONSTVAL<T>::_LN2HI = 6.9314718036912381649E-1;
-//template<typename T> const T CONSTVAL<T>::_LOG2_E = 0.693147180559945309417;
-//template<typename T> const T CONSTVAL<T>::_1_LN10 = 0.43429448190325182765;   /* 1 / log(10) */
-//template<typename T> const T CONSTVAL<T>::_1_LN2 = 1.4426950408889633870E0;  /* 1 / log(2) */
-//template<typename T> const T CONSTVAL<T>::_1_SQRT2 = 0.70710678118654752440;
-//template<typename T> const T CONSTVAL<T>::_1_SQRT3 = 0.577350269189625764509;
-//template<typename T> const T CONSTVAL<T>::_MAX_ITERATION_FOR_SOLVERS = 40;
-//template<typename T> const T CONSTVAL<T>::_ABS_TOLERANCE_FOR_SOLVERS = 1.0e-24;
-//template<typename T> const T CONSTVAL<T>::_FACTOR_FOR_SOLVERS = 1.6;
-//template<typename T> const T CONSTVAL<T>::_2_PI_3_FOR_SOLVERS = 2.0943951023931954923084;
-//template<typename T> const T CONSTVAL<T>::_4_PI_3_FOR_SOLVERS = 4.1887902047863909846168;
-//template<typename T> const T CONSTVAL<T>::_SMALL_ENOUGH_FOR_SOLVERS = 1.0e-10;
-//template<typename T> const T CONSTVAL<T>::_WATER = 1.000f;                 //0
-//template<typename T> const T CONSTVAL<T>::_LIVER = 1.050f;                 //65  +/- 5
-//template<typename T> const T CONSTVAL<T>::_KIDNEY = 1.050f;                 //30  +/- 10
-//template<typename T> const T CONSTVAL<T>::_AORTA = 1.050f;                 //55  +/- 5
-//template<typename T> const T CONSTVAL<T>::_PANCREAS = 1.040f;                 //40  +/- 10
-//template<typename T> const T CONSTVAL<T>::_BRAIN = 1.040f;                 //50  +/- 5
-//template<typename T> const T CONSTVAL<T>::_HEART = 1.050f;                 //50  +/- 5
-//template<typename T> const T CONSTVAL<T>::_MUSCLE = 1.050f;                 //45  +/- 5
-//template<typename T> const T CONSTVAL<T>::_FAT = 0.930f;                 //-65  +/- 10
-//template<typename T> const T CONSTVAL<T>::_BONEMARROW = 0.980f;                 //-30  +/- 5
-//template<typename T> const T CONSTVAL<T>::_LUNG = 0.260f;                 //-770 +/- 20
-//template<typename T> const T CONSTVAL<T>::_URINE = 1.020f;                 //20  +/- 5
-//template<typename T> const T CONSTVAL<T>::_SPONGIOSA = 1.180f;                 //130 +/- 100
-//template<typename T> const T CONSTVAL<T>::_STERNUM = 1.250f;                 //ca. 400
-//template<typename T> const T CONSTVAL<T>::_RIPS_2ND = 1.410f;                 //ca. 665
-//template<typename T> const T CONSTVAL<T>::_RIPS_10TH = 1.510f;                 //ca. 840
-//template<typename T> const T CONSTVAL<T>::_FEMUR = 1.430f;                 //ca. 720
-//template<typename T> const T CONSTVAL<T>::_HUMERUS = 1.460f;                 //ca. 765
-//template<typename T> const T CONSTVAL<T>::_CLAVICULUM = 1.460f;                 //ca. 765
-//template<typename T> const T CONSTVAL<T>::_SKAPULUM = 1.460f;                 //ca. 765
-//template<typename T> const T CONSTVAL<T>::_CRANIUM = 1.610f;                 //ca. 1020
-//template<typename T> const T CONSTVAL<T>::_MANDIBULA = 1.680f;                 //ca. 1130
-//template<typename T> const T CONSTVAL<T>::_KORTIKALIS = 1.920f;                 //ca. 1500
-//template<typename T> const T CONSTVAL<T>::_TEETH = 2.5f;                   //2000-3000
-//template<typename T> const T CONSTVAL<T>::_CROWN = 7.3f;
-//template<typename T> const T CONSTVAL<T>::_METAL = 10.0f;                  //depends on type of metal
-//template<typename T> const T CONSTVAL<T>::_AIR = 0.0f;
-//template<typename T> const T CONSTVAL<T>::_MAXIMUM_VAL = 1.0E+30;
-//template<typename T> const T CONSTVAL<T>::_MINIMUM_VAL = 1.0E-30;
-//template<typename T> const T CONSTVAL<T>::_EPSILON = static_cast<float>(1.0E-9);
-//
-//
+
+//Calculate Two Arrays inner product
+///This function is not used for Users but for calling by system; 
+///IT IS A META-PROGRAM
+///Author: Rui LIU
+///Date: 2013-2-18
+///Version: 1.0
+template<int Dims,typename T>
+class DotProduct
+{
+public:
+	static T result(T* a,T* b)
+	{
+		return (*a)*(*b) + DotProduct<Dims-1,T>::result(a+1,b+1);
+	}
+};
+template<typename T>
+class DotProduct<1,T>
+{
+public:
+	static T result(T* a,T* b)
+	{
+		return (*a)*(*b);
+	}
+};
+
+//////////////////////////////////////////////////////////////////////////
+/// Call the dot production meta function
+template<int Dims,typename T>
+inline T innerProd_META(T* a, T* b)
+{
+	return DotProduct<Dims,T>::result(a,b);
+}
+
+
+
+//Add two vector together
+//This function is not used for Users but for calling by system;
+//It is a META-program
+//Author: Rui LIU
+//Date: 2013-8-9
+//Version: 1.0
+template<int Dims, typename T>
+class AddVector
+{
+public:
+	static void result(T* a, T* b, T* c)
+	{
+		(*c) = (*a) + (*b);
+		AddVector<Dims-1,T>::result(a+1,b+1);
+	}
+};
+template<typename T>
+class AddVector<1,T>
+{
+public:
+	static T result(T* a,T* b,T* c)
+	{
+		(*c) = (*a) + (*b);
+	}
+};
+
+template<int Dims,typename T>
+inline void add_META(T* a, T* b, T* c)
+{
+	return AddVector<Dims,T>::result(a,b,c);
+}
+
+
+//Sub vector a from b together
+//This function is not used for Users but for calling by system;
+//It is a META-program
+//Author: Rui LIU
+//Date: 2013-8-9
+//Version: 1.0
+template<int Dims, typename T>
+class SubVector
+{
+public:
+	static void result(T* a, T* b, T* c)
+	{
+		(*c) = (*a) - (*b);
+		SubVector<Dims-1,T>::result(a+1,b+1);
+	}
+};
+template<typename T>
+class SubVector<1,T>
+{
+public:
+	static T result(T* a,T* b)
+	{
+		(*c) = (*a) - (*b);
+	}
+};
+
+template<int Dims,typename T>
+inline void sub_META(T* a, T* b, T* c)
+{
+	return SubVector<Dims,T>::result(a,b,c);
+}
+
+
+
+///This metaprogram is used to calculate the p power for each element and then add them together
+//It is a META-PROGRAM
+//Author: Rui Liu
+//Date: 2013-08-13
+//Version: 1.0
+template<int Dims, typename T>
+class powerVector
+{
+public:
+	static T result(T* vec, T p)
+	{
+		return std::pow((*vec),p) + powerVector<Dims-1,T>::result(vec+1,p);
+	}
+};
+template<typename T>
+class powerVector<1,T>
+{
+public:
+	static T result(T *vec, T p)
+	{
+		return std::pow((*vec),p);
+	}
+};
+
+
+
+///This meta function solute the problem that a matrix multiply with
+/// a vector
+///Author: Rui Liu
+/// Use the meta programming method to generate the 
+/// cosine and sine series given a series of theta
+template<int Dims, typename T>
+class CosSinTheta
+{
+public:
+	static void result(T* cosTheta, T* sinTheta, T* theta)
+	{
+		(*cosTheta) = cos((*theta));
+		(*sinTheta) = sin((*theta));
+		CosSinTheta<Dims-1,T>::result(cosTheta+1,sinTheta+1,theta+1);
+	}
+};
+template<typename T>
+class CosSinTheta<1,T>
+{
+public:
+	static T result(T* cosTheta,T* sinTheta,T* theta)
+	{
+		(*cosTheta) = cos((*theta));
+		(*sinTheta) = sin((*theta));
+	}
+};
 
 
 /// \brief Ray class on 2D
