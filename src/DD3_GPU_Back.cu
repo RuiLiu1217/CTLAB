@@ -2209,3 +2209,481 @@ void DD3BackHelical_4GPU(
 
 
 
+
+
+void DD3Back_branchless_sat2d_multiGPU(
+	float x0, float y0, float z0,
+	int DNU, int DNV,
+	float* xds, float* yds, float* zds,
+	float imgXCenter, float imgYCenter, float imgZCenter,
+	float* h_angs, float* h_zPos, int PN,
+	int XN, int YN, int ZN,
+	float* hvol, float* hprj,
+	float dx, float dz,
+	byte* mask, int* startVOL, int gpuNum)
+{
+	const int nDNU = DNU + 1;
+	const int nDNV = DNV + 1;
+
+	thrust::host_vector<float> hangs(h_angs, h_angs + PN);
+	thrust::host_vector<float> hzPos(h_zPos, h_zPos + PN);
+
+	std::vector<int> ObjZIdx_Start(startVOL, startVOL + gpuNum);
+	std::vector<int> ObjZIdx_End(ObjZIdx_Start.size());
+	std::copy(ObjZIdx_Start.begin() + 1, ObjZIdx_Start.end(), ObjZIdx_End.begin());
+	ObjZIdx_End[gpuNum - 1] = ZN;
+
+	std::vector<int> prjIdx_Start(gpuNum);
+	std::vector<int> prjIdx_End(gpuNum);
+
+	const float objCntIdxZ = (ZN - 1.0f) * 0.5 - imgZCenter / dz;
+	const float detStpZ = (zds[DNV - 1] - zds[0]) / (DNV - 1.0f); // detector cell height
+	const float detCntIdxV = -zds[0] / detStpZ; // Detector Center along Z direction
+
+	std::vector<int> SZN = ObjZIdx_End - ObjZIdx_Start; // sub volume slices number
+
+	std::vector<float> subImgZCenter(gpuNum,0.0f);
+	std::vector<int> SPN(gpuNum);
+
+	const float objCntIdxX = (XN - 1.0f) * 0.5f - imgXCenter / dx;
+	const float objCntIdxY = (YN - 1.0f) * 0.5f - imgYCenter / dx;
+
+	std::vector<float3> sour(gpuNum);
+	thrust::host_vector<thrust::device_vector<byte> > msk(gpuNum);
+	thrust::host_vector<thrust::device_vector<float> > vol(gpuNum);
+	thrust::host_vector<thrust::device_vector<float3> > cossinZT(gpuNum);
+	thrust::host_vector<cudaArray*> d_prjArray(gpuNum);
+	thrust::host_vector<cudaTextureObject_t> texObj(gpuNum);
+	thrust::host_vector<thrust::device_vector<float> > prjSAT(gpuNum);
+	thrust::host_vector<thrust::device_vector<float> > prj(gpuNum);
+	thrust::host_vector<cudaStream_t> stream(gpuNum);
+
+	const float4 detParas = calDetParas(xds, yds, zds, x0, y0, z0, DNU, DNV);
+	const float S2D = hypotf(xds[0] - x0, yds[0] - y0);
+
+	// Pre calculate the cossin z positions
+	thrust::device_vector<float3> COSSINZT(PN);
+	thrust::device_vector<float> ANGS = hangs;
+	thrust::device_vector<float> ZPOS = hzPos;
+	thrust::transform(
+		thrust::make_zip_iterator(thrust::make_tuple(ANGS.begin(), ZPOS.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(ANGS.end(), ZPOS.end())),
+		COSSINZT.begin(), CTMBIR::ConstantForBackProjection4(x0, y0, z0));
+
+	dim3 copyBlk(64,16,1);
+	thrust::host_vector<dim3> copyGid(gpuNum);
+	dim3 blk(BACK_BLKX, BACK_BLKY, BACK_BLKZ);
+	thrust::host_vector<dim3> gid(gpuNum);
+	dim3 vertGenBlk(512,1,1);
+	thrust::host_vector<dim3> vertGenGid(gpuNum);
+	dim3 horzGenBlk(64,16,1);
+	thrust::host_vector<dim3> horzGenGid(gpuNum);
+
+	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float>();
+
+	thrust::host_vector<thrust::host_vector<float> > subVol(gpuNum);
+
+	std::vector<size_t> siz(gpuNum,0);
+	std::vector<size_t> nsiz(gpuNum,0);
+
+	omp_set_num_threads(gpuNum);
+#pragma omp parallel for
+	for(int i = 0; i < gpuNum; ++i)
+	{
+		// get projection view index pair
+		getPrjIdxPair<float>(hzPos, ObjZIdx_Start[i], ObjZIdx_End[i],
+						objCntIdxZ, dz, ZN, detCntIdxV, detStpZ, DNV,
+						prjIdx_Start[i], prjIdx_End[i]);
+		SPN[i] = prjIdx_End[i] - prjIdx_Start[i];
+		//std::cout<<i<<" "<<prjIdx_Start[i]<<" "<<prjIdx_End[i]<<"\n";
+		// Calculate the corresponding center position index of the sub volumes
+		subImgZCenter[i] = -imgZCenter / dz + ZN * 0.5 - ObjZIdx_Start[i] - 0.5f; // index position
+
+		cudaSetDevice(i);
+		cudaStreamCreate(&stream[i]);
+
+		// Generate the SAT for the projection data
+		siz[i] = DNU * DNV * SPN[i];
+		nsiz[i] = (DNU + 1) * (DNV + 1) * SPN[i];
+		prjSAT[i].resize(nsiz[i]);
+		prj[i].resize(siz[i]);
+		thrust::copy(
+				hprj + DNU * DNV * prjIdx_Start[i],
+				hprj + DNU * DNV * prjIdx_End[i],
+				prj[i].begin());
+
+		copyGid[i].x = (DNV + copyBlk.x - 1) / copyBlk.x;
+		copyGid[i].y = (DNU + copyBlk.y - 1) / copyBlk.y;
+		copyGid[i].z = (SPN[i] + copyBlk.z - 1) / copyBlk.z;
+		addOneSidedZeroBoarder<<<copyGid[i], copyBlk, 0, stream[i]>>>(
+				thrust::raw_pointer_cast(&prj[i][0]),
+				thrust::raw_pointer_cast(&prjSAT[i][0]),
+				DNU, DNV, SPN[i]);
+		//cudaStreamSynchronize(stream[i]);
+
+		vertGenGid[i].x = (nDNU * SPN[i] + vertGenBlk.x - 1) / copyBlk.x;
+		vertGenGid[i].y = 1;
+		vertGenGid[i].z = 1;
+		verticalIntegral2 << <vertGenGid[i], vertGenBlk, 0, stream[i] >> >(
+			thrust::raw_pointer_cast(&prjSAT[i][0]), nDNV, nDNU * SPN[i]);
+
+		horzGenGid[i].x = (nDNV + horzGenBlk.x - 1) / horzGenBlk.x;
+		horzGenGid[i].y = (SPN[i] + horzGenBlk.y - 1) / horzGenBlk.y;
+		horzGenGid[i].z = 1;
+		heorizontalIntegral2 << <horzGenGid[i], horzGenBlk,0,stream[i] >> >(
+			thrust::raw_pointer_cast(&prjSAT[i][0]), nDNU, nDNV, SPN[i]);
+
+		prj[i].clear();
+
+		cudaExtent prjSize;
+		prjSize.width = DNV + 1;
+		prjSize.height = DNU + 1;
+		prjSize.depth = SPN[i];
+		cudaMalloc3DArray(&d_prjArray[i], &channelDesc, prjSize);
+
+		cudaMemcpy3DParms copyParams = { 0 };
+			copyParams.srcPtr = make_cudaPitchedPtr(
+				(void*) thrust::raw_pointer_cast(&prjSAT[i][0]),
+				prjSize.width * sizeof(float),
+				prjSize.width, prjSize.height);
+			copyParams.dstArray = d_prjArray[i];
+			copyParams.extent = prjSize;
+			copyParams.kind = cudaMemcpyDeviceToDevice;
+		cudaMemcpy3DAsync(&copyParams,stream[i]);
+
+		cudaResourceDesc resDesc;
+		memset(&resDesc, 0, sizeof(resDesc));
+		resDesc.resType = cudaResourceTypeArray;
+		resDesc.res.array.array = d_prjArray[i];
+		cudaTextureDesc texDesc;
+		memset(&texDesc, 0, sizeof(texDesc));
+		texDesc.addressMode[0] = cudaAddressModeClamp;
+		texDesc.addressMode[1] = cudaAddressModeClamp;
+		texDesc.addressMode[2] = cudaAddressModeClamp;
+		texDesc.filterMode = cudaFilterModeLinear;
+		texDesc.readMode = cudaReadModeElementType;
+		texDesc.normalizedCoords = false;
+		cudaCreateTextureObject(&texObj[i], &resDesc, &texDesc, nullptr);
+		prjSAT[i].clear();
+		// The part above are for branchless DD
+
+		gid[i].x = (SZN[i] + blk.x - 1) / blk.x;
+		gid[i].y = (XN + blk.y - 1) / blk.y;
+		gid[i].z = (YN + blk.z - 1) / blk.z;
+
+		vol[i].resize(XN * YN * SZN[i]);
+		msk[i].resize(XN * YN);
+		thrust::copy(mask, mask + XN * YN, msk[i].begin());
+
+		cossinZT[i].resize(SPN[i]);
+		thrust::copy(
+				COSSINZT.begin() + prjIdx_Start[i],
+				COSSINZT.begin() + prjIdx_End[i],
+				cossinZT[i].begin());
+	}
+#pragma omp parallel for
+	for(int i = 0; i < gpuNum; ++i)
+	{
+
+		cudaSetDevice(i);
+		DD3_gpu_back_ker<_BRANCHLESS> << <gid[i], blk, 0, stream[i] >> >(texObj[i],
+				thrust::raw_pointer_cast(&vol[i][0]), thrust::raw_pointer_cast(&msk[i][0]),
+				thrust::raw_pointer_cast(&cossinZT[i][0]), make_float3(x0, y0, z0), S2D,
+				make_float3(objCntIdxX, objCntIdxY, subImgZCenter[i]), //  have to be changed
+				dx, dz, detParas.z, detParas.w, make_float2(detParas.x, detParas.y),
+				make_int3(XN, YN, SZN[i]), SPN[i], 0);
+	}
+#pragma omp barrier
+#pragma omp parallel for
+	for(int i = 0 ;i < gpuNum; ++i)
+	{
+		cudaSetDevice(i);
+		// copy the volume back.
+		subVol[i].resize(XN * YN * SZN[i]);
+		thrust::copy(vol[i].begin(), vol[i].end(), subVol[i].begin());
+
+		vol[i].clear();
+		msk[i].clear();
+		cossinZT[i].clear();
+
+		cudaDestroyTextureObject(texObj[i]);
+		cudaFreeArray(d_prjArray[i]);
+	}
+	cudaDeviceSynchronize();
+
+	combineVolume<float>(hvol, XN, YN, ZN, subVol, &(SZN[0]), gpuNum);
+
+	hangs.clear();
+	hzPos.clear();
+	ObjZIdx_Start.clear();
+	ObjZIdx_End.clear();
+	prjIdx_Start.clear();
+	prjIdx_End.clear();
+	SZN.clear();
+	subImgZCenter.clear();
+	SPN.clear();
+	sour.clear();
+	msk.clear();
+	vol.clear();
+	cossinZT.clear();
+	d_prjArray.clear();
+	texObj.clear();
+	prjSAT.clear();
+	prj.clear();
+	stream.clear();
+	COSSINZT.clear();
+	ANGS.clear();
+	ZPOS.clear();
+	copyGid.clear();
+	gid.clear();
+	vertGenGid.clear();
+	horzGenGid.clear();
+}
+
+
+
+
+
+void DD3Back_pseudo_multiGPU(
+	float x0, float y0, float z0,
+	int DNU, int DNV,
+	float* xds, float* yds, float* zds,
+	float imgXCenter, float imgYCenter, float imgZCenter,
+	float* h_angs, float* h_zPos, int PN,
+	int XN, int YN, int ZN,
+	float* hvol, float* hprj,
+	float dx, float dz,
+	byte* mask, int* startVOL, int gpuNum)
+{
+	thrust::host_vector<float> hangs(h_angs, h_angs + PN);
+	thrust::host_vector<float> hzPos(h_zPos, h_zPos + PN);
+
+	std::vector<int> ObjZIdx_Start(startVOL, startVOL + gpuNum);
+	std::vector<int> ObjZIdx_End(ObjZIdx_Start.size());
+	std::copy(ObjZIdx_Start.begin() + 1, ObjZIdx_Start.end(), ObjZIdx_End.begin());
+	ObjZIdx_End[gpuNum - 1] = ZN;
+
+	std::vector<int> prjIdx_Start(gpuNum);
+	std::vector<int> prjIdx_End(gpuNum);
+
+	const float objCntIdxZ = (ZN - 1.0f) * 0.5 - imgZCenter / dz;
+	const float detStpZ = (zds[DNV - 1] - zds[0]) / (DNV - 1.0f); // detector cell height
+	const float detCntIdxV = -zds[0] / detStpZ; // Detector Center along Z direction
+
+	std::vector<int> SZN = ObjZIdx_End - ObjZIdx_Start; // sub volume slices number
+
+	std::vector<float> subImgZCenter(gpuNum,0.0f);
+	std::vector<int> SPN(gpuNum);
+
+	const float objCntIdxX = (XN - 1.0f) * 0.5f - imgXCenter / dx;
+	const float objCntIdxY = (YN - 1.0f) * 0.5f - imgYCenter / dx;
+
+	std::vector<float3> sour(gpuNum);
+	thrust::host_vector<thrust::device_vector<byte> > msk(gpuNum);
+	thrust::host_vector<thrust::device_vector<float> > vol(gpuNum);
+	thrust::host_vector<thrust::device_vector<float3> > cossinZT(gpuNum);
+	thrust::host_vector<cudaArray*> d_prjArray(gpuNum);
+	thrust::host_vector<cudaTextureObject_t> texObj(gpuNum);
+	thrust::host_vector<thrust::device_vector<float> > prj(gpuNum);
+	thrust::host_vector<cudaStream_t> stream(gpuNum);
+
+	const float4 detParas = calDetParas(xds, yds, zds, x0, y0, z0, DNU, DNV);
+	const float S2D = hypotf(xds[0] - x0, yds[0] - y0);
+
+	// Pre calculate the cossin z positions
+	thrust::device_vector<float3> COSSINZT(PN);
+	thrust::device_vector<float> ANGS = hangs;
+	thrust::device_vector<float> ZPOS = hzPos;
+	thrust::transform(
+		thrust::make_zip_iterator(thrust::make_tuple(ANGS.begin(), ZPOS.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(ANGS.end(), ZPOS.end())),
+		COSSINZT.begin(), CTMBIR::ConstantForBackProjection4(x0, y0, z0));
+
+	dim3 copyBlk(64,16,1);
+	thrust::host_vector<dim3> copyGid(gpuNum);
+	dim3 blk(BACK_BLKX, BACK_BLKY, BACK_BLKZ);
+	thrust::host_vector<dim3> gid(gpuNum);
+	dim3 vertGenBlk(512,1,1);
+	thrust::host_vector<dim3> vertGenGid(gpuNum);
+	dim3 horzGenBlk(64,16,1);
+	thrust::host_vector<dim3> horzGenGid(gpuNum);
+
+	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float>();
+
+	thrust::host_vector<thrust::host_vector<float> > subVol(gpuNum);
+
+	std::vector<size_t> siz(gpuNum,0);
+	std::vector<size_t> nsiz(gpuNum,0);
+
+	omp_set_num_threads(gpuNum);
+#pragma omp parallel for
+	for(int i = 0; i < gpuNum; ++i)
+	{
+		// get projection view index pair
+		getPrjIdxPair<float>(hzPos, ObjZIdx_Start[i], ObjZIdx_End[i],
+						objCntIdxZ, dz, ZN, detCntIdxV, detStpZ, DNV,
+						prjIdx_Start[i], prjIdx_End[i]);
+		SPN[i] = prjIdx_End[i] - prjIdx_Start[i];
+		//std::cout<<i<<" "<<prjIdx_Start[i]<<" "<<prjIdx_End[i]<<"\n";
+		// Calculate the corresponding center position index of the sub volumes
+		subImgZCenter[i] = -imgZCenter / dz + ZN * 0.5 - ObjZIdx_Start[i] - 0.5f; // index position
+
+		cudaSetDevice(i);
+		cudaStreamCreate(&stream[i]);
+		////////////////////////////////////////////////////////////////////////
+		siz[i] = DNU * DNV * SPN[i];
+		prj[i].resize(siz[i]);
+		thrust::copy(
+				hprj + DNU * DNV * prjIdx_Start[i],
+				hprj + DNU * DNV * prjIdx_End[i],
+				prj[i].begin());
+
+		cudaExtent prjSize;
+		prjSize.width = DNV;
+		prjSize.height = DNU;
+		prjSize.depth = SPN[i];
+		cudaMalloc3DArray(&d_prjArray[i], &channelDesc, prjSize);
+
+		cudaMemcpy3DParms copyParams = { 0 };
+			copyParams.srcPtr = make_cudaPitchedPtr(
+				(void*) thrust::raw_pointer_cast(&prj[i][0]),
+				prjSize.width * sizeof(float),
+				prjSize.width, prjSize.height);
+			copyParams.dstArray = d_prjArray[i];
+			copyParams.extent = prjSize;
+			copyParams.kind = cudaMemcpyDeviceToDevice;
+		cudaMemcpy3DAsync(&copyParams,stream[i]);
+
+		cudaResourceDesc resDesc;
+		memset(&resDesc, 0, sizeof(resDesc));
+		resDesc.resType = cudaResourceTypeArray;
+		resDesc.res.array.array = d_prjArray[i];
+		cudaTextureDesc texDesc;
+		memset(&texDesc, 0, sizeof(texDesc));
+		texDesc.addressMode[0] = cudaAddressModeBorder;
+		texDesc.addressMode[1] = cudaAddressModeBorder;
+		texDesc.addressMode[2] = cudaAddressModeBorder;
+		texDesc.filterMode = cudaFilterModeLinear;
+		texDesc.readMode = cudaReadModeElementType;
+		texDesc.normalizedCoords = false;
+		cudaCreateTextureObject(&texObj[i], &resDesc, &texDesc, nullptr);
+		prj[i].clear();
+		////////////////////////////////////////////////////////////////////////
+		// Generate the SAT for the projection data
+		// The part above are for branchless DD
+
+		gid[i].x = (SZN[i] + blk.x - 1) / blk.x;
+		gid[i].y = (XN + blk.y - 1) / blk.y;
+		gid[i].z = (YN + blk.z - 1) / blk.z;
+
+		vol[i].resize(XN * YN * SZN[i]);
+		msk[i].resize(XN * YN);
+		thrust::copy(mask, mask + XN * YN, msk[i].begin());
+
+		cossinZT[i].resize(SPN[i]);
+		thrust::copy(
+				COSSINZT.begin() + prjIdx_Start[i],
+				COSSINZT.begin() + prjIdx_End[i],
+				cossinZT[i].begin());
+	}
+#pragma omp parallel for
+	for(int i = 0; i < gpuNum; ++i)
+	{
+		cudaSetDevice(i);
+		DD3_gpu_back_ker<_PSEUDODD> << <gid[i], blk, 0, stream[i] >> >(texObj[i],
+				thrust::raw_pointer_cast(&vol[i][0]), thrust::raw_pointer_cast(&msk[i][0]),
+				thrust::raw_pointer_cast(&cossinZT[i][0]), make_float3(x0, y0, z0), S2D,
+				make_float3(objCntIdxX, objCntIdxY, subImgZCenter[i]), //  have to be changed
+				dx, dz, detParas.z, detParas.w, make_float2(detParas.x, detParas.y),
+				make_int3(XN, YN, SZN[i]), SPN[i], 0);
+	}
+#pragma omp barrier
+#pragma omp parallel for
+	for (int i = 0; i < gpuNum; ++i)
+	{
+		// copy the volume back.
+		subVol[i].resize(XN * YN * SZN[i]);
+		thrust::copy(vol[i].begin(), vol[i].end(), subVol[i].begin());
+
+		vol[i].clear();
+		msk[i].clear();
+		cossinZT[i].clear();
+
+		cudaDestroyTextureObject(texObj[i]);
+		cudaFreeArray(d_prjArray[i]);
+	}
+	cudaDeviceSynchronize();
+
+	combineVolume<float>(hvol, XN, YN, ZN, subVol, &(SZN[0]), gpuNum);
+
+	hangs.clear();
+	hzPos.clear();
+	ObjZIdx_Start.clear();
+	ObjZIdx_End.clear();
+	prjIdx_Start.clear();
+	prjIdx_End.clear();
+	SZN.clear();
+	subImgZCenter.clear();
+	SPN.clear();
+	sour.clear();
+	msk.clear();
+	vol.clear();
+	cossinZT.clear();
+	d_prjArray.clear();
+	texObj.clear();
+	prj.clear();
+	stream.clear();
+	COSSINZT.clear();
+	ANGS.clear();
+	ZPOS.clear();
+	copyGid.clear();
+	gid.clear();
+	vertGenGid.clear();
+	horzGenGid.clear();
+}
+
+
+
+
+extern "C"
+void DD3Back_multiGPU(
+	float x0, float y0, float z0,
+	int DNU, int DNV,
+	float* xds, float* yds, float* zds,
+	float imgXCenter, float imgYCenter, float imgZCenter,
+	float* hangs, float* hzPos, int PN,
+	int XN, int YN, int ZN,
+	float* hvol, float* hprj,
+	float dx, float dz,
+	byte* mask, int bakMode, int* startVOL, int gpuNum)
+{
+	switch(bakMode)
+	{
+	case 0: // Branchless backprojection
+		DD3Back_branchless_sat2d_multiGPU(x0, y0, z0,
+			DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
+			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj,
+			dx, dz, mask, startVOL, gpuNum);
+		break;
+	case 1: // Volume Rendering backprojection
+	case 2: // Pseudo DD backprojection
+		DD3Back_pseudo_multiGPU(x0, y0, z0,
+			DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
+			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj,
+			dx, dz, mask, startVOL, gpuNum);
+		break;
+	case 3: // Z line branchless backprojection
+	default: // branchless DD backprojection
+		DD3Back_branchless_sat2d_multiGPU(x0, y0, z0,
+			DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
+			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj,
+			dx, dz, mask, startVOL, gpuNum);
+		break;
+	}
+
+}
+
+
+
+
+
