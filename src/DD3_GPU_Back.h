@@ -55,6 +55,19 @@ void DD3BackHelical_4GPU(
 	float* hvol, float* hprj,
 	float dx, float dz,
 	byte* mask, int methodId, int (&startVOL)[4]);
+	
+	
+extern "C"
+void DD3Back_multiGPU(
+	float x0, float y0, float z0,
+	int DNU, int DNV,
+	float* xds, float* yds, float* zds,
+	float imgXCenter, float imgYCenter, float imgZCenter,
+	float* hangs, float* hzPos, int PN,
+	int XN, int YN, int ZN,
+	float* hvol, float* hprj,
+	float dx, float dz,
+	byte* mask, int bakMode, int* startVOL, int gpuNum);
 
 #endif /* DD3_GPU_BACK_H_ */
 
