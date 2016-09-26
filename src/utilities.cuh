@@ -827,5 +827,16 @@ inline __device__ float calSiddonOneRayKer(
 enum ForwardDDMethod{PROJ_BRANCHLESS=0,PROJ_PSEUDODISTANCE=2};
 enum BackwardDDMethod{BACK_BRANCHLESS=0,BACK_PSEUDODISTANCE=2,BACK_ZLINEBRANCHLESS=3};
 
+
+template<typename T>
+thrust::host_vector<T> operator-(
+	const thrust::host_vector<T>& a,
+	const thrust::host_vector<T>& b)
+{
+	thrust::host_vector<T> res(a);
+	thrust::transform(res.begin(),res.end(),b.begin(),res.begin(),[=](T aa, T bb){return aa - bb;});
+	return res;
+}
+
 #endif /* UTILITIES_CUH_ */
 
