@@ -50,6 +50,8 @@ SET(CTLAB_HEADERS
 	Ellipsoid.h             # kernel function for generation Shepp-Logan projection
 	genSheppLoganProjection.h # Generate Shepp Logan phantom based projection
 	genSysMatrix.hpp        # Generate system matrix with SIDDON/AIM model
+	multiSlices_ker.cuh     # multi slices based projection and backprojection
+	
 	
 )
 
@@ -76,6 +78,7 @@ SET(CTLAB_SRC
 	genModifiedPhantom.cu   # Generate modified Shepp-Logan phantom in GPU
 	genSheppLoganProjection.cpp # Generate Shepp Logan phantom based projection
 	genSysMatrix.cpp        # Generate system matrix with SIDDON/AIM model
+	multiSlices_ker.cu      # multi slices based projection and backprojection
 )
 
 
