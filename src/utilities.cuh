@@ -562,6 +562,32 @@ void combineVolume(
 }
 
 
+template<typename T>
+void combineVolume(
+	T* vol, // The volume to be combined
+	const int XN, const int YN, const int ZN,
+	thrust::host_vector<thrust::host_vector<T> >& subVol, // All sub volumes
+	const int* SZN, // Number of slices for each subVolume
+	const int subVolNum) // Number of sub volumes
+{
+	int kk = 0;
+	for (size_t yIdx = 0; yIdx != YN; ++yIdx)
+	{
+		for (size_t xIdx = 0; xIdx != XN; ++xIdx)
+		{
+			kk = 0;
+			for (size_t volIdx = 0; volIdx != subVolNum; ++volIdx)
+			{
+				for (size_t zIdx = 0; zIdx != SZN[volIdx]; ++zIdx)
+				{
+					vol[(yIdx * XN + xIdx) * ZN + kk] = subVol[volIdx][(yIdx * XN + xIdx) * SZN[volIdx] + zIdx];
+					kk = kk + 1;
+				}
+			}
+		}
+	}
+}
+
 
 
 template<typename T>
