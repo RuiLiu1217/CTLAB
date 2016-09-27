@@ -838,5 +838,16 @@ thrust::host_vector<T> operator-(
 	return res;
 }
 
+
+template<typename T>
+std::vector<T> operator-(
+	const std::vector<T>& a,
+	const std::vector<T>& b)
+{
+	std::vector<T> res(a);
+	thrust::transform(res.begin(),res.end(),b.begin(),res.begin(),[=](T aa, T bb){return aa - bb;});
+	return res;
+}
+
 #endif /* UTILITIES_CUH_ */
 
