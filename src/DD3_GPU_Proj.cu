@@ -2149,9 +2149,9 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 	std::vector<float> byds(DNU + 1, 0.0f);
 	std::vector<float> bzds(DNV + 1, 0.0f);
 
-	DD3Boundaries<float>(DNU + 1, xds, bxds);
-	DD3Boundaries<float>(DNU + 1, yds, byds);
-	DD3Boundaries<float>(DNV + 1, zds, bzds);
+	DD3Boundaries<float>(DNU + 1, xds, &(bxds[0]));
+	DD3Boundaries<float>(DNU + 1, yds, &(byds[0]));
+	DD3Boundaries<float>(DNV + 1, zds, &(bzds[0]));
 
 	const float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter / dx;
 	const float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter / dx;
