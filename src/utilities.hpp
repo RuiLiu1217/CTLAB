@@ -233,7 +233,7 @@ template<typename T>
 class SubVector<1,T>
 {
 public:
-	static T result(T* a,T* b)
+	static T result(T* a,T* b, T* c)
 	{
 		(*c) = (*a) - (*b);
 	}
