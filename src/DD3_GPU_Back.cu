@@ -1,14 +1,30 @@
 #include "utilities.cuh"
 #include "DD3_GPU_Back.h"
 
-#define BACK_BLKX 64
-#define BACK_BLKY 4
-#define BACK_BLKZ 1
 
-enum BackProjectionMethod{ _BRANCHLESS, _PSEUDODD, _ZLINEBRANCHLESS, _VOLUMERENDERING };
+#define BACK_BLKX 64 ///< Define the block size along x dimension for backprojection
+#define BACK_BLKY 4  ///< Define the block size along y dimension for backprojection
+#define BACK_BLKZ 1  ///< Define the block size along z dimension for backprojection
+
+/// \brief BackProjectionMethod with different model/implementation
+enum BackProjectionMethod{
+	_BRANCHLESS, ///< Branchless DD model
+	_PSEUDODD,  ///< Pseudo DD model
+	_ZLINEBRANCHLESS,  ///< Branchless DD model with Z-line implementation
+	_VOLUMERENDERING  ///< Pixel driven model
+};
 
 #ifndef CALDETPARAS
 #define CALDETPARAS
+/// \brief Calculate the size of the detector fan angle, detector cell height and the center of the index according to the x,y coordinates of the detector cells at initial position
+/// \param xds x coordinate
+/// \param yds y coordinate
+/// \param zds z coordinate
+/// \param x0 source position x
+/// \param y0 source position y
+/// \param z0 source position z
+/// \param DNU detector cell number along channel direction
+/// \param DNV detector cell number along bench moving direction
 float4 calDetParas(float* xds, float* yds, float* zds, float x0, float y0, float z0, int DNU, int DNV)
 {
 	float* bxds = new float[DNU + 1];
@@ -32,7 +48,15 @@ float4 calDetParas(float* xds, float* yds, float* zds, float x0, float y0, float
 	return make_float4(detCtrIdxU, detCtrIdxV, dbeta, ddv);
 
 }
-
+/// \brief Calculate the size of the detector fan angle, detector cell height and the center of the index according to the x,y coordinates of the detector cells at initial position
+/// \param dxds x coordinate
+/// \param dyds y coordinate
+/// \param dzds z coordinate
+/// \param x0 source position x
+/// \param y0 source position y
+/// \param z0 source position z
+/// \param DNU detector cell number along channel direction
+/// \param DNV detector cell number along bench moving direction
 float4 calDetParas_alreadyinGPU(const thrust::device_vector<float>& dxds, const thrust::device_vector<float>& dyds,
 		const thrust::device_vector<float>& dzds, float x0, float y0, float z0, int DNU, int DNV)
 {
@@ -66,7 +90,12 @@ float4 calDetParas_alreadyinGPU(const thrust::device_vector<float>& dxds, const 
 }
 
 #endif
-
+/// \brief Add two columns and rows of all 0 borders on the left and top of each projection views
+/// \param prjIn Input of the projection data
+/// \param prjOut Output of the projection data
+/// \param DNU detector cell number along channel direction
+/// \param DNV detector cell number along bench moving direction
+/// \param PN number of views
 __global__ void addTwoSidedZeroBoarder(float* prjIn, float* prjOut,
 	const int DNU, const int DNV, const int PN)
 {
@@ -81,7 +110,12 @@ __global__ void addTwoSidedZeroBoarder(float* prjIn, float* prjOut,
 	}
 }
 
-
+/// \brief Add one column and row of all 0 borders on the left and top of each projection views
+/// \param prj_in Input of the projection data
+/// \param prj_out Output of the projection data
+/// \param DNU detector cell number along channel direction
+/// \param DNV detector cell number along bench moving direction
+/// \param PN number of views
 __global__ void addOneSidedZeroBoarder(const float* prj_in, float* prj_out, int DNU, int DNV, int PN)
 {
 	int idv = threadIdx.x + blockIdx.x * blockDim.x;
@@ -95,6 +129,10 @@ __global__ void addOneSidedZeroBoarder(const float* prj_in, float* prj_out, int 
 	}
 }
 
+/// \brief Integral image along vertical direction
+/// \param prj Input/Output of the projection data
+/// \param ZN image dimension along bench moving direction
+/// \param N usually equals (XN x YN)
 __global__ void verticalIntegral2(float* prj, int ZN, int N)
 {
 	int idx = threadIdx.x + blockIdx.x * blockDim.x;
@@ -109,7 +147,11 @@ __global__ void verticalIntegral2(float* prj, int ZN, int N)
 }
 
 
-
+/// \brief Integral image along horizontal direction
+/// \param prj Input/Output of the projection data
+/// \param DNU detector cell number along channel direction
+/// \param DNV detector cell number along bench moving direction
+/// \param PN number of views
 __global__ void heorizontalIntegral2(float* prj, int DNU, int DNV, int PN)
 {
 	int idv = threadIdx.x + blockIdx.x * blockDim.x;
@@ -123,6 +165,12 @@ __global__ void heorizontalIntegral2(float* prj, int DNU, int DNV, int PN)
 		}
 	}
 }
+
+/// \brief Generate the summed area table for the projection data
+/// \param hprj projection data stored in host memory
+/// \param DNU detector cell number along channel direction
+/// \param DNV detector cell number along bench moving direction
+/// \param PN number of views
 
 thrust::device_vector<float> genSAT_of_Projection(
 	float* hprj,
