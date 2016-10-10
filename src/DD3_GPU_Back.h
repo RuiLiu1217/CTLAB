@@ -1,16 +1,15 @@
-/*
- *  DD3_GPU_Back.h
- *  Wake Forest Health Sciences & University of Massachusetts Lowell
- *  Created on: Oct 2, 2015
- *  Author: Rui Liu
- *  Email: liurui1217@gmail.com
+/*!
+ * \file DD3_GPU_Back.h
+ * Wake Forest Health Sciences & University of Massachusetts Lowell
+ * E-mail: liurui1217@gmail.com
+ * \date Oct 2, 2015
+ * \author Rui Liu
+ * \version 1.0
  */
-
 #ifndef DD3_GPU_BACK_H_
 #define DD3_GPU_BACK_H_
 
 typedef unsigned char byte;
-
 
 /// \brief Backprojection interface in one GPU
 /// \param x0 The initial X coordinate of the source position
@@ -143,4 +142,3 @@ void DD3Back_multiGPU(float x0, float y0, float z0, int DNU, int DNV, float* xds
         int* startVOL, int gpuNum);
 
 #endif /* DD3_GPU_BACK_H_ */
-
