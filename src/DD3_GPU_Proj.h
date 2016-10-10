@@ -1,18 +1,17 @@
-/*
- * DD3_GPU_Proj.h
- * The GPU based branchless DD projection routine
- * Created on: Oct 2, 2015
- * Author: Rui Liu
- * Email: liurui1217@gmail.com
+/*!
+ * \file DD3_GPU_Proj.h
+ * \brief The GPU based branchless DD projection routine
  * Wake Forest Health Sciences & University of Massachusetts Lowell
+ * E-mail liurui1217@gmail.com
+ * \date Oct 2, 2015
+ * \author Rui Liu
+ * \version 1.0 
  */
-
 #ifndef _DD3_GPU_PROJ_H_
 #define _DD3_GPU_PROJ_H_
 #include <thrust/device_vector.h>
 
 typedef unsigned char byte;
-
 
 /// \brief Projection interface in one GPU
 /// \param x0 The initial X coordinate of the source position
