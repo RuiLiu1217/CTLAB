@@ -3,15 +3,15 @@
  * COPYRIGHT (c) 2015, Wake Forest and UMass Lowell
  * All rights reserved
  *
- * @file useful.hpp
- * @brief The useful functions declaring. Including read and write functions called by users. Also
+ * \file useful.hpp
+ * \brief The useful functions declaring. Including read and write functions called by users. Also
  * it includes some useful classes that used in reconstruction process. This file mainly includes 
  * some useful functions that can be called by the users. The author strongly suggest the users do 
  * NOT modify any codes but you can add your own functions and classes.  
  *
- * @version 1.0
- * @author Rui Liu
- * @date Aug. 24, 2014
+ * \version 1.0
+ * \author Rui Liu
+ * \date Aug. 24, 2014
  *
  */
 #pragma once
