@@ -1,10 +1,10 @@
-/*
- * SARTWeighting.h
+/*!
+ * \file SARTWeighting.h
  *
- *  Created on: Jun 8, 2016
- *      Author: liurui
+ * \date Jun 8, 2016
+ * \author liurui
+ * \version 1.0
  */
-
 #ifndef SARTWEIGHTING_H_
 #define SARTWEIGHTING_H_
 
@@ -14,7 +14,7 @@
 #include <thrust/tuple.h>
 #include <thrust/iterator/zip_iterator.h>
 
-// The static class for the SART weighting
+/// \brief The static class for the SART weighting
 template<typename Type>
 class SART_Weighting
 {
@@ -136,7 +136,4 @@ public:
 	};
 };
 template<typename Type>const float SART_Weighting<Type>::epsilon = 1.0e-7;
-
-
-
 #endif /* SARTWEIGHTING_H_ */
