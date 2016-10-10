@@ -3,29 +3,14 @@
  * COPYRIGHT (c) 2015, GEGRC, Wake Forest and UMass Lowell
  * All rights reserved
  *
- * @file utilities.hpp
- * @brief The utilities functions used in GPU.
+ * \file utilities.hpp
+ * \brief The utilities functions used in GPU.
  *
- * @version 1.0
- * @author Rui Liu
- * @date Sep. 1, 2015
- *
- */
-
-/*
- * COPYRIGHT NOTICE
- * COPYRIGHT (c) 2015, GEGRC, Wake Forest and UMass Lowell
- * All rights reserved
- *
- * @file utilities.hpp
- * @brief The utilities functions used in GPU based Branchless DD projection/backprojection
- *
- * @version 1.0
- * @author Rui Liu
- * @date Sep. 1, 2015
+ * \version 1.0
+ * \author Rui Liu
+ * \date Sep. 1, 2015
  *
  */
-
 #pragma once
 #include <algorithm>
 #include <cassert>
