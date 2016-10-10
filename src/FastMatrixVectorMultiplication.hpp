@@ -1,3 +1,10 @@
+/*!
+ * \file FastMatrixVectorMultiplication.h
+ * \brief Fast Matrix-Vector Multiplication in GPU
+ * \author Rui Liu
+ * \version 1.0
+ * \date Jun. 1, 2015
+ */
 
 /// \brief Fast Matrix-Vector Multiplication;
 /// \param y = Ax, on host memory
@@ -6,6 +13,7 @@
 /// \param m row number of the matrix
 /// \param n col number of the matrix
 void FMVM(float* y, float* A, float* x, int m, int n);
+
 /// \brief Fast Matrix-Vector Multiplication;
 /// \param d_y = Ax, on device memory
 /// \param d_A matrix, on device memory
