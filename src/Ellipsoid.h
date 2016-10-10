@@ -1,20 +1,21 @@
-
-/*
-* Ellipsoid.h
-*
-*  Created on: Jun 14, 2016
-*      Author: liurui
-*/
-
+/*!
+ * \file Ellipsoid.h
+ * \brief Definition of Ellipsoid for 3D Shepp-Logan phantom
+ * Wake Forest University Health Sciences
+ * \author Rui Liu
+ * \date Jun 14, 2016
+ * \version 1.0
+ */
 #ifndef ELLIPSOID_H_
 #define ELLIPSOID_H_
 
 #include <cmath>
 #include <iostream>
 #include <vector>
+/// \brief CTLAB is the main namespace for our library
 namespace CTLAB
 {
-
+	/// \brief Basic datatype with two single floating values
 	struct float2
 	{
 		float x;
@@ -60,6 +61,8 @@ namespace CTLAB
 			return lhs;
 		}
 
+		/// \brief rotate the point with a given angle arc
+		/// \return new point position
 		float2 rot(const float arc)
 		{
 			float2 res;
@@ -91,19 +94,20 @@ namespace CTLAB
 
 
 	};
-
+	
+	/// \brief Point datatype
 	struct Point : public float2
 	{
 
 	};
-
+	/// \brief 2D vector
 	struct Vector : public float2
 	{
 
 	};
 
 
-
+	/// \brief Ellipsoid
 	class Ellipsoid
 	{
 	public:
@@ -244,7 +248,7 @@ namespace CTLAB
 
 	};
 
-
+	/// \brief 3D Shepp Logan phantom
 	class SheppLoganPhantom
 	{
 
@@ -314,7 +318,4 @@ namespace CTLAB
 
 
 } /* namespace CTLAB */
-
-
-
 #endif
