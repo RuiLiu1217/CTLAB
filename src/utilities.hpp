@@ -38,6 +38,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <thrust/binary_search.h>
 #include <thrust/copy.h>
 #include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>
@@ -60,7 +61,7 @@
 #include <vector>
 #include <vector_functions.h>
 #include <vector_types.h>
-
+#include <omp.h>
 
 /// Key words for inlining the codes
 #define FORCEINLINE 1
@@ -73,9 +74,11 @@
 // Usually, for safety, we will use checkCudaErrors or CUDA_CHECK_RETURN before "cuda" API functions
 #if DEBUG
 #define CUDA_CHECK_RETURN(value) { cudaError_t _m_cudaStat = value; if(_m_cudaStat != cudaSuccess){fprintf(stderr, "Error %s at line %d in file %s\n", cudaGetErrorString(_m_cudaStat), __LINE__, __FILE__); exit(1);}}
+#define CUDA_SAFE_CALL(call) do{ cudaError_t err = call; if (cudaSuccess != err) {  fprintf (stderr, "Cuda error in file '%s' in line %i : %s.", __FILE__, __LINE__, cudaGetErrorString(err) );  exit(EXIT_FAILURE);  } } while (0)
 #define checkCudaErrors(value) { cudaError_t _m_cudaStat = value; if(_m_cudaStat != cudaSuccess){fprintf(stderr, "Error %s at line %d in file %s\n", cudaGetErrorString(_m_cudaStat), __LINE__, __FILE__); exit(1);}}
 #else
 #define CUDA_CHECK_RETURN(value) {value;}
+#define CUDA_SAFE_CALL(value) {value;}
 #define checkCudaErrors(value) {value;}
 #endif
 
@@ -128,6 +131,13 @@ typedef thrust::host_vector<float> h_vec_t;
 #ifndef _EPSILON
 #define _EPSILON (1.0E-9)
 #endif
+
+#define PI_2		1.570796326794897
+#define PI_4		0.785398163397448
+#define PI_3_4		2.356194490192344
+#define PI_5_4		3.926990816987241
+#define PI_7_4		5.497787143782138
+#define TWOPI       6.283185307179586
 
 
 //Calculate Two Arrays inner product
