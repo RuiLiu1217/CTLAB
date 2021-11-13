@@ -63,6 +63,10 @@
 #include <vector_types.h>
 #include <omp.h>
 
+#ifndef nullptr
+#define nullptr NULL
+#endif
+
 /// Key words for inlining the codes
 #define FORCEINLINE 1
 #if FORCEINLINE
