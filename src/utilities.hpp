@@ -394,21 +394,21 @@ INLINE __host__ __device__ float fminf(const float3& a){	return fminf(a.x, fminf
 INLINE __host__ __device__ float2 fminf(const float2& a, const float2& b){ return make_float2(fmin(a.x, b.x), fmin(a.y, b.y)); }
 INLINE __host__ __device__ float3 fminf(const float3& a, const float3& b){	return make_float3(fminf(a.x, b.x), fminf(a.y, b.y), fminf(a.z, b.z));}
 INLINE __host__ __device__ double2 fminf(const double2& a, const double2& b){ return make_double2(fmin(a.x, b.x), fmin(a.y, b.y)); }
-INLINE __host__ __device__ double2 fminf(const float2& a, const double2& b){ return make_double2(fminf(a.x, b.x), fminf(a.y, b.y)); }
-INLINE __host__ __device__ double2 fminf(const double2& a, const float2& b){ return make_double2(fminf(a.x, b.x), fminf(a.y, b.y)); }
-INLINE __host__ __device__ double3 fminf(const double3& a, const double3& b){ return make_double3(fminf(a.x, b.x), fminf(a.y, b.y), fminf(a.z, b.z)); }
-INLINE __host__ __device__ double3 fminf(const double3& a, const float3& b){ return make_double3(fminf(a.x, b.x), fminf(a.y, b.y), fminf(a.z, b.z)); }
-INLINE __host__ __device__ double3 fminf(const float3& a, const double3& b){ return make_double3(fminf(a.x, b.x), fminf(a.y, b.y), fminf(a.z, b.z)); }
+INLINE __host__ __device__ double2 fminf(const float2& a, const double2& b){ return make_double2(fmin(a.x, b.x), fmin(a.y, b.y)); }
+INLINE __host__ __device__ double2 fminf(const double2& a, const float2& b){ return make_double2(fmin(a.x, b.x), fmin(a.y, b.y)); }
+INLINE __host__ __device__ double3 fminf(const double3& a, const double3& b){ return make_double3(fmin(a.x, b.x), fmin(a.y, b.y), fmin(a.z, b.z)); }
+INLINE __host__ __device__ double3 fminf(const double3& a, const float3& b){ return make_double3(fmin(a.x, b.x), fmin(a.y, b.y), fmin(a.z, b.z)); }
+INLINE __host__ __device__ double3 fminf(const float3& a, const double3& b){ return make_double3(fmin(a.x, b.x), fmin(a.y, b.y), fmin(a.z, b.z)); }
 INLINE __host__ __device__ float fmaxf(const float2& a){	return fmaxf(a.x, a.y);}
 INLINE __host__ __device__ float fmaxf(const float3& a){	return fmaxf(a.x, fmaxf(a.y, a.z));}
 INLINE __host__ __device__ float2 fmaxf(const float2& a, const float2& b){ return make_float2(fmax(a.x, b.x), fmax(a.y, b.y)); }
 INLINE __host__ __device__ float3 fmaxf(const float3& a, const float3& b){	return make_float3(fmaxf(a.x, b.x), fmaxf(a.y, b.y), fmaxf(a.z, b.z));}
-INLINE __host__ __device__ double2 fmaxf(const double2& a, const double2& b){ return make_double2(fmaxf(a.x, b.x), fmaxf(a.y, b.y)); }
-INLINE __host__ __device__ double2 fmaxf(const float2& a, const double2& b){ return make_double2(fmaxf(a.x, b.x), fmaxf(a.y, b.y)); }
-INLINE __host__ __device__ double2 fmaxf(const double2& a, const float2& b){ return make_double2(fmaxf(a.x, b.x), fmaxf(a.y, b.y)); }
-INLINE __host__ __device__ double3 fmaxf(const double3& a, const double3& b){ return make_double3(fmaxf(a.x, b.x), fmaxf(a.y, b.y), fmaxf(a.z, b.z)); }
-INLINE __host__ __device__ double3 fmaxf(const double3& a, const float3& b){ return make_double3(fmaxf(a.x, b.x), fmaxf(a.y, b.y), fmaxf(a.z, b.z)); }
-INLINE __host__ __device__ double3 fmaxf(const float3& a, const double3& b){ return make_double3(fmaxf(a.x, b.x), fmaxf(a.y, b.y), fmaxf(a.z, b.z)); }
+INLINE __host__ __device__ double2 fmaxf(const double2& a, const double2& b){ return make_double2(fmax(a.x, b.x), fmax(a.y, b.y)); }
+INLINE __host__ __device__ double2 fmaxf(const float2& a, const double2& b){ return make_double2(fmax(a.x, b.x), fmax(a.y, b.y)); }
+INLINE __host__ __device__ double2 fmaxf(const double2& a, const float2& b){ return make_double2(fmax(a.x, b.x), fmax(a.y, b.y)); }
+INLINE __host__ __device__ double3 fmaxf(const double3& a, const double3& b){ return make_double3(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z)); }
+INLINE __host__ __device__ double3 fmaxf(const double3& a, const float3& b){ return make_double3(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z)); }
+INLINE __host__ __device__ double3 fmaxf(const float3& a, const double3& b){ return make_double3(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z)); }
 
 INLINE __host__ __device__ float length(const float2& a){	return sqrtf(a.x * a.x + a.y * a.y);}
 INLINE __host__ __device__ float length(const float3& a){	return sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);}
@@ -546,7 +546,7 @@ INLINE __host__ __device__ bool intersectBox(
 	const float3& boxmax,
 	float* tnear, float* tfar)
 {
-	const float3 invR = make_float3(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
+	const float3 invR = make_float3(1.0f / dir.x, 1.0f / dir.y, 1.0f / dir.z);
 	const float3 tbot = invR * (boxmin - sour);
 	const float3 ttop = invR * (boxmax - sour);
 
@@ -2940,66 +2940,11 @@ inline __host__ __device__ int intersectBox(Ray r, double3 boxmin, double3 boxma
 //! @param x       input value
 //! @return        whether the input parameter is power of 2
 //////////////////////////////////////////////////////////////////////////
-inline __host__ __device__ bool isPow2(const unsigned int& x)
+template<typename T>
+inline __host__ __device__ bool isPow2(const T& x)
 {
 	return ((x&(x - 1)) == 0);
 }
-inline __host__ __device__ bool isPow2(unsigned int&x)
-{
-	const unsigned int y(x);
-	return isPow2(y);
-}
-inline __host__ __device__ bool isPow2(int& x)
-{
-	const unsigned int y(x);
-	return isPow2(y);
-}
-inline __host__ __device__ bool isPow2(const int& x)
-{
-	const unsigned int y(x);
-	return isPow2(y);
-}
-inline __host__ __device__  bool isPow2(long& x)
-{
-	const unsigned int y(x);
-	return isPow2(y);
-}
-inline __host__ __device__  bool isPow2(unsigned long& x)
-{
-	const unsigned int y(x);
-	return isPow2(y);
-}
-inline __host__ __device__ bool isPow2(const long& x)
-{
-	const unsigned int y(x);
-	return isPow2(y);
-}
-inline __host__ __device__ bool isPow2(const unsigned long& x)
-{
-	const unsigned int y(x);
-	return isPow2(y);
-}
-inline __host__ __device__ bool isPow2(long long& x)
-{
-	const unsigned int y(x);
-	return isPow2(y);
-}
-inline __host__ __device__ bool isPow2(unsigned long long& x)
-{
-	const unsigned int y(x);
-	return isPow2(y);
-}
-inline __host__ __device__ bool isPow2(const long long& x)
-{
-	const unsigned int y(x);
-	return isPow2(y);
-}
-inline __host__ __device__ bool isPow2(const unsigned long long& x)
-{
-	const unsigned int y(x);
-	return isPow2(y);
-}
-
 
 
 
@@ -4196,6 +4141,14 @@ void DD3Boundaries(int nrBoundaries, std::vector<T>& Centers, std::vector<T>& Bo
 
 }
 
+template<typename T>
+void DD3Boundaries(int nrBoundaries, thrust::host_vector<T>& Centers, thrust::host_vector<T>& Boundaries)
+{
+	DD3Boundaries<T>(nrBoundaries, &Centers[0], &Boundaries[0]);
+}
+
+
+
 
 template<typename T>
 T SIGN(const T& v)
@@ -4445,6 +4398,20 @@ void FISTA(std::vector<T>& lasImg, std::vector<T>&  currentImg, T t1, T t2, int 
 }
 
 
+template<typename T>
+__device__ inline T intersectLength_device(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax)
+{
+	const T left = (fixedmin > varimin) ? fixedmin : varimin;
+	const T right = (fixedmax < varimax) ? fixedmax : varimax;
+	return fabsf(right - left) * static_cast<T>(right > left);
+}
 
 
 
+template<typename T>
+__host__ __device__ inline T intersectLength(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax)
+{
+	const T left = (fixedmin > varimin) ? fixedmin : varimin;
+	const T right = (fixedmax < varimax) ? fixedmax : varimax;
+	return abs(right - left) * static_cast<double>(right > left);
+}

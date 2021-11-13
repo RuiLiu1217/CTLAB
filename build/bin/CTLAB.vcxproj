@@ -1,0 +1,1418 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EFD48380-E097-3359-82A7-715DD2F26079}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>CTLAB</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\lib\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CTLAB.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CTLAB</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\lib\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CTLAB.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CTLAB</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\lib\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CTLAB.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CTLAB</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\lib\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CTLAB.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CTLAB</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.dll</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;CMAKE_INTDIR="Debug";CTLAB_EXPORTS</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\";CTLAB_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\lib\x64\cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/lib/Debug/CTLAB.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/lib/Debug/CTLAB.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="Release";CTLAB_EXPORTS</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\";CTLAB_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\lib\x64\cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/lib/Release/CTLAB.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/lib/Release/CTLAB.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="MinSizeRel";CTLAB_EXPORTS</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\";CTLAB_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\lib\x64\cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/lib/MinSizeRel/CTLAB.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/lib/MinSizeRel/CTLAB.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR="RelWithDebInfo";CTLAB_EXPORTS</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\";CTLAB_EXPORTS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>\common\inc;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\lib\x64\cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/lib/RelWithDebInfo/CTLAB.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/lib/RelWithDebInfo/CTLAB.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\DD3_GPU_Proj.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_Proj.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Proj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Proj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_Proj.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_Proj.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_Proj.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Proj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Proj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_Proj.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_Proj.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_Proj.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Proj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Proj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_Proj.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_Proj.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_Proj.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Proj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Proj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_Proj.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_Proj.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\DD3_GPU_Back.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_Back.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Back.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Back.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_Back.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_Back.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_Back.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Back.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Back.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_Back.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_Back.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_Back.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Back.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Back.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_Back.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_Back.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_Back.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Back.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_Back.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_Back.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_Back.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\DD3_GPU_demo.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_demo.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_demo.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_demo.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_demo.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_demo.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_demo.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_demo.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_demo.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_demo.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_demo.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_demo.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_demo.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_demo.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_demo.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_demo.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_demo.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_demo.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_demo.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_demo.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_demo.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\DD3_GPU_recon.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_recon.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_recon.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_recon.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_recon.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_recon.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_recon.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_recon.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_recon.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\DDM_proj.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DDM_proj.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DDM_proj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DDM_proj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DDM_proj.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DDM_proj.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DDM_proj.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DDM_proj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DDM_proj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DDM_proj.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DDM_proj.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DDM_proj.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DDM_proj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DDM_proj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DDM_proj.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DDM_proj.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_DDM_proj.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DDM_proj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DDM_proj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DDM_proj.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DDM_proj.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\differentialFuncs.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_differentialFuncs.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_differentialFuncs.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_differentialFuncs.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_differentialFuncs.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_differentialFuncs.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_differentialFuncs.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_differentialFuncs.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_differentialFuncs.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_differentialFuncs.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_differentialFuncs.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_differentialFuncs.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_differentialFuncs.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_differentialFuncs.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_differentialFuncs.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_differentialFuncs.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_differentialFuncs.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_differentialFuncs.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_differentialFuncs.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_differentialFuncs.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_differentialFuncs.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\useful.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_useful.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_useful.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_useful.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_useful.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_useful.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_useful.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_useful.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_useful.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_useful.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_useful.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_useful.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_useful.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_useful.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_useful.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_useful.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_useful.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_useful.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_useful.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_useful.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_useful.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\projbackproj.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_projbackproj.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_projbackproj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_projbackproj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_projbackproj.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_projbackproj.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_projbackproj.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_projbackproj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_projbackproj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_projbackproj.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_projbackproj.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_projbackproj.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_projbackproj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_projbackproj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_projbackproj.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_projbackproj.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_projbackproj.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_projbackproj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_projbackproj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_projbackproj.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_projbackproj.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\threeGPUHouseholder.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_threeGPUHouseholder.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_threeGPUHouseholder.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_threeGPUHouseholder.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_threeGPUHouseholder.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_threeGPUHouseholder.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_threeGPUHouseholder.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_threeGPUHouseholder.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_threeGPUHouseholder.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\spectralCTscan.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_spectralCTscan.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_spectralCTscan.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_spectralCTscan.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_spectralCTscan.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_spectralCTscan.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_spectralCTscan.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_spectralCTscan.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_spectralCTscan.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\FastMatrixVectorMultiplication.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genModifiedPhantom.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_genModifiedPhantom.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_genModifiedPhantom.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_genModifiedPhantom.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_genModifiedPhantom.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_genModifiedPhantom.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_genModifiedPhantom.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_genModifiedPhantom.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_genModifiedPhantom.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\multiSlices_ker.cu">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_multiSlices_ker.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.Debug.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_multiSlices_ker.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_multiSlices_ker.cu.obj.Release.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.Release.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_multiSlices_ker.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_multiSlices_ker.cu.obj.MinSizeRel.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.MinSizeRel.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_multiSlices_ker.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building NVCC (Device) object bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=$(VCInstallDir)Tools/MSVC/$(VCToolsVersion)/bin/Host$(Platform)/$(PlatformTarget)" -D build_configuration:STRING=$(ConfigurationName) -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_multiSlices_ker.cu.obj.RelWithDebInfo.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.RelWithDebInfo.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_multiSlices_ker.cu.obj</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/liuru/Dropbox/MyWebsite/CTLAB/src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/liuru/Dropbox/MyWebsite/CTLAB -BC:/Users/liuru/Dropbox/MyWebsite/CTLAB/build --check-stamp-file C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.22\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindCUDA.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindCUDA\run_nvcc.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindCUDA\select_compute_arch.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindOpenMP.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindPackageMessage.cmake;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPCheckVersion.c;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPCheckVersion.cpp;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPTryFlag.c;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPTryFlag.cpp;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.depend;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/liuru/Dropbox/MyWebsite/CTLAB/src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/liuru/Dropbox/MyWebsite/CTLAB -BC:/Users/liuru/Dropbox/MyWebsite/CTLAB/build --check-stamp-file C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.22\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindCUDA.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindCUDA\run_nvcc.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindCUDA\select_compute_arch.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindOpenMP.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindPackageMessage.cmake;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPCheckVersion.c;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPCheckVersion.cpp;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPTryFlag.c;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPTryFlag.cpp;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.depend;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/liuru/Dropbox/MyWebsite/CTLAB/src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/liuru/Dropbox/MyWebsite/CTLAB -BC:/Users/liuru/Dropbox/MyWebsite/CTLAB/build --check-stamp-file C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.22\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindCUDA.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindCUDA\run_nvcc.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindCUDA\select_compute_arch.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindOpenMP.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindPackageMessage.cmake;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPCheckVersion.c;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPCheckVersion.cpp;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPTryFlag.c;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPTryFlag.cpp;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.depend;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/liuru/Dropbox/MyWebsite/CTLAB/src/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/liuru/Dropbox/MyWebsite/CTLAB -BC:/Users/liuru/Dropbox/MyWebsite/CTLAB/build --check-stamp-file C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.22\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindCUDA.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindCUDA\run_nvcc.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindCUDA\select_compute_arch.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindOpenMP.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.22\Modules\FindPackageMessage.cmake;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPCheckVersion.c;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPCheckVersion.cpp;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPTryFlag.c;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\CMakeFiles\FindOpenMP\OpenMPTryFlag.cpp;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Back.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_Proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_demo.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DD3_GPU_recon.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_DDM_proj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_differentialFuncs.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_genModifiedPhantom.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_multiSlices_ker.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_projbackproj.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_spectralCTscan.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_threeGPUHouseholder.cu.obj.depend;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.cmake.pre-gen;C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\CTLAB_generated_useful.cu.obj.depend;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_Proj.cu.obj" />
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_Back.cu.obj" />
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_demo.cu.obj" />
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DD3_GPU_recon.cu.obj" />
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_DDM_proj.cu.obj" />
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_differentialFuncs.cu.obj" />
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_useful.cu.obj" />
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_projbackproj.cu.obj" />
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_threeGPUHouseholder.cu.obj" />
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_spectralCTscan.cu.obj" />
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj" />
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_genModifiedPhantom.cu.obj" />
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_multiSlices_ker.cu.obj" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\DDM_proj.cpp" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\SF_proj.cpp" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\differentialFuncs.cpp" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\useful.cpp" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\projbackproj.cpp" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\spectralCTscan.cpp" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\readwrite.cpp" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSheppLoganProjection.cpp" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSysMatrix.cpp" />
+    <None Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\utilities.cuh">
+    </None>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\utilities.hpp" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\DD3_GPU_Proj.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\DD3_GPU_Back.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\DD3_GPU_demo.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\FastIterativeShrinkageAlgorithm.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\SARTWeighting.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\DD3_GPU_recon.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\DDM_proj.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\SF_proj.hpp" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\differentialFuncs.hpp" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\useful.hpp" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\projbackproj.hpp" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\threeGPUHouseholder.hpp" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\spectralCTscan.hpp" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\readwrite.hpp" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\FastMatrixVectorMultiplication.hpp" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genModifiedPhantom.hpp" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Ellipsoid.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSheppLoganProjection.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSysMatrix.hpp" />
+    <None Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\multiSlices_ker.cuh">
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\ZERO_CHECK.vcxproj">
+      <Project>{281995D6-6798-3B0F-9638-6945752DCFB7}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

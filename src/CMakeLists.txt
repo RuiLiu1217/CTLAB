@@ -1,5 +1,5 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+cmake_minimum_required(VERSION 3.22)
+STRING(REPLACE "-O2" "-Od" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
 FIND_PACKAGE(CUDA)
 MESSAGE( STATUS "CTLAB - project is being generated" )
 
@@ -56,8 +56,8 @@ SET(CTLAB_HEADERS
 )
 
 SET(CTLAB_SRC 
-        DD3_GPU_Proj.cu 	# implementation of branchless DD projection
-	DD3_GPU_Back.cu 	# implementation of branchless DD backprojection
+    DD3_GPU_Proj.cu 	# implementation of branchless DD projection
+    DD3_GPU_Back.cu 	# implementation of branchless DD backprojection
 	DD3_GPU_demo.cu   	# Demo of using the DD3 lib
 	DD3_GPU_recon.cu         # GPU based reconstruction methods
 	DDM_proj.cpp    	# conventional DD projection/backprojection in CPU
@@ -105,26 +105,12 @@ else (WIN32)
   endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 endif (WIN32)
 
-# Copy DLLs
-if (WIN32)
-  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    file(COPY $ENV{CUDA_SDK_ROOT_DIR}/Bin/win64/Release/freeglut.dll DESTINATION ${CMAKE_BINARY_DIR}) 
-    file(COPY $ENV{CUDA_SDK_ROOT_DIR}/Bin/win64/Release/${GLEW_NAME}.dll DESTINATION ${CMAKE_BINARY_DIR}) 
-  else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    file(COPY $ENV{CUDA_SDK_ROOT_DIR}/Bin/win32/Release/freeglut.dll DESTINATION ${CMAKE_BINARY_DIR}) 
-    file(COPY $ENV{CUDA_SDK_ROOT_DIR}/Bin/win32/Release/${GLEW_NAME}.dll DESTINATION ${CMAKE_BINARY_DIR}) 
-  endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-endif (WIN32)
-
 include_directories($ENV{CUDA_SDK_ROOT_DIR}/common/inc)
 
-
-set(GENCODE -O3 --use_fast_math -Xcompiler -fopenmp -std=c++11 -gencode=arch=compute_52,code=sm_52 -gencode=arch=compute_35,code=compute_35)
-set(GENCODE ${GENCODE} -gencode=arch=compute_30,code=sm_30 -gencode=arch=compute_20,code=compute_20)
+set(GENCODE -O3 --use_fast_math -Xcompiler)
 
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
-CUDA_ADD_LIBRARY(CTLAB ${CTLAB_SRC} ${CTLAB_HEADERS} 
-                     OPTIONS ${GENCODE} ${DEVICE_DEBUGGING})
+CUDA_ADD_LIBRARY(CTLAB ${CTLAB_SRC} ${CTLAB_HEADERS} SHARED OPTIONS ${GENCODE} ${DEVICE_DEBUGGING})
 
 target_link_libraries(CTLAB ${ALL_LIBRARIES})
