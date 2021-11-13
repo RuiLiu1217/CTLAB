@@ -11,7 +11,7 @@
 #define _DD3_GPU_PROJ_H_
 #include <thrust/device_vector.h>
 
-typedef unsigned char byte;
+using byte = unsigned char;
 
 /// \brief Projection interface in one GPU
 /// \param x0 The initial X coordinate of the source position

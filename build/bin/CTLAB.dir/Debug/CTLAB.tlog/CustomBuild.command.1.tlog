@@ -1,0 +1,218 @@
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\DD3_GPU_PROJ.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_DD3_GPU_Proj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_DD3_GPU_Proj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_Proj.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\DD3_GPU_BACK.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_DD3_GPU_Back.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_DD3_GPU_Back.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_Back.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\DD3_GPU_DEMO.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_DD3_GPU_demo.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_DD3_GPU_demo.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_demo.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\DD3_GPU_RECON.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_DD3_GPU_recon.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_DD3_GPU_recon.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DD3_GPU_recon.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\DDM_PROJ.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_DDM_proj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_DDM_proj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_DDM_proj.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\DIFFERENTIALFUNCS.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_differentialFuncs.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_differentialFuncs.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_differentialFuncs.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\USEFUL.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_useful.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_useful.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_useful.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\PROJBACKPROJ.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_projbackproj.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_projbackproj.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_projbackproj.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\THREEGPUHOUSEHOLDER.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_threeGPUHouseholder.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_threeGPUHouseholder.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_threeGPUHouseholder.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\SPECTRALCTSCAN.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_spectralCTscan.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_spectralCTscan.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_spectralCTscan.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\FASTMATRIXVECTORMULTIPLICATION.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_FastMatrixVectorMultiplication.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\GENMODIFIEDPHANTOM.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_genModifiedPhantom.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_genModifiedPhantom.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_genModifiedPhantom.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\MULTISLICES_KER.CU
+setlocal
+cd C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -D verbose:BOOL=OFF -D "CCBIN:PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools/MSVC/14.28.29910/bin/Hostx64/x64" -D build_configuration:STRING=Debug -D generated_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_multiSlices_ker.cu.obj -D generated_cubin_file:STRING=C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//Debug/CTLAB_generated_multiSlices_ker.cu.obj.cubin.txt -P C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//CTLAB_generated_multiSlices_ker.cu.obj.Debug.cmake
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LIURU\DROPBOX\MYWEBSITE\CTLAB\SRC\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/liuru/Dropbox/MyWebsite/CTLAB -BC:/Users/liuru/Dropbox/MyWebsite/CTLAB/build --check-stamp-file C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

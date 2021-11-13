@@ -61,6 +61,9 @@
 #include <vector_functions.h>
 #include <vector_types.h>
 
+#ifndef nullptr
+#define nullptr NULL
+#endif
 
 /// Key words for inlining the codes
 #define FORCEINLINE 1
@@ -76,6 +79,7 @@
 #define checkCudaErrors(value) { cudaError_t _m_cudaStat = value; if(_m_cudaStat != cudaSuccess){fprintf(stderr, "Error %s at line %d in file %s\n", cudaGetErrorString(_m_cudaStat), __LINE__, __FILE__); exit(1);}}
 #else
 #define CUDA_CHECK_RETURN(value) {value;}
+#define CUDA_SAFE_CALL(value) {value;}
 #define checkCudaErrors(value) {value;}
 #endif
 
