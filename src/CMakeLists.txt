@@ -51,6 +51,9 @@ SET(CTLAB_HEADERS
 	genSheppLoganProjection.h # Generate Shepp Logan phantom based projection
 	genSysMatrix.hpp        # Generate system matrix with SIDDON/AIM model
 	multiSlices_ker.cuh     # multi slices based projection and backprojection
+	ProjectionModelMap.h
+	BackprojectionModelMap.h
+	Geometry.h
 	
 	
 )
@@ -79,6 +82,9 @@ SET(CTLAB_SRC
 	genSheppLoganProjection.cpp # Generate Shepp Logan phantom based projection
 	genSysMatrix.cpp        # Generate system matrix with SIDDON/AIM model
 	multiSlices_ker.cu      # multi slices based projection and backprojection
+	ProjectionModelMap.cpp
+	BackprojectionModelMap.cpp
+	Geometry.cpp
 )
 
 
@@ -107,10 +113,13 @@ endif (WIN32)
 
 include_directories($ENV{CUDA_SDK_ROOT_DIR}/common/inc)
 
+link_directories("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.5/bin")
+
 set(GENCODE -O3 --use_fast_math -Xcompiler)
 
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 CUDA_ADD_LIBRARY(CTLAB ${CTLAB_SRC} ${CTLAB_HEADERS} SHARED OPTIONS ${GENCODE} ${DEVICE_DEBUGGING})
 
-target_link_libraries(CTLAB ${ALL_LIBRARIES})
+target_link_libraries(CTLAB "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.5/lib/x64/cublas.lib")
+target_link_libraries(CTLAB "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.5/lib/x64/cusparse.lib")

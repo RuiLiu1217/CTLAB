@@ -3,6 +3,7 @@
 #include "DD3_GPU_Proj.h"
 #include "CTLAB.h"
 #include "Geometry.h"
+#include "ProjectionModelMap.h"
 
 #define BLKX 32
 #define BLKY 8
@@ -3404,7 +3405,7 @@ void DD3Proj_multiGPU(
 	}
 }
 
-#include "ProjectionModelMap.h"
+
 
 void CT::Proj(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, const std::string& projModel)
 {

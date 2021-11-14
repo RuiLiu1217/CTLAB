@@ -28,6 +28,15 @@
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSysMatrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ProjectionModelMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\BackprojectionModelMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\utilities.hpp">
@@ -88,6 +97,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSysMatrix.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ProjectionModelMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\BackprojectionModelMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Geometry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

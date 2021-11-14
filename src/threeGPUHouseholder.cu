@@ -1,105 +1,79 @@
+#include <typeinfo>
 #include "utilities.hpp"
-
-
 #include "threeGPUHouseholder.hpp"
 
-
-namespace SVD{
+namespace SVD {
 template<typename T>
-__host__ __device__ inline T SIGN(const T& y)
-{
-	if (y > 0)
-	{
+__host__ __device__ inline T SIGN(const T& y) {
+	if (y > 0) {
 		return 1.0f;
-	}
-	else if (y < 0)
-	{
+	} else if (y < 0) {
 		return -1.0f;
-	}
-	else
-	{
+	} else {
 		return 0;
 	}
 }
 
 template<typename T>
-__global__ void calculateQB(T* B, T* hvec, T* Bhvec, const int m, const int n)
-{
+__global__ void calculateQB(T* B, T* hvec, T* Bhvec, const int m, const int n) {
 	const int i = threadIdx.x + blockIdx.x * blockDim.x; 
 	const int j = threadIdx.y + blockIdx.y * blockDim.y; 
-	if (i < m && j < n)
-	{
-		B[j * m + i] = B[j * m + i] - 2.0 * hvec[i] * Bhvec[j];
-	}
-}
-template<typename T>
-__global__ void calculateBP(T* B, T* lvec, T* lvecB, const int m, const int n)
-{
-	const int i = threadIdx.x + blockIdx.x * blockDim.x;
-	const int j = threadIdx.y + blockIdx.y * blockDim.y;
-	if (i < m && j < n)
-	{
-		B[j * m + i] = B[j * m + i] - 2.0 * lvecB[i] * lvec[j];
+	if (i < m && j < n) {
+		B[j * m + i] -= (2.0 * hvec[i] * Bhvec[j]);
 	}
 }
 
 template<typename T>
-__global__ void CopyBm(T* B, T* Bm, const int m, const int k)
-{
+__global__ void calculateBP(T* B, T* lvec, T* lvecB, const int m, const int n) {
+	const int i = threadIdx.x + blockIdx.x * blockDim.x;
+	const int j = threadIdx.y + blockIdx.y * blockDim.y;
+	if (i < m && j < n) {
+		B[j * m + i] -= (2.0 * lvecB[i] * lvec[j]);
+	}
+}
+
+template<typename T>
+__global__ void CopyBm(T* B, T* Bm, const int m, const int k) {
 	const int i = threadIdx.x + blockDim.x * blockIdx.x;
-	if (i < m)
-	{
-		if (i >= k)
-		{
-			Bm[i] = B[k * m + i];
-		}
-		else
-		{
-			Bm[i] = 0;
-		}
+	if (i < m) {
+		Bm[i] = i >= k ? B[k * m + i] : 0;
 	}
 }
 
 template<typename T>
-__global__ void CopyBn(T* B, T* Bn, const int m, const int n, const int k)
-{
+__global__ void CopyBn(T* B, T* Bn, const int m, const int n, const int k) {
 	const int i = threadIdx.x + blockDim.x * blockIdx.x;
-	if (i < n)
-	{
-		if (i > k)
-		{
-			Bn[i] = B[(k + 1 + i) * m + k];
-		}
-		else
-		{
-			Bn[i] = 0;
-		}
+	if (i < n) {
+		Bn[i] = i > k ? B[(k + 1 + i) * m + k] : 0;
 	}
 }
 
 template<typename T>
-__global__ void updateU(T* U, T* Uhvec, T* hvec, const int m)
-{
+__global__ void updateU(T* U, T* Uhvec, T* hvec, const int m) {
 	const int i = threadIdx.x + blockIdx.x * blockDim.x;
 	const int j = threadIdx.y + blockIdx.y * blockDim.y;
-	if (i < m && j < m)
-	{
-		U[j * m + i] = U[j * m + i] - 2.0 * Uhvec[i] * hvec[j];
+	if (i < m && j < m) {
+		U[j * m + i] -= (2.0 * Uhvec[i] * hvec[j]);
 	}
 }
 
 
 template<typename T>
-__global__ void updateV(T* V, T* Vlvec, T* lvec, const int n)
-{
+__global__ void updateV(T* V, T* Vlvec, T* lvec, const int n) {
 	const int i = threadIdx.x + blockIdx.x * blockDim.x;
 	const int j = threadIdx.y + blockIdx.y * blockDim.y;
-	if (i < n && j < n)
-	{
-		V[j * n + i] = V[j * n + i] - 2.0 * Vlvec[i] * lvec[j];
+	if (i < n && j < n) {
+		V[j * n + i] -= (2.0 * Vlvec[i] * lvec[j]);
 	}
 }
 
+template<typename T> 
+void setMajorDiagnosis(thrust::device_vector<T>& M, const size_t m,const T& value) {
+	assert(M.size() == m * m);
+	for (size_t i = 0; i < m; i++) {
+		M[i * m + i] = value;
+	}
+}
 
 void HouseHolder_v2(thrust::device_vector<float>& B, const int m, const int n)
 {
@@ -407,15 +381,16 @@ void threeGPUHouseHolder(const std::string& FileName,const std::string& dataType
 	
 }
 
-int testHouseHolder()
-{
+int testHouseHolder() {
 	const int m = 22000;
 	const int n = 22000;
+	// Todo: give random values when initalize the matrix.
 	std::vector<float> hA(m * n, 0);
-	for (size_t i = 0; i < m * n; i++)
-	{
+	
+	for (size_t i = 0; i < m * n; i++) {
 		hA[i] = rand() % (m * n);
 	}
+
 	checkCudaErrors(cudaDeviceReset());
 	checkCudaErrors(cudaSetDevice(0));
 	thrust::device_vector<float> A = hA;
@@ -425,7 +400,6 @@ int testHouseHolder()
 	checkCudaErrors(cudaDeviceReset());
 	std::cout << duration << std::endl;
 	return 0;
-
 }
 
 

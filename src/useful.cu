@@ -1521,7 +1521,7 @@ void DEMO2_1(const FanEAGeo& FanGeo, const Image& Img,
 	//Begin OS-SART;
 	OS_SART_SD(himg, hprj, hweg, hmsk, FanGeo, Img, iterNum, subSetNum, updateCoef, initAlpha, apa_s, descentTime);
 
-	writeData_host(FouName, himg, imgReso);
+	// writeData_host(FouName, himg, imgReso);
 }
 
 
@@ -1573,7 +1573,7 @@ void DEMO2()
 	//Begin OS-SART;
 	OS_SART_SD(himg, hprj, hweg, hmsk, FanGeo, Img, iterNum, subSetNum, updateCoef, initAlpha, apa_s, descentTime);
 
-	writeData_host(FouName, himg, imgReso);
+	// writeData_host(FouName, himg, imgReso);
 }
 
 
@@ -1622,7 +1622,7 @@ void DEMO3()//This is the demo of OS-SART + STF
 	//Begin OS-SART;
 
 	OS_SART_STF(himg, hprj, hweg, hmsk, FanGeo, Img, iterNum, subSetNum, objTV, updateCoef);
-	writeData_host(FouName, himg, imgReso);
+	// writeData_host(FouName, himg, imgReso);
 }
 
 
@@ -1680,7 +1680,7 @@ void DEMO3_1(const FanEAGeo& FanGeo, const Image& Img,
 	//Begin OS-SART;
 
 	OS_SART_STF(himg, hprj, hweg, hmsk, FanGeo, Img, iterNum, subSetNum, objTV, updateCoef);
-	writeData_host(FouName, himg, imgReso);
+	// writeData_host(FouName, himg, imgReso);
 }
 
 
