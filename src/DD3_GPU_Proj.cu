@@ -9,8 +9,6 @@
 #define BLKY 8
 #define BLKZ 1
 
-
-
 //Create texture object and corresponding cudaArray function
 template<typename T>
 void createTextureObject2(
@@ -22,8 +20,7 @@ void createTextureObject2(
 	cudaTextureAddressMode addressMode, // how to address the texture (clamp, border ...)
 	cudaTextureFilterMode textureFilterMode, // usually linear filtering (double --> int2 use pointer not linear interpolation)
 	cudaTextureReadMode textureReadMode, // usually use element wise reading mode.
-	bool isNormalized) // usually false
-{
+	bool isNormalized) { // usually false
 	cudaExtent prjSize;
 	prjSize.width = Width;
 	prjSize.height = Height;
@@ -55,8 +52,7 @@ void createTextureObject2(
 }
 
 // Destroy a GPU array and corresponding TextureObject
-void destroyTextureObject2(cudaTextureObject_t& texObj, cudaArray* d_array)
-{
+void destroyTextureObject2(cudaTextureObject_t& texObj, cudaArray* d_array) {
 	cudaDestroyTextureObject(texObj);
 	cudaFreeArray(d_array);
 }
@@ -66,14 +62,13 @@ __global__ void naive_copyToTwoVolumes(Ta* in_ZXY,
 	Tb* out_ZXY, Tb* out_ZYX,
 	int XN, int YN, int ZN)
 {
-	int idz = threadIdx.x + blockIdx.x * blockDim.x;
-	int idx = threadIdx.y + blockIdx.y * blockDim.y;
-	int idy = threadIdx.z + blockIdx.z * blockDim.z;
-	if (idx < XN && idy < YN && idz < ZN)
-	{
-		int i = (idy * XN + idx) * ZN + idz;
-		int ni = (idy * (XN + 1) + (idx + 1)) * (ZN + 1) + idz + 1;
-		int nj = (idx * (YN + 1) + (idy + 1)) * (ZN + 1) + idz + 1;
+	const int idz = threadIdx.x + blockIdx.x * blockDim.x;
+	const int idx = threadIdx.y + blockIdx.y * blockDim.y;
+	const int idy = threadIdx.z + blockIdx.z * blockDim.z;
+	if (idx < XN && idy < YN && idz < ZN) {
+		const int i = (idy * XN + idx) * ZN + idz;
+		const int ni = (idy * (XN + 1) + (idx + 1)) * (ZN + 1) + idz + 1;
+		const int nj = (idx * (YN + 1) + (idy + 1)) * (ZN + 1) + idz + 1;
 
 		out_ZXY[ni] = in_ZXY[i];
 		out_ZYX[nj] = in_ZXY[i];

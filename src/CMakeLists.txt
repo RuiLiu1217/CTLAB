@@ -54,7 +54,7 @@ SET(CTLAB_HEADERS
 	ProjectionModelMap.h
 	BackprojectionModelMap.h
 	Geometry.h
-	
+	# ProjectionTextureObjectProvider.h
 	
 )
 
@@ -85,6 +85,7 @@ SET(CTLAB_SRC
 	ProjectionModelMap.cpp
 	BackprojectionModelMap.cpp
 	Geometry.cpp
+	# ProjectionTextureObjectProvider.cpp
 )
 
 
