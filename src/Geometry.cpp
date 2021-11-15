@@ -1,9 +1,10 @@
 #include "Geometry.h"
-
-#include <cmath>
 #include <algorithm>
-#ifndef M_PI
-#define M_PI (3.14159265358979323846264)
+#include <cmath>
+#include <math.h>
+
+#ifndef PI
+#define PI (3.14159265358979323846264)
 #endif
 
 Geometry::Geometry() :mDetShape(ARC)
@@ -63,7 +64,7 @@ void Geometry::setStartView(const float s)
 void Geometry::setViewPerRot(const int s)
 {
 	mViewPerRot = s;
-	mViewStep = M_PI * 2.0 / static_cast<float>(mViewPerRot);
+	mViewStep = PI * 2.0 / static_cast<float>(mViewPerRot);
 }
 void Geometry::setViewNumber(const int s)
 {

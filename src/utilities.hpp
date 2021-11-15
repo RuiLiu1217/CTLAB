@@ -16,6 +16,7 @@
 #include <cassert>
 #include <cfloat>
 #include <chrono>
+#define _USE_MATH_DEFINES // for C++
 #include <cmath>
 #include <cstdio>
 #include <cusparse.h>
@@ -82,7 +83,7 @@ typedef unsigned int uint;
 typedef const unsigned int cuint;
 typedef unsigned char byte;
 typedef thrust::device_vector<float> d_vec_t;
-typedef thrust::host_vector<float> h_vec_t;
+// typedef thrust::host_vector<float> h_vec_t;
 
 
 /// \brief Define that macro for Thrust compiling successful
@@ -91,9 +92,10 @@ typedef thrust::host_vector<float> h_vec_t;
 #endif
 
 
-#ifndef PI
-#define PI (3.14159265358979323846264) 
+#ifndef PI 
+#define PI (3.14159265358979323846264)
 #endif
+
 
 #ifndef _PI 
 #define _PI (3.14159265358979323846264)
@@ -127,162 +129,6 @@ typedef thrust::host_vector<float> h_vec_t;
 #ifndef _EPSILON
 #define _EPSILON (1.0E-9)
 #endif
-
-
-//Calculate Two Arrays inner product
-///This function is not used for Users but for calling by system; 
-///IT IS A META-PROGRAM
-///Author: Rui LIU
-///Date: 2013-2-18
-///Version: 1.0
-template<int Dims,typename T>
-class DotProduct
-{
-public:
-	static T result(T* a,T* b)
-	{
-		return (*a)*(*b) + DotProduct<Dims-1,T>::result(a+1,b+1);
-	}
-};
-template<typename T>
-class DotProduct<1,T>
-{
-public:
-	static T result(T* a,T* b)
-	{
-		return (*a)*(*b);
-	}
-};
-
-//////////////////////////////////////////////////////////////////////////
-/// Call the dot production meta function
-template<int Dims,typename T>
-inline T innerProd_META(T* a, T* b)
-{
-	return DotProduct<Dims,T>::result(a,b);
-}
-
-
-
-//Add two vector together
-//This function is not used for Users but for calling by system;
-//It is a META-program
-//Author: Rui LIU
-//Date: 2013-8-9
-//Version: 1.0
-template<int Dims, typename T>
-class AddVector
-{
-public:
-	static void result(T* a, T* b, T* c)
-	{
-		(*c) = (*a) + (*b);
-		AddVector<Dims-1,T>::result(a+1,b+1);
-	}
-};
-template<typename T>
-class AddVector<1,T>
-{
-public:
-	static T result(T* a,T* b,T* c)
-	{
-		(*c) = (*a) + (*b);
-	}
-};
-
-template<int Dims,typename T>
-inline void add_META(T* a, T* b, T* c)
-{
-	return AddVector<Dims,T>::result(a,b,c);
-}
-
-
-//Sub vector a from b together
-//This function is not used for Users but for calling by system;
-//It is a META-program
-//Author: Rui LIU
-//Date: 2013-8-9
-//Version: 1.0
-template<int Dims, typename T>
-class SubVector
-{
-public:
-	static void result(T* a, T* b, T* c)
-	{
-		(*c) = (*a) - (*b);
-		SubVector<Dims-1,T>::result(a+1,b+1);
-	}
-};
-template<typename T>
-class SubVector<1,T>
-{
-public:
-	static T result(T* a,T* b, T* c)
-	{
-		(*c) = (*a) - (*b);
-	}
-};
-
-template<int Dims,typename T>
-inline void sub_META(T* a, T* b, T* c)
-{
-	return SubVector<Dims,T>::result(a,b,c);
-}
-
-
-
-///This metaprogram is used to calculate the p power for each element and then add them together
-//It is a META-PROGRAM
-//Author: Rui Liu
-//Date: 2013-08-13
-//Version: 1.0
-template<int Dims, typename T>
-class powerVector
-{
-public:
-	static T result(T* vec, T p)
-	{
-		return std::pow((*vec),p) + powerVector<Dims-1,T>::result(vec+1,p);
-	}
-};
-template<typename T>
-class powerVector<1,T>
-{
-public:
-	static T result(T *vec, T p)
-	{
-		return std::pow((*vec),p);
-	}
-};
-
-
-
-///This meta function solute the problem that a matrix multiply with
-/// a vector
-///Author: Rui Liu
-/// Use the meta programming method to generate the 
-/// cosine and sine series given a series of theta
-template<int Dims, typename T>
-class CosSinTheta
-{
-public:
-	static void result(T* cosTheta, T* sinTheta, T* theta)
-	{
-		(*cosTheta) = cos((*theta));
-		(*sinTheta) = sin((*theta));
-		CosSinTheta<Dims-1,T>::result(cosTheta+1,sinTheta+1,theta+1);
-	}
-};
-template<typename T>
-class CosSinTheta<1,T>
-{
-public:
-	static T result(T* cosTheta,T* sinTheta,T* theta)
-	{
-		(*cosTheta) = cos((*theta));
-		(*sinTheta) = sin((*theta));
-	}
-};
 
 
 /// \brief Ray class on 2D
@@ -3320,19 +3166,12 @@ inline __host__ __device__ void SortProj(T(&grid)[4][3])
 	}
 }
 
-
 template<typename T>
-__host__ __device__ inline void SortProjection(T(&Grid)[4][3])
-{
-	int i, j;
+__host__ __device__ inline void SortProjection(T(&Grid)[4][3]) {
 	T td;
-	//mexPrintf("S0=%d,S1=%d,S2=%d,S3=%d\n",SSort[0],SSort[1],SSort[2],SSort[3]);
-	for (i = 0; i < 3; i++)
-	{
-		for (j = i + 1; j < 4; j++)
-		{
-			if (Grid[j][2] < Grid[i][2])
-			{
+	for (int i = 0; i < 3; i++)	{
+		for (int j = i + 1; j < 4; j++)	{
+			if (Grid[j][2] < Grid[i][2]) {
 				td = Grid[i][0];
 				Grid[i][0] = Grid[j][0];
 				Grid[j][0] = td;
@@ -3348,6 +3187,7 @@ __host__ __device__ inline void SortProjection(T(&Grid)[4][3])
 		}
 	}
 }
+
 template<typename T>
 inline __host__ __device__ T ComputeCoefficient(
 	const T(&Grid)[4][3],
@@ -3385,286 +3225,282 @@ inline __host__ __device__ T ComputeCoefficient(
 
 	switch (AI)
 	{
-	case 0:
-	{
-		switch (BI)
+		case 0:
 		{
-		case 1:// case [0,1]
-		{
-			x0 = Grid[0][0] - SPoint[0];
-			y0 = Grid[0][1] - SPoint[1];
-			if (abs(SVB[0] * SVB[1]) > 0)
+			switch (BI)
 			{
-				t = x0*SVB[1] - y0*SVB[0];
-				a = t / SVB[0];
-				b = t / SVB[1];
-				coef = 0.5*abs(a*b);
-			}
-			break;
-		}
-		case 2: // case [0,2]
-		{
-			x0 = abs(Grid[0][0] - Grid[1][0]);
-			y0 = abs(Grid[0][1] - Grid[1][1]);
-			if (x0 > y0) // line is on the x-direction
+			case 1:// case [0,1]
 			{
-				a = abs((Grid[0][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[0][1] - SPoint[1]));
-				b = abs((Grid[1][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[1][1] - SPoint[1]));
-				coef = (a + b)*x0*0.5;
+				x0 = Grid[0][0] - SPoint[0];
+				y0 = Grid[0][1] - SPoint[1];
+				if (abs(SVB[0] * SVB[1]) > 0)
+				{
+					t = x0*SVB[1] - y0*SVB[0];
+					a = t / SVB[0];
+					b = t / SVB[1];
+					coef = 0.5*abs(a*b);
+				}
+				break;
 			}
-			else
+			case 2: // case [0,2]
 			{
-				a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVB[0] / SVB[1]);
-				b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVB[0] / SVB[1]);
-				coef = (a + b)*y0*0.5;
+				x0 = abs(Grid[0][0] - Grid[1][0]);
+				y0 = abs(Grid[0][1] - Grid[1][1]);
+				if (x0 > y0) // line is on the x-direction
+				{
+					a = abs((Grid[0][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[0][1] - SPoint[1]));
+					b = abs((Grid[1][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[1][1] - SPoint[1]));
+					coef = (a + b)*x0*0.5;
+				}
+				else
+				{
+					a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVB[0] / SVB[1]);
+					b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVB[0] / SVB[1]);
+					coef = (a + b)*y0*0.5;
+				}
+				break;
 			}
-			break;
-		}
-		case 3://case [0,3]
-		{    x0 = Grid[3][0] - SPoint[0];
-		y0 = Grid[3][1] - SPoint[1];
-		if (abs(SVB[0] * SVB[1]) > 0)
-		{
-			t = x0*SVB[1] - y0*SVB[0];
-			a = t / SVB[0];
-			b = t / SVB[1];
-			coef = 0.5*abs(a*b);
-			coef = area - coef;
-		}
-		else
-			coef = area;
-		break;
-		}
-		case 4: // case [0,4]
-		{
-			coef = area;
-			break;
-		}
-		default: break;
-		}
-		break;
-	}//end case 0 of AI
-	case 1:
-	{
-		switch (BI)
-		{
-		case 1://case [1,1]
-		{
-			x0 = Grid[0][0] - SPoint[0];
-			y0 = Grid[0][1] - SPoint[1];
-			t = x0*SVB[1] - y0*SVB[0];
-			if (abs(SVB[0] * SVB[1]) > 0)
+			case 3://case [0,3]
+			{    
+				x0 = Grid[3][0] - SPoint[0];
+				y0 = Grid[3][1] - SPoint[1];
+				if (abs(SVB[0] * SVB[1]) > 0)
+				{
+					t = x0*SVB[1] - y0*SVB[0];
+					a = t / SVB[0];
+					b = t / SVB[1];
+					coef = 0.5*abs(a*b);
+					coef = area - coef;
+				}
+				else
+					coef = area;
+				break;
+			}
+			case 4: // case [0,4]
 			{
-				a = t / SVB[0];
-				b = t / SVB[1];
-				coef = 0.5*abs(a*b);
-			}
-			t = x0*SVA[1] - y0*SVA[0];
-			if (abs(SVA[0] * SVA[1]) > 0)
-			{
-				a = t / SVA[0];
-				b = t / SVA[1];
-				coef = abs(coef - 0.5*abs(a*b));
-			}
-			break;
-		}
-		case 2://case [1,2]
-		{
-			x0 = abs(Grid[0][0] - Grid[1][0]);
-			y0 = abs(Grid[0][1] - Grid[1][1]);
-			if (x0 > y0) // line is on the x-dirction
-			{
-				a = abs((Grid[0][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[0][1] - SPoint[1]));
-				b = abs((Grid[1][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[1][1] - SPoint[1]));
-				coef = (a + b)*x0*0.5;
-			}
-			else
-			{
-				a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVB[0] / SVB[1]);
-				b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVB[0] / SVB[1]);
-				coef = (a + b)*y0*0.5;
-			}
-			x0 = Grid[0][0] - SPoint[0];
-			y0 = Grid[0][1] - SPoint[1];
-			if (abs(SVA[0] * SVA[1]) > 0)
-			{
-				t = x0*SVA[1] - y0*SVA[0];
-				a = t / SVA[0];
-				b = t / SVA[1];
-				coef = abs(0.5*abs(a*b) - coef);
-			}
-			break;
-		}
-		case 3://case [1,3]
-		{
-			x0 = Grid[0][0] - SPoint[0];
-			y0 = Grid[0][1] - SPoint[1];
-			if (abs(SVA[0] * SVA[1]) > 0)
-			{
-				t = x0*SVA[1] - y0*SVA[0];
-				a = t / SVA[0];
-				b = t / SVA[1];
-				coef = area - 0.5*abs(a*b);
-			}
-			else
 				coef = area;
-			x0 = Grid[3][0] - SPoint[0];
-			y0 = Grid[3][1] - SPoint[1];
-			if (abs(SVB[0] * SVB[1]) > 0)
+				break;
+			}
+			default: break;
+			}
+			break;
+		}//end case 0 of AI
+		case 1:
+		{
+			switch (BI)
 			{
+			case 1://case [1,1]
+			{
+				x0 = Grid[0][0] - SPoint[0];
+				y0 = Grid[0][1] - SPoint[1];
 				t = x0*SVB[1] - y0*SVB[0];
-				a = t / SVB[0];
-				b = t / SVB[1];
-				coef = coef - 0.5*abs(a*b);
-			}
-			break;
-		}
-		case 4://case [1,4]
-		{
-			x0 = Grid[0][0] - SPoint[0];
-			y0 = Grid[0][1] - SPoint[1];
-			if (abs(SVA[0] * SVA[1]) > 0)
-			{
+				if (abs(SVB[0] * SVB[1]) > 0)
+				{
+					a = t / SVB[0];
+					b = t / SVB[1];
+					coef = 0.5*abs(a*b);
+				}
 				t = x0*SVA[1] - y0*SVA[0];
-				a = t / SVA[0];
-				b = t / SVA[1];
-				coef = 0.5*abs(a*b);
-				coef = area - coef;
+				if (abs(SVA[0] * SVA[1]) > 0)
+				{
+					a = t / SVA[0];
+					b = t / SVA[1];
+					coef = abs(coef - 0.5*abs(a*b));
+				}
+				break;
 			}
-			else
-				coef = area;
+			case 2://case [1,2]
+			{
+				x0 = abs(Grid[0][0] - Grid[1][0]);
+				y0 = abs(Grid[0][1] - Grid[1][1]);
+				if (x0 > y0) // line is on the x-dirction
+				{
+					a = abs((Grid[0][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[0][1] - SPoint[1]));
+					b = abs((Grid[1][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[1][1] - SPoint[1]));
+					coef = (a + b)*x0*0.5;
+				}
+				else
+				{
+					a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVB[0] / SVB[1]);
+					b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVB[0] / SVB[1]);
+					coef = (a + b)*y0*0.5;
+				}
+				x0 = Grid[0][0] - SPoint[0];
+				y0 = Grid[0][1] - SPoint[1];
+				if (abs(SVA[0] * SVA[1]) > 0)
+				{
+					t = x0*SVA[1] - y0*SVA[0];
+					a = t / SVA[0];
+					b = t / SVA[1];
+					coef = abs(0.5*abs(a*b) - coef);
+				}
+				break;
+			}
+			case 3://case [1,3]
+			{
+				x0 = Grid[0][0] - SPoint[0];
+				y0 = Grid[0][1] - SPoint[1];
+				if (abs(SVA[0] * SVA[1]) > 0)
+				{
+					t = x0*SVA[1] - y0*SVA[0];
+					a = t / SVA[0];
+					b = t / SVA[1];
+					coef = area - 0.5*abs(a*b);
+				}
+				else
+					coef = area;
+				x0 = Grid[3][0] - SPoint[0];
+				y0 = Grid[3][1] - SPoint[1];
+				if (abs(SVB[0] * SVB[1]) > 0)
+				{
+					t = x0*SVB[1] - y0*SVB[0];
+					a = t / SVB[0];
+					b = t / SVB[1];
+					coef = coef - 0.5*abs(a*b);
+				}
+				break;
+			}
+			case 4://case [1,4]
+			{
+				x0 = Grid[0][0] - SPoint[0];
+				y0 = Grid[0][1] - SPoint[1];
+				if (abs(SVA[0] * SVA[1]) > 0)
+				{
+					t = x0*SVA[1] - y0*SVA[0];
+					a = t / SVA[0];
+					b = t / SVA[1];
+					coef = 0.5*abs(a*b);
+					coef = area - coef;
+				}
+				else
+					coef = area;
+				break;
+			}
+			default: break;
+			}
 			break;
-		}
-		default: break;
-		}
-		break;
-	}//end case 1 of AI
-	case 2:
-	{
-		switch (BI)
-		{
+		}//end case 1 of AI
 		case 2:
 		{
-			x0 = abs(Grid[0][0] - Grid[1][0]);
-			y0 = abs(Grid[0][1] - Grid[1][1]);
-			if (x0 > y0) // line is on the x-dirction
+			switch (BI)
 			{
-				a = abs((Grid[0][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[0][1] - SPoint[1]));
-				b = abs((Grid[1][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[1][1] - SPoint[1]));
-				coef = (a + b)*x0*0.5;
-				a = abs((Grid[0][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[0][1] - SPoint[1]));
-				b = abs((Grid[1][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[1][1] - SPoint[1]));
-				coef = abs(coef - (a + b)*x0*0.5);
+			case 2:
+			{
+				x0 = abs(Grid[0][0] - Grid[1][0]);
+				y0 = abs(Grid[0][1] - Grid[1][1]);
+				if (x0 > y0) // line is on the x-dirction
+				{
+					a = abs((Grid[0][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[0][1] - SPoint[1]));
+					b = abs((Grid[1][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[1][1] - SPoint[1]));
+					coef = (a + b)*x0*0.5;
+					a = abs((Grid[0][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[0][1] - SPoint[1]));
+					b = abs((Grid[1][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[1][1] - SPoint[1]));
+					coef = abs(coef - (a + b)*x0*0.5);
+				}
+				else
+				{
+					a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVB[0] / SVB[1]);
+					b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVB[0] / SVB[1]);
+					coef = (a + b)*y0*0.5;
+					a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVA[0] / SVA[1]);
+					b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVA[0] / SVA[1]);
+					coef = abs(coef - (a + b)*y0*0.5);
+				}
+				break;
 			}
-			else
+			case 3:
 			{
-				a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVB[0] / SVB[1]);
-				b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVB[0] / SVB[1]);
-				coef = (a + b)*y0*0.5;
-				a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVA[0] / SVA[1]);
-				b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVA[0] / SVA[1]);
-				coef = abs(coef - (a + b)*y0*0.5);
+				x0 = abs(Grid[2][0] - Grid[3][0]);
+				y0 = abs(Grid[2][1] - Grid[3][1]);
+				if (x0 > y0) // line is on the x-dirction
+				{
+					a = abs((Grid[2][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[2][1] - SPoint[1]));
+					b = abs((Grid[3][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[3][1] - SPoint[1]));
+					coef = (a + b)*x0*0.5;
+				}
+				else
+				{
+					a = abs((Grid[2][0] - SPoint[0]) - (Grid[2][1] - SPoint[1])*SVA[0] / SVA[1]);
+					b = abs((Grid[3][0] - SPoint[0]) - (Grid[3][1] - SPoint[1])*SVA[0] / SVA[1]);
+					coef = (a + b)*y0*0.5;
+				}
+				x0 = Grid[3][0] - SPoint[0];
+				y0 = Grid[3][1] - SPoint[1];
+				if (abs(SVB[0] * SVB[1]) > 0)
+				{
+					t = x0*SVB[1] - y0*SVB[0];
+					a = t / SVB[0];
+					b = t / SVB[1];
+					coef = abs(0.5*abs(a*b) - coef);
+				}
+				break;
+			}
+			case 4:
+			{
+				x0 = abs(Grid[2][0] - Grid[3][0]);
+				y0 = abs(Grid[2][1] - Grid[3][1]);
+				if (x0 > y0) // line is on the x-dirction
+				{
+					a = abs((Grid[2][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[2][1] - SPoint[1]));
+					b = abs((Grid[3][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[3][1] - SPoint[1]));
+					coef = (a + b)*x0*0.5;
+				}
+				else // line is on the y-direction
+				{
+					a = abs((Grid[2][0] - SPoint[0]) - (Grid[2][1] - SPoint[1])*SVA[0] / SVA[1]);
+					b = abs((Grid[3][0] - SPoint[0]) - (Grid[3][1] - SPoint[1])*SVA[0] / SVA[1]);
+					coef = (a + b)*y0*0.5;
+				}
+				break;
+			}
+			default: break;
 			}
 			break;
-		}
+		}//end case 2 of AI
 		case 3:
 		{
-			x0 = abs(Grid[2][0] - Grid[3][0]);
-			y0 = abs(Grid[2][1] - Grid[3][1]);
-			if (x0 > y0) // line is on the x-dirction
+			switch (BI)
 			{
-				a = abs((Grid[2][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[2][1] - SPoint[1]));
-				b = abs((Grid[3][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[3][1] - SPoint[1]));
-				coef = (a + b)*x0*0.5;
+			case 3:
+			{
+				x0 = Grid[3][0] - SPoint[0];
+				y0 = Grid[3][1] - SPoint[1];
+				if (abs(SVB[0] * SVB[1]) > 0)
+				{
+					t = x0*SVB[1] - y0*SVB[0];
+					a = t / SVB[0];
+					b = t / SVB[1];
+					coef = 0.5*abs(a*b);
+				}
+				if (abs(SVA[0] * SVA[1]) > 0)
+				{
+					t = x0*SVA[1] - y0*SVA[0];
+					a = t / SVA[0];
+					b = t / SVA[1];
+					coef = abs(coef - 0.5*abs(a*b));
+				}
+				break;
 			}
-			else
+			case 4:
 			{
-				a = abs((Grid[2][0] - SPoint[0]) - (Grid[2][1] - SPoint[1])*SVA[0] / SVA[1]);
-				b = abs((Grid[3][0] - SPoint[0]) - (Grid[3][1] - SPoint[1])*SVA[0] / SVA[1]);
-				coef = (a + b)*y0*0.5;
+				x0 = Grid[3][0] - SPoint[0];
+				y0 = Grid[3][1] - SPoint[1];
+				if (abs(SVA[0] * (SVA[1])) > 0)
+				{
+					t = x0*SVA[1] - y0*SVA[0];
+					a = t / SVA[0];
+					b = t / SVA[1];
+					coef = 0.5*abs(a*b);
+				}
+				break;
 			}
-			x0 = Grid[3][0] - SPoint[0];
-			y0 = Grid[3][1] - SPoint[1];
-			if (abs(SVB[0] * SVB[1]) > 0)
-			{
-				t = x0*SVB[1] - y0*SVB[0];
-				a = t / SVB[0];
-				b = t / SVB[1];
-				coef = abs(0.5*abs(a*b) - coef);
-			}
-			break;
-		}
-		case 4:
-		{
-			x0 = abs(Grid[2][0] - Grid[3][0]);
-			y0 = abs(Grid[2][1] - Grid[3][1]);
-			if (x0 > y0) // line is on the x-dirction
-			{
-				a = abs((Grid[2][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[2][1] - SPoint[1]));
-				b = abs((Grid[3][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[3][1] - SPoint[1]));
-				coef = (a + b)*x0*0.5;
-			}
-			else // line is on the y-direction
-			{
-				a = abs((Grid[2][0] - SPoint[0]) - (Grid[2][1] - SPoint[1])*SVA[0] / SVA[1]);
-				b = abs((Grid[3][0] - SPoint[0]) - (Grid[3][1] - SPoint[1])*SVA[0] / SVA[1]);
-				coef = (a + b)*y0*0.5;
+			default: break;
 			}
 			break;
-		}
-		default: break;
-		}
-		break;
-	}//end case 2 of AI
-	case 3:
-	{
-		switch (BI)
-		{
-		case 3:
-		{
-			x0 = Grid[3][0] - SPoint[0];
-			y0 = Grid[3][1] - SPoint[1];
-			if (abs(SVB[0] * SVB[1]) > 0)
-			{
-				t = x0*SVB[1] - y0*SVB[0];
-				a = t / SVB[0];
-				b = t / SVB[1];
-				coef = 0.5*abs(a*b);
-			}
-			if (abs(SVA[0] * SVA[1]) > 0)
-			{
-				t = x0*SVA[1] - y0*SVA[0];
-				a = t / SVA[0];
-				b = t / SVA[1];
-				coef = abs(coef - 0.5*abs(a*b));
-			}
-			break;
-		}
-		case 4:
-		{
-			x0 = Grid[3][0] - SPoint[0];
-			y0 = Grid[3][1] - SPoint[1];
-			if (abs(SVA[0] * (SVA[1])) > 0)
-			{
-				t = x0*SVA[1] - y0*SVA[0];
-				a = t / SVA[0];
-				b = t / SVA[1];
-				coef = 0.5*abs(a*b);
-				//mexPrintf("x0=%f,y0=%f,SVA[0]=%f,SVA[1]=%f,t=%f,a=%f,b=%f;coef=%f\n",x0,y0,SVA[0],SVA[1],t,a,b,coef);
-			}
-			break;
-		}
-		default: break;
-		}
-		break;
-	}//end case 3 of AI
+		}//end case 3 of AI
 	}//end of switch AI
 	return coef;
 }
-
-
-
-
 
 // Generate The projection matrix in AIM model
 template<typename T>
@@ -3911,8 +3747,7 @@ void genProj_AIM(std::vector<int>& rowIdx, std::vector<int>& colIdx, std::vector
 
 
 template<typename T>
-void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img)
-{
+void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img) {
 	unsigned int angIdx = 0;
 	std::vector < int> rowIdx;
 	std::vector < int > colIdx;
@@ -3930,14 +3765,11 @@ void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img)
 	std::string f1;
 	std::string f2;
 	std::string f3;
-	if (sizeof(T) == 4)
-	{
+	if (sizeof(T) == 4)	{
 		f1 = "prjAIM" + ss.str() + "f.row";
 		f2 = "prjAIM" + ss.str() + "f.col";
 		f3 = "prjAIM" + ss.str() + "f.cof";
-	}
-	else if (sizeof(T) == 8)
-	{
+	} else if (sizeof(T) == 8) {
 		f1 = "prjAIM" + ss.str() + "d.row";
 		f2 = "prjAIM" + ss.str() + "d.col";
 		f3 = "prjAIM" + ss.str() + "d.cof";
@@ -3956,12 +3788,10 @@ void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img)
 	rowFile.close();
 	colFile.close();
 	coeFile.close();
-
 }
 
 template<typename T>
-void genProjectionMatrix_AIM_template(const FanEAGeo FanGeo, const Image Img)
-{
+void genProjectionMatrix_AIM_template(const FanEAGeo FanGeo, const Image Img) {
 	int angIdx = 0;
 	std::vector < int> rowIdx;
 	std::vector < int > colIdx;
@@ -4071,101 +3901,33 @@ int calZeroNorm(const thrust::device_vector<T>& v, thrust::device_vector<int>& I
 
 
 template<typename T>
-void DD3Boundaries(int nrBoundaries, T*pCenters, T *pBoundaries)
-{
+void DD3Boundaries(int nrBoundaries, T*pCenters, T *pBoundaries) {
 	int i;
-	if (nrBoundaries >= 3)
-	{
+	if (nrBoundaries >= 3) {
 		*pBoundaries++ = 1.5 * *pCenters - 0.5 * *(pCenters + 1);
-		for (i = 1; i <= (nrBoundaries - 2); i++)
-		{
+		for (i = 1; i <= (nrBoundaries - 2); i++) {
 			*pBoundaries++ = 0.5 * *pCenters + 0.5 * *(pCenters + 1);
 			pCenters++;
 		}
 		*pBoundaries = 1.5 * *pCenters - 0.5 * *(pCenters - 1);
-	}
-	else
-	{
+	} else {
 		*pBoundaries = *pCenters - 0.5;
 		*(pBoundaries + 1) = *pCenters + 0.5;
 	}
-
-}
-
-
-
-template<typename T>
-void DD3Boundaries(int nrBoundaries,const T*pCenters, T *pBoundaries)
-{
-	int i;
-	if (nrBoundaries >= 3)
-	{
-		*pBoundaries++ = 1.5 * *pCenters - 0.5 * *(pCenters + 1);
-		for (i = 1; i <= (nrBoundaries - 2); i++)
-		{
-			*pBoundaries++ = 0.5 * *pCenters + 0.5 * *(pCenters + 1);
-			pCenters++;
-		}
-		*pBoundaries = 1.5 * *pCenters - 0.5 * *(pCenters - 1);
-	}
-	else
-	{
-		*pBoundaries = *pCenters - 0.5;
-		*(pBoundaries + 1) = *pCenters + 0.5;
-	}
-
 }
 
 template<typename T>
-void DD3Boundaries(int nrBoundaries, std::vector<T>& Centers, std::vector<T>& Boundaries)
-{
+void DD3Boundaries(int nrBoundaries, std::vector<T>& Centers, std::vector<T>& Boundaries) {
 	int i;
 	T* pBoundaries = &Boundaries[0];
 	T* pCenters = &Centers[0];
-	if (nrBoundaries >= 3)
-	{
-		*pBoundaries++ = 1.5 * *pCenters - 0.5 * *(pCenters + 1);
-		for (i = 1; i <= (nrBoundaries - 2); i++)
-		{
-			*pBoundaries++ = 0.5 * *pCenters + 0.5 * *(pCenters + 1);
-			pCenters++;
-		}
-		*pBoundaries = 1.5 * *pCenters - 0.5 * *(pCenters - 1);
-	}
-	else
-	{
-		*pBoundaries = *pCenters - 0.5;
-		*(pBoundaries + 1) = *pCenters + 0.5;
-	}
-
+	DD3Boundaries(nrBoundaries, pCenters, pBoundaries);
 }
 
 template<typename T>
-void DD3Boundaries(int nrBoundaries, thrust::host_vector<T>& Centers, thrust::host_vector<T>& Boundaries)
-{
+void DD3Boundaries(int nrBoundaries, thrust::host_vector<T>& Centers, thrust::host_vector<T>& Boundaries) {
 	DD3Boundaries<T>(nrBoundaries, &Centers[0], &Boundaries[0]);
 }
-
-
-
-
-template<typename T>
-T SIGN(const T& v)
-{
-	if (v > 0)
-	{
-		return 1;
-	}
-	else if (v < 0)
-	{
-		return -1;
-	}
-	else
-	{
-		return 0;
-	}
-}
-
 
 template<typename T>
 std::vector<T>& operator+(std::vector<T>& v, const T& ms)
@@ -4194,21 +3956,11 @@ std::ostream& operator<<(std::ostream& os, std::vector<T>& dt)
 
 
 template<typename T>
-const T mean(std::vector<T>& v)
-{
-	T summ = 0;
-	for (unsigned int i = 0; i != v.size(); ++i)
-	{
-		summ += v[i];
-	}
-	if (v.size() == 0)
-	{
+const T mean(std::vector<T>& v) {
+	if (v.empty()) {
 		return 0;
 	}
-	else
-	{
-		return (summ / static_cast<T>(v.size()));
-	}
+	return std::accumulate(begin(v), end(v), 0) / static_cast<T>(v.size());
 }
 
 
@@ -4260,40 +4012,31 @@ void prjWeight(T* prj, // projection data to be updated
 		int N) // total elements number
 {
 #pragma omp parallel for
-	for (int i = 0; i < N; ++i)
-	{
-		if (rowSum[i] > _EPSILON)
-		{
+	for (int i = 0; i < N; ++i)	{
+		if (rowSum[i] > _EPSILON) {
 			prj[i] = (realPrj[i] - prj[i]) / rowSum[i];
-		}
-		else
-		{
+		} else {
 			prj[i] = 0;
 		}
 	}
 }
 
 template<typename T>
-void prjWeight(std::vector<T>& prj, std::vector<T>& realPrj, std::vector<T>& rowSum)
-{
-	struct prjFunctor
-	{
+void prjWeight(std::vector<T>& prj, std::vector<T>& realPrj, std::vector<T>& rowSum) {
+
+	struct prjFunctor {
 		typedef thrust::tuple<T,T,T> InputTuple;
 		T operator()(InputTuple& in)
 		{
 			T prj_ = thrust::get<0>(in);
 			T realPrj_ = thrust::get<1>(in);
 			T rowSum_ = thrust::get<2>(in);
-			if(rowSum_> _EPSILON)
-			{
+			if(rowSum_> _EPSILON) {
 				return (realPrj_ - prj_) / rowSum_;
-			}
-			else
-			{
+			} else {
 				return 0;
 			}
 		}
-
 	};
 
 	thrust::transform(
@@ -4382,35 +4125,20 @@ void FISTA(T* lasImg, T* currentImg, T t1, T t2, int N)
 template<typename T>
 void FISTA(std::vector<T>& lasImg, std::vector<T>&  currentImg, T t1, T t2, int N)
 {
-	struct FISTA_functor
-	{
-		T t1;
-		T t2;
-		FISTA_functor(const T& _t1, const T& _t2) :t1(_t1), t2(_t2){}
-		__host__ __device__ T operator()(T curImg, T lasImg)
-		{
-			return curImg + (t1 - 1.0) / t2 * (curImg - lasImg);
-		}
-
-	};
-	thrust::transform(currentImg.begin(), currentImg.end(), lasImg.begin(), currentImg, FISTA_functor(t1, t2));
+	FISTA(&(currentImg[0]), &(lasImg[0]), t1, t2, N);
 }
-
-
-template<typename T>
-__device__ inline T intersectLength_device(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax)
-{
-	const T left = (fixedmin > varimin) ? fixedmin : varimin;
-	const T right = (fixedmax < varimax) ? fixedmax : varimax;
-	return fabsf(right - left) * static_cast<T>(right > left);
-}
-
-
 
 template<typename T>
 __host__ __device__ inline T intersectLength(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax)
 {
 	const T left = (fixedmin > varimin) ? fixedmin : varimin;
 	const T right = (fixedmax < varimax) ? fixedmax : varimax;
-	return abs(right - left) * static_cast<double>(right > left);
+	return (sizeof(T) == 4 ? fabsf(right - left) : fabs(right - left)) * static_cast<double>(right > left);
+}
+
+template<typename T>
+__device__ inline T intersectLength_device(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax) {
+	const T left = (fixedmin > varimin) ? fixedmin : varimin;
+	const T right = (fixedmax < varimax) ? fixedmax : varimax;
+	return (sizeof(T) == 4 ? fabsf(right - left) : fabs(right - left)) * static_cast<double>(right > left);
 }
