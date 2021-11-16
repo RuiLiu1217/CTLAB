@@ -72,13 +72,13 @@ set(generated_file_internal "C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CM
 set(generated_cubin_file_internal "C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir//$(Configuration)/CTLAB_generated_DD3_GPU_recon.cu.obj.cubin.txt") # path
 
 set(CUDA_NVCC_EXECUTABLE "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.5/bin/nvcc.exe") # path
-set(CUDA_NVCC_FLAGS  ;; -O3;--use_fast_math;-Xcompiler) # list
+set(CUDA_NVCC_FLAGS  ;; -O3;--use_fast_math;-Xcompiler;-fopenmp;-std=c++11;-gencode=arch=compute_52,code=sm_52;-gencode=arch=compute_35,code=compute_35;-gencode=arch=compute_52,code=sm_52) # list
 # Build specific configuration flags
 set(CUDA_NVCC_FLAGS_DEBUG  ; )
 set(CUDA_NVCC_FLAGS_RELEASE  ; )
 set(CUDA_NVCC_FLAGS_MINSIZEREL  ; )
 set(CUDA_NVCC_FLAGS_RELWITHDEBINFO  ; )
-set(nvcc_flags -m64;-DCTLAB_EXPORTS) # list
+set(nvcc_flags -m64) # list
 set(CUDA_NVCC_INCLUDE_DIRS [==[C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.5/include;/common/inc;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.5/include]==]) # list (needs to be in lua quotes to address backslashes)
 string(REPLACE "\\" "/" CUDA_NVCC_INCLUDE_DIRS "${CUDA_NVCC_INCLUDE_DIRS}")
 set(CUDA_NVCC_COMPILE_DEFINITIONS [==[]==]) # list (needs to be in lua quotes see #16510 ).
@@ -105,7 +105,7 @@ endif()
 
 # This is the list of host compilation flags.  It C or CXX should already have
 # been chosen by FindCUDA.cmake.
-set(CMAKE_HOST_FLAGS /DWIN32 /D_WINDOWS /W3 /GR /EHsc -openmp )
+set(CMAKE_HOST_FLAGS /DWIN32 /D_WINDOWS /W3 /GR /EHsc  -openmp )
 set(CMAKE_HOST_FLAGS_DEBUG /MDd /Zi /Ob0 /Od /RTC1)
 set(CMAKE_HOST_FLAGS_RELEASE /MD /O2 /Ob2 /DNDEBUG)
 set(CMAKE_HOST_FLAGS_MINSIZEREL /MD /O1 /Ob1 /DNDEBUG)

@@ -37,6 +37,9 @@
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Geometry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\CTLAB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\utilities.hpp">
@@ -106,6 +109,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Geometry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\OldCodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\CTLAB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

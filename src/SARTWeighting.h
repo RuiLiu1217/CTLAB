@@ -13,7 +13,7 @@
 #include <thrust/transform.h>
 #include <thrust/tuple.h>
 #include <thrust/iterator/zip_iterator.h>
-
+#include <omp.h>
 /// \brief The static class for the SART weighting
 template<typename Type>
 class SART_Weighting
@@ -125,7 +125,6 @@ public:
 			if(colSum > epsilon)
 			{
 				vol = vol / colSum;
-
 			}
 			else
 			{

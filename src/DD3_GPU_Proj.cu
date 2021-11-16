@@ -3,11 +3,12 @@
 #include "DD3_GPU_Proj.h"
 #include "CTLAB.h"
 #include "Geometry.h"
-#include "ProjectionModelMap.h"
 
 #define BLKX 32
 #define BLKY 8
 #define BLKZ 1
+
+
 
 //Create texture object and corresponding cudaArray function
 template<typename T>
@@ -20,7 +21,8 @@ void createTextureObject2(
 	cudaTextureAddressMode addressMode, // how to address the texture (clamp, border ...)
 	cudaTextureFilterMode textureFilterMode, // usually linear filtering (double --> int2 use pointer not linear interpolation)
 	cudaTextureReadMode textureReadMode, // usually use element wise reading mode.
-	bool isNormalized) { // usually false
+	bool isNormalized) // usually false
+{
 	cudaExtent prjSize;
 	prjSize.width = Width;
 	prjSize.height = Height;
@@ -52,7 +54,8 @@ void createTextureObject2(
 }
 
 // Destroy a GPU array and corresponding TextureObject
-void destroyTextureObject2(cudaTextureObject_t& texObj, cudaArray* d_array) {
+void destroyTextureObject2(cudaTextureObject_t& texObj, cudaArray* d_array)
+{
 	cudaDestroyTextureObject(texObj);
 	cudaFreeArray(d_array);
 }
@@ -62,13 +65,14 @@ __global__ void naive_copyToTwoVolumes(Ta* in_ZXY,
 	Tb* out_ZXY, Tb* out_ZYX,
 	int XN, int YN, int ZN)
 {
-	const int idz = threadIdx.x + blockIdx.x * blockDim.x;
-	const int idx = threadIdx.y + blockIdx.y * blockDim.y;
-	const int idy = threadIdx.z + blockIdx.z * blockDim.z;
-	if (idx < XN && idy < YN && idz < ZN) {
-		const int i = (idy * XN + idx) * ZN + idz;
-		const int ni = (idy * (XN + 1) + (idx + 1)) * (ZN + 1) + idz + 1;
-		const int nj = (idx * (YN + 1) + (idy + 1)) * (ZN + 1) + idz + 1;
+	int idz = threadIdx.x + blockIdx.x * blockDim.x;
+	int idx = threadIdx.y + blockIdx.y * blockDim.y;
+	int idy = threadIdx.z + blockIdx.z * blockDim.z;
+	if (idx < XN && idy < YN && idz < ZN)
+	{
+		int i = (idy * XN + idx) * ZN + idz;
+		int ni = (idy * (XN + 1) + (idx + 1)) * (ZN + 1) + idz + 1;
+		int nj = (idx * (YN + 1) + (idy + 1)) * (ZN + 1) + idz + 1;
 
 		out_ZXY[ni] = in_ZXY[i];
 		out_ZYX[nj] = in_ZXY[i];
@@ -546,9 +550,9 @@ void DD3_gpu_proj_branchless_sat2d(
 //	cudaStreamCreate(&streams[2]);
 //	cudaStreamCreate(&streams[3]);
 
-	float objCntIdxX = (XN - 1.0f) * 0.5f - imgXCenter / dx;
-	float objCntIdxY = (YN - 1.0f) * 0.5f - imgYCenter / dx;
-	float objCntIdxZ = (ZN - 1.0f) * 0.5f - imgZCenter / dz;
+	float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter / dx;
+	float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter / dx;
+	float objCntIdxZ = (ZN - 1.0) * 0.5 - imgZCenter / dz;
 
 	thrust::device_vector<float> SATZXY;
 	thrust::device_vector<float> SATZYX;
@@ -904,9 +908,9 @@ void DD3_gpu_proj_branchless_sat2d_alreadyinGPU(
 	DD3Boundaries(DNU + 1, &hyds[0], &byds[0]);
 	DD3Boundaries(DNV + 1, &hzds[0], &bzds[0]);
 
-	float objCntIdxX = (XN - 1.0f) * 0.5f - imgXCenter / dx;
-	float objCntIdxY = (YN - 1.0f) * 0.5f - imgYCenter / dx;
-	float objCntIdxZ = (ZN - 1.0f) * 0.5f - imgZCenter / dz;
+	float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter / dx;
+	float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter / dx;
+	float objCntIdxZ = (ZN - 1.0) * 0.5 - imgZCenter / dz;
 
 	thrust::device_vector<float> SATZXY;
 	thrust::device_vector<float> SATZYX;
@@ -1378,9 +1382,9 @@ void DD3_gpu_proj_volumerendering(float x0, float y0, float z0, int DNU, int DNV
 		cossinZT.begin(), CTMBIR::ConstantForBackProjection<float>(x0, y0, z0));
 
 	float3 objCtrIdx = make_float3(
-		(XN - 1.0f) * 0.5f - imgXCenter / dx,
-		(YN - 1.0f) * 0.5f - imgYCenter / dx,
-		(ZN - 1.0f) * 0.5f - imgZCenter / dz);
+		(XN - 1.0) * 0.5 - imgXCenter / dx,
+		(YN - 1.0) * 0.5 - imgYCenter / dx,
+		(ZN - 1.0) * 0.5 - imgZCenter / dz);
 
 	//Configure BLOCKs for projection
 	dim3 blk;
@@ -1513,9 +1517,9 @@ void DD3_gpu_proj_pseudodistancedriven(
 	cudaDeviceReset();
 
 	const int TOTVN = XN * YN * ZN;
-	float objCntIdxX = (XN - 1.0f) * 0.5f - imgXCenter / dx;
-	float objCntIdxY = (YN - 1.0f) * 0.5f - imgYCenter / dx;
-	float objCntIdxZ = (ZN - 1.0f) * 0.5f - imgZCenter / dz;
+	float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter / dx;
+	float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter / dx;
+	float objCntIdxZ = (ZN - 1.0) * 0.5 - imgZCenter / dz;
 
 	thrust::device_vector<float> vol(hvol, hvol + TOTVN);
 
@@ -2678,7 +2682,7 @@ void DD3ProjHelical_3GPU(
 	int SZN[3] = {0, 0, 0}; // The slices number of each sub volume
 	float detStpZ = zds[1] - zds[0]; // detector cell height
 	float detCntIdxV = -zds[0] / detStpZ; // Detector center along Z direction
-	float objCntIdxZ = (ZN - 1.0f) / 2.0f - imgZCenter / dz; //object center in Z direction
+	float objCntIdxZ = (ZN - 1.0) / 2.0 - imgZCenter / dz; //object center in Z direction
 
 	float** subVol = new float*[3];
 	float subImgZCenter[3] = {0, 0, 0};
@@ -2695,7 +2699,7 @@ void DD3ProjHelical_3GPU(
 		//Divide the volume
 		getSubVolume<float>(hvol, XN * YN, ZN, ObjIdx_Start[i], ObjIdx_End[i], subVol[i]);
 		//Calculate the corresponding center position
-		subImgZCenter[i] = ((ObjIdx_End[i] + ObjIdx_Start[i] - (ZN - 1.0f)) * dz + imgZCenter * 2.0f) / 2.0f;
+		subImgZCenter[i] = ((ObjIdx_End[i] + ObjIdx_Start[i] - (ZN - 1.0)) * dz + imgZCenter * 2.0) / 2.0;
 
 		DD3Proj_gpu(x0, y0, z0, DNU, DNV, xds, yds, zds,
 				imgXCenter, imgYCenter, subImgZCenter[i], hangs + prefixSPN[i] , hzPos + prefixSPN[i], SPN[i],
@@ -2736,7 +2740,7 @@ void DD3ProjHelical_4GPU(
 	int SZN[4] = {0, 0, 0, 0}; // The slices number of each sub volume
 	float detStpZ = zds[1] - zds[0]; // detector cell height
 	float detCntIdxV = -zds[0] / detStpZ; // Detector center along Z direction
-	float objCntIdxZ = (ZN - 1.0f) / 2.0f - imgZCenter / dz; //object center in Z direction
+	float objCntIdxZ = (ZN - 1.0) / 2.0 - imgZCenter / dz; //object center in Z direction
 
 	float** subVol = new float*[4];
 	float subImgZCenter[4] = {0, 0, 0, 0};
@@ -2793,9 +2797,9 @@ void DD3_gpu_proj_pseudodistancedriven_multiGPU(
 	}
 	// Calculate the boundary positions
 
-	const float objCntIdxX = (XN - 1.0f) * 0.5f - imgXCenter / dx;
-	const float objCntIdxY = (YN - 1.0f) * 0.5f - imgYCenter / dx;
-	const float objCntIdxZ = (ZN - 1.0f) * 0.5f - imgZCenter / dz;
+	const float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter / dx;
+	const float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter / dx;
+	const float objCntIdxZ = (ZN - 1.0) * 0.5 - imgZCenter / dz;
 
 	// Divide the volume into sub volumes with overlaps according to the startPN
 	std::vector<int> ObjIdx_Start(gpuNum, -1);
@@ -2855,7 +2859,7 @@ void DD3_gpu_proj_pseudodistancedriven_multiGPU(
 		getSubVolume<float>(hvol, XN * YN, ZN, ObjIdx_Start[i], ObjIdx_End[i], &(subVol[i][0]));
 
 		// NOTE: The explanation will be later:
-		subImgZCenter[i] = -imgZCenter / dz + ZN * 0.5f - ObjIdx_Start[i] - 0.5f;
+		subImgZCenter[i] = -imgZCenter / dz + ZN * 0.5 - ObjIdx_Start[i] - 0.5f;
 
 		CUDA_SAFE_CALL(cudaSetDevice(i));
 		// For each GPU generate two streams
@@ -3024,9 +3028,9 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 	DD3Boundaries<float>(DNU + 1, yds, &(byds[0]));
 	DD3Boundaries<float>(DNV + 1, zds, &(bzds[0]));
 
-	const float objCntIdxX = (XN - 1.0f) * 0.5f - imgXCenter / dx;
-	const float objCntIdxY = (YN - 1.0f) * 0.5f - imgYCenter / dx;
-	const float objCntIdxZ = (ZN - 1.0f) * 0.5f - imgZCenter / dz;
+	const float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter / dx;
+	const float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter / dx;
+	const float objCntIdxZ = (ZN - 1.0) * 0.5 - imgZCenter / dz;
 
 	// Divide the volume into sub volumes with overlaps according to the startPN
 	std::vector<int> ObjIdx_Start(gpuNum, -1);
@@ -3122,7 +3126,7 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 		// is -->  imgZCenter - dz * N / 2 + ObjIdx_Start[i] * dz + 0.5 * dz
 		// We need when ii==0 --> (ii - subImgZCenter[i]) * dz = imgZCenter - dz * N / 2 + ObjIdx_Start[i] * dz + 0.5 * dz
 		// It means subImgZCenter[i] = -imgZCenter / dz + N / 2 - ObjIdx_Start[i] - 0.5;
-		subImgZCenter[i] = -imgZCenter / dz + ZN * 0.5f - ObjIdx_Start[i] - 0.5f;
+		subImgZCenter[i] = -imgZCenter / dz + ZN * 0.5 - ObjIdx_Start[i] - 0.5f;
 
 
 		CUDA_SAFE_CALL(cudaSetDevice(i));
@@ -3400,7 +3404,7 @@ void DD3Proj_multiGPU(
 	}
 }
 
-
+#include "ProjectionModelMap.h"
 
 void CT::Proj(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, const std::string& projModel)
 {

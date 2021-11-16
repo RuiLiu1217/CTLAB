@@ -95,18 +95,6 @@ namespace CTLAB
 
 	};
 	
-	/// \brief Point datatype
-	struct Point : public float2
-	{
-
-	};
-	/// \brief 2D vector
-	struct Vector : public float2
-	{
-
-	};
-
-
 	/// \brief Ellipsoid
 	class Ellipsoid
 	{

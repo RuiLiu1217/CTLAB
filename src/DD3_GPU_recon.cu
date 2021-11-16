@@ -791,6 +791,14 @@ double calculateAlpha(const thrust::host_vector<T>& R, const thrust::host_vector
 }
 
 
+//////////#include "utilities.cuh"
+/// \brief The updating methods for Conjugate Gradient method
+enum CGMethod{CG_FR, ///<
+	      CG_PRP,///<
+	      CG_CW, ///<
+	      CG_DI, ///<
+	      CG_DY  ///<
+	     };
 
 /// \brief Evaluate the projection/backprojection with all one input
 /// \param forwardProjection Forward projection (true) or backprojection (false)

@@ -10,7 +10,6 @@
 #include <thrust/transform.h>
 #include <vector_types.h>
 
-#include "utilities.cuh"
 #include "multiSlices_ker.cuh"
 typedef unsigned char byte;
 

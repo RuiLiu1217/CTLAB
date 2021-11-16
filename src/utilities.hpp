@@ -16,28 +16,32 @@
 #include <cassert>
 #include <cfloat>
 #include <chrono>
-#define _USE_MATH_DEFINES // for C++
 #include <cmath>
 #include <cstdio>
-#include <cusparse.h>
-#include <cusparse_v2.h>
-#include "cublas_v2.h"
-
-#include <cuda_runtime.h>
-#include "device_launch_parameters.h"
 #include <fstream>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <numeric>
 #include <omp.h>
-
 #include <random>
 #include <sstream>
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
+#include <vector_functions.h>
+#include <vector_types.h>
 
+#include <cusparse.h>
+#include <cusparse_v2.h>
+#include "cublas_v2.h"
+#include <cuda_runtime.h>
+#include <cuda.h>
+#include <device_functions.h>
+#include "device_launch_parameters.h"
+
+#include <thrust/binary_search.h>
 #include <thrust/copy.h>
 #include <thrust/device_ptr.h>
 #include <thrust/device_vector.h>
@@ -57,9 +61,21 @@
 #include <thrust/transform_reduce.h>
 #include <thrust/tuple.h>
 
-#include <vector>
-#include <vector_functions.h>
-#include <vector_types.h>
+// TODO: TO A STATIC VARIABLES
+#ifndef __PI__
+#define __PI__
+#define PI		3.141592653589793
+#define PI_2		1.570796326794897
+#define PI_4		0.785398163397448
+#define PI_3_4		2.356194490192344
+#define PI_5_4		3.926990816987241
+#define PI_7_4		5.497787143782138
+#define TWOPI       6.283185307179586
+#endif
+
+#ifndef nullptr
+#define nullptr NULL
+#endif
 
 
 /// Key words for inlining the codes
@@ -76,14 +92,18 @@
 #define checkCudaErrors(value) { cudaError_t _m_cudaStat = value; if(_m_cudaStat != cudaSuccess){fprintf(stderr, "Error %s at line %d in file %s\n", cudaGetErrorString(_m_cudaStat), __LINE__, __FILE__); exit(1);}}
 #else
 #define CUDA_CHECK_RETURN(value) {value;}
+#define CUDA_SAFE_CALL(value) {value;}
 #define checkCudaErrors(value) {value;}
 #endif
 
+
+typedef unsigned char byte;
 typedef unsigned int uint;
 typedef const unsigned int cuint;
 typedef unsigned char byte;
+
 typedef thrust::device_vector<float> d_vec_t;
-// typedef thrust::host_vector<float> h_vec_t;
+typedef thrust::host_vector<float> h_vec_t;
 
 
 /// \brief Define that macro for Thrust compiling successful
@@ -92,10 +112,9 @@ typedef thrust::device_vector<float> d_vec_t;
 #endif
 
 
-#ifndef PI 
-#define PI (3.14159265358979323846264)
+#ifndef PI
+#define PI (3.14159265358979323846264) 
 #endif
-
 
 #ifndef _PI 
 #define _PI (3.14159265358979323846264)
@@ -131,6 +150,7 @@ typedef thrust::device_vector<float> d_vec_t;
 #endif
 
 
+
 /// \brief Ray class on 2D
 struct Ray2D
 {
@@ -161,21 +181,103 @@ public:
 template<typename T>
 inline __host__ __device__ bool IS_ZERO(const T& x)
 {
-	return (x < 1.0E-9) && (x > -1.0E-9);
+	return (abs(x) < 1.0E-9);
+}
+
+/// \brief SIDDON kernel function 1
+inline __host__ __device__ float dev_pFun(const float& alpha, const float& pstart, const float&pend)
+{
+	return pstart + alpha * (pend - pstart);
+}
+
+/// \brief SIDDON kernel function 2
+inline __host__ __device__ float dev_alpha_IFun(const float& b, const float& d, const float& pstart, const float& pend, const unsigned int& i)
+{
+	if (!IS_ZERO<float>(pend - pstart))
+	{
+		return ((b + (float)i*d) - pstart) / (pend - pstart);
+	}
+	else return 1000;//((b + i*d)-pstart)/(1e-6);
 }
 
 
-/* Define the Data Type of the files in enum type*/
-typedef enum{
-	RUI_UCHAR = 0X00,
-	RUI_CHAR = 0X02,
-	RUI_UINT = 0X04,
-	RUI_INT = 0X08,
-	RUI_FLOAT = 0X10,
-	RUI_DOUBLE = 0X20,
-	RUI_LONGDOUBLE = 0X40,
-	RUI_OTHER = 0X80,
-}RUI_DATA_TYPE;
+
+/// \brief SIDDON kernel function 3
+inline __host__ __device__ float dev_varphiFun(const float& alpha, const float& b, const float& d, const float& pstart, const float& pend)
+{
+	return (dev_pFun(alpha, pstart, pend) - b) / d;
+}
+
+
+/// \brief SIDDON kernel function 4
+inline __host__ __device__ void dev_minmaxIdxFun(
+	const float& pstart, const float& pend,
+	const float& b, const float& d,
+	const float& alphaMIN, const float& alphaMAX,
+	const float& alphaPmin, const float& alphaPmax,
+	const unsigned int& Nplane, int* imin, int* imax)
+{
+	if (pstart < pend)
+	{
+		if (IS_ZERO<float>(alphaMIN - alphaPmin))
+		{
+			*imin = 1;
+		}
+		else
+		{
+			*imin = static_cast<int>(ceil(dev_varphiFun(alphaMIN, b, d, pstart, pend)));
+		}
+		if (IS_ZERO<float>(alphaMAX - alphaPmax))
+		{
+			*imax = Nplane - 1;
+		}
+		else
+		{
+			*imax = static_cast<int>(floor(dev_varphiFun(alphaMAX, b, d, pstart, pend)));
+		}
+	}
+	else
+	{
+		if (IS_ZERO<float>(alphaMIN - alphaPmin))
+		{
+			*imax = Nplane - 2;
+		}
+		else
+		{
+			*imax = static_cast<int>(floor(dev_varphiFun(alphaMIN, b, d, pstart, pend)));
+		}
+		if (IS_ZERO<float>(alphaMAX - alphaPmax))
+		{
+			*imin = 0;
+		}
+		else
+		{
+			*imin = static_cast<int>(ceil(dev_varphiFun(alphaMAX, b, d, pstart, pend)));
+		}
+	}
+}
+
+
+
+/// \brief SIDDON kernel function 5
+inline __host__ __device__  float dev_alphaU_Fun(const float& d, const float& startx, const float& endx)
+{
+	if (IS_ZERO<float>(startx - endx))
+	{
+		return 1000.0f;//(d/1e-6);
+	}
+	return d / fabsf(startx - endx);
+}
+
+
+/// \brief SIDDON kernel function 6
+template<typename T>
+inline __host__ __device__  int dev_iu_Fun(const T& start, const T& end)
+{
+	return (start < end) ? 1 : -1;
+}
+
+
 
 template<typename T>
 INLINE __host__ __device__ T safeDivide(const T& a, const T& b)
@@ -191,12 +293,14 @@ INLINE __host__ __device__ T safeDivide(const T& a, const T& b)
 }
 
 INLINE __host__ __device__ float2 operator+(const float2& a, const float2& b){return make_float2(a.x + b.x, a.y + b.y);};
-INLINE __host__ __device__ float2 operator-(const float2& a, const float2& b){return make_float2(a.x - b.x, a.y - b.y);};
+//INLINE __host__ __device__ float2 operator-(const float2& a, const float2& b){return make_float2(a.x - b.x, a.y - b.y);};
+INLINE __host__ __device__ float2 operator-(float2 a, float2 b) { return make_float2(a.x - b.x, a.y - b.y); };
 INLINE __host__ __device__ float2 operator*(const float2& a, const float2& b){return make_float2(a.x * b.x, a.y * b.y);};
 INLINE __host__ __device__ float2 operator*(const float a, const float2& b){return make_float2(a * b.x, a * b.y);};
 INLINE __host__ __device__ float2 operator*(const float2& a, const float b){return make_float2(a.x * b, a.y * b);};
 INLINE __host__ __device__ float2 operator/(const float2& a, const float2& b){return make_float2(safeDivide<float>(a.x,b.x),safeDivide<float>(a.y,b.y));};
 INLINE __host__ __device__ float2 operator/(const float2& a, const float b){return make_float2(safeDivide<float>(a.x,b), safeDivide<float>(a.y,b));};
+
 INLINE __host__ __device__ float3 operator+(const float3& a, const float3& b){return make_float3(a.x + b.x, a.y + b.y, a.z + b.z);};
 INLINE __host__ __device__ float3 operator+(const float& a, const float3& b){return make_float3(a + b.x, a + b.y, a + b.z);};
 INLINE __host__ __device__ float3 operator+=(const float3& a, const float3& b){	return make_float3(a.x + b.x, a.y + b.y, a.z + b.z);};
@@ -207,6 +311,7 @@ INLINE __host__ __device__ float3 operator*(const float& a, const float3& b){ret
 INLINE __host__ __device__ float3 operator*(const float3& a, const float3& b){	return make_float3(a.x * b.x, a.y * b.y, a.z * b.z);}
 INLINE __host__ __device__ float3 operator/(const float3& a, const float& b){return make_float3(safeDivide<float>(a.x,b),safeDivide<float>(a.y,b),safeDivide<float>(a.z,b));};
 INLINE __host__ __device__ float3 operator/(const float3& a, const float3& b){	return make_float3(safeDivide<float>(a.x, b.x),safeDivide<float>(a.y, b.y),safeDivide<float>(a.z, b.z));}
+
 INLINE __host__ __device__ double2 operator+(const double2& a, const double2& b){ return make_double2(a.x + b.x, a.y + b.y); }
 INLINE __host__ __device__ double2 operator+(const double2& a, const float2& b){ return make_double2(a.x + b.x, a.y + b.y); }
 INLINE __host__ __device__ double2 operator+(const float2& a, const double2& b){ return make_double2(a.x + b.x, a.y + b.y); }
@@ -219,10 +324,13 @@ INLINE __host__ __device__ double2 operator*(const float2& a, const double2& b){
 INLINE __host__ __device__ double2 operator/(const double2& a, const double2& b){ return make_double2(safeDivide<double>(a.x,b.x),safeDivide<double>(a.y,b.y));}
 INLINE __host__ __device__ double2 operator/(const double2& a, const float2& b){return make_double2(safeDivide<double>(a.x,b.x),safeDivide<double>(a.y,b.y));}
 INLINE __host__ __device__ double2 operator/(const float2& a, const double2& b){return make_double2(safeDivide<double>(a.x,b.x),safeDivide<double>(a.y,b.y));}
+INLINE __host__ __device__ double2 operator/(const double2& a, double b) { return make_double2(a.x / b, a.y / b); }
+
 INLINE __host__ __device__ double3 operator+(const double3& a, const double3& b){ return make_double3(a.x + b.x, a.y + b.y, a.z + b.z); }
 INLINE __host__ __device__ double3 operator+(const double3& a, const float3& b){ return make_double3(a.x + b.x, a.y + b.y, a.z + b.z); }
 INLINE __host__ __device__ double3 operator+(const float3& a, const double3& b){ return make_double3(a.x + b.x, a.y + b.y, a.z + b.z); }
 INLINE __host__ __device__ double3 operator-(const double3& a, const double3& b){	return make_double3(a.x - b.x, a.y - b.y, a.z - b.z);}
+INLINE __host__ __device__ double3 operator-(const int3& a, const double3& b) { return make_double3(a.x - b.x, a.y - b.y, a.z - b.z); }
 INLINE __host__ __device__ double3 operator-(const double3& a, const float3& b){ return make_double3(a.x - b.x, a.y - b.y, a.z - b.z); }
 INLINE __host__ __device__ double3 operator-(const float3& a, const double3& b){ return make_double3(a.x - b.x, a.y - b.y, a.z - b.z); }
 INLINE __host__ __device__ double3 operator*(const double3& a, const double3& b){ return make_double3(a.x * b.x, a.y * b.y, a.z * b.z); }
@@ -234,33 +342,238 @@ INLINE __host__ __device__ double3 operator/(const float3& a, const double3& b){
 INLINE __host__ __device__ double3 operator/(const double3& a, const double& b){return make_double3(safeDivide<double>(a.x,b),safeDivide<double>(a.y,b),safeDivide<double>(a.z,b));};
 
 
+
+
+
+template<typename T>
+std::vector<T> operator+(const std::vector<T>& a, const std::vector<T>& b)
+{
+	std::vector<T> c(a.size(), 0);
+	std::transform(a.begin(), a.end(), b.begin(), c.begin(), std::plus<T>());
+	return c;
+}
+
+template<typename T>
+std::vector<T> operator-(const std::vector<T>& a, const std::vector<T>& b)
+{
+	std::vector<T> c(a.size(), 0);
+	std::transform(a.begin(), a.end(), b.begin(), c.begin(), std::minus<T>());
+	return c;
+}
+
+
+/// \brief pointwise multiplication
+/// \param a input vector a
+/// \param b input vector b
+/// \return a.*b
+template<typename T>
+std::vector<T> operator*(const std::vector<T>& a, const std::vector<T>& b)
+{
+	std::vector<T> c(a.size(), 0);
+	std::transform(a.begin(), a.end(), b.begin(), c.begin(), std::multiplies<T>());
+	return c;
+}
+
+
+
+template<typename T>
+thrust::host_vector<T> operator-(
+	const thrust::host_vector<T>& a,
+	const thrust::host_vector<T>& b)
+{
+	thrust::host_vector<T> res(a);
+	thrust::transform(res.begin(), res.end(), b.begin(), res.begin(), [=](T aa, T bb) {return aa - bb; });
+	return res;
+}
+
+
+
+template<typename T>
+thrust::host_vector<T> operator+(thrust::host_vector<T>& a, thrust::host_vector<T>& b)
+{
+	thrust::host_vector<T> c(a.size(), 0);
+	thrust::transform(a.begin(), a.end(), b.begin(), c.begin(), thrust::plus<T>());
+	return c;
+}
+
+
+
+template<typename T>
+thrust::device_vector<T> operator+(thrust::device_vector<T>& a, thrust::device_vector<T>& b)
+{
+	thrust::device_vector<T> c(a.size(), 0);
+	thrust::transform(a.begin(), a.end(), b.begin(), c.begin(), thrust::plus<T>());
+	return c;
+}
+
+
+
+template<typename T>
+thrust::device_vector<T> operator-(thrust::device_vector<T>& a, thrust::device_vector<T>& b)
+{
+	thrust::device_vector<T> c(a.size(), 0);
+	thrust::transform(a.begin(), a.end(), b.begin(), c.begin(), thrust::minus<T>());
+	return c;
+}
+
+
+/// \brief pointwise multiplication
+/// \param a input vector a
+/// \param b input vector b
+/// \return a.*b
+template<typename T>
+thrust::device_vector<T> operator*(thrust::device_vector<T>& a, thrust::device_vector<T>& b)
+{
+	thrust::device_vector<T> c(a.size(), 0);
+	thrust::transform(a.begin(), a.end(), b.begin(), c.begin(), thrust::multiplies<T>());
+	return c;
+}
+
+
+
+/// \brief scale-vector multiplication
+/// \param a input vector
+/// \param s scale in R
+/// \return the scaled vector of a
+template<typename T>
+thrust::device_vector<T> operator*(thrust::device_vector<T>& a, const T& s)
+{
+	thrust::device_vector<T> res(a.size(), 0);
+	thrust::transform(a.begin(), a.end(), res.begin(), [&](T v) {return s * v; });
+	return res;
+}
+
+/// \brief operator overload for multiplication with device vector
+/// \param a input vector
+/// \param s scale in R
+/// \return the scaled vector of a
+template<typename T>
+thrust::device_vector<T> operator*(const T& s, thrust::device_vector<T>& a)
+{
+	thrust::device_vector<T> res(a.size(), 0);
+	thrust::transform(a.begin(), a.end(), res.begin(), [&](T v) {return s * v; });
+	return res;
+}
+
+
+
+/// \brief operator overload for inner product of two vectors
+/// \param a one device vector
+/// \param b one device vector
+/// \return the inner product of two vectors
+template<typename T>
+T operator&(thrust::device_vector<T>& a, thrust::device_vector<T>& b)
+{
+	return thrust::inner_product(a.begin(), a.end(), b.begin(), 0.0);
+}
+
+/// \brief Operator overload
+/// \param a input vector a
+/// \param b input vector b
+/// \return a ./ b
+template<typename T>
+thrust::device_vector<T> operator/(thrust::device_vector<T>& a, thrust::device_vector<T>& b)
+{
+	thrust::device_vector<T> c(a.size(), 0);
+	thrust::transform(a.begin(), a.end(), b.begin(), c.begin(), thrust::divides<T>());
+	return c;
+}
+
+
+template<typename T>
+thrust::device_vector<T>& operator+=(thrust::device_vector<T>& lhs, const thrust::device_vector<T>& rhs)
+{
+	thrust::transform(lhs.begin(), lhs.end(), rhs.begin(), lhs.begin(), thrust::plus<T>());
+	return lhs;
+}
+
+template<typename T>
+thrust::device_vector<T>& operator-=(thrust::device_vector<T>& lhs, const thrust::device_vector<T>& rhs)
+{
+	thrust::transform(lhs.begin(), lhs.end(), rhs.begin(), lhs.begin(), thrust::minus<T>());
+	return lhs;
+}
+
+template<typename T>
+thrust::device_vector<T>& operator*=(thrust::device_vector<T>& lhs, const thrust::device_vector<T>& rhs)
+{
+	thrust::transform(lhs.begin(), lhs.end(), rhs.begin(), lhs.begin(), thrust::multiplies<T>());
+	return lhs;
+}
+
+template<typename T>
+thrust::device_vector<T>& operator/=(thrust::device_vector<T>& lhs, const thrust::device_vector<T>& rhs)
+{
+	thrust::transform(lhs.begin(), lhs.end(), rhs.begin(), lhs.begin(), thrust::divides<T>());
+	return lhs;
+}
+
+template<typename T>
+thrust::device_vector<T>& operator*=(thrust::device_vector<T>& lhs, const T& rhs)
+{
+	thrust::transform(lhs.begin(), lhs.end(), lhs.begin(), thrust::multiplies<T>());
+	return lhs;
+}
+
+
+/// \brief return the p norm of a vector
+/// \param v the vector
+/// \param p the p norm
+/// \return (sum(v^p))^(1/p)
+//template<typename T>
+//T operator^(const thrust::device_vector<T>& v, const T& p)
+//{
+//	//return std::pow(thrust::transform_reduce(v.begin(), v.end(), _lp_functor<T>(p), 0.0, thrust::plus<T>()));
+//}
+
+/// \brief Operator overload |, Get abs(a - b) vector of two vectors a and b
+/// \param lhs left vector
+/// \param rhs right vector
+/// \return abs(lhs - rhs)
+template<typename T>
+thrust::device_vector<T> operator|(
+	const thrust::device_vector<T>& lhs,
+	const thrust::device_vector<T>& rhs)
+{
+	thrust::device_vector<T> res(lhs.size(), 0);
+	thrust::transform(lhs.begin(), lhs.end(), rhs.begin(), res.begin(), [&](T& ll, T& rr) {return abs(ll - rr); });
+	return res;
+}
+
+
 INLINE __host__ __device__ float fminf(const float2& a){	return fminf(a.x, a.y);}
 INLINE __host__ __device__ float fminf(const float3& a){	return fminf(a.x, fminf(a.y, a.z)); }
 INLINE __host__ __device__ float2 fminf(const float2& a, const float2& b){ return make_float2(fmin(a.x, b.x), fmin(a.y, b.y)); }
 INLINE __host__ __device__ float3 fminf(const float3& a, const float3& b){	return make_float3(fminf(a.x, b.x), fminf(a.y, b.y), fminf(a.z, b.z));}
 INLINE __host__ __device__ double2 fminf(const double2& a, const double2& b){ return make_double2(fmin(a.x, b.x), fmin(a.y, b.y)); }
-INLINE __host__ __device__ double2 fminf(const float2& a, const double2& b){ return make_double2(fmin(a.x, b.x), fmin(a.y, b.y)); }
-INLINE __host__ __device__ double2 fminf(const double2& a, const float2& b){ return make_double2(fmin(a.x, b.x), fmin(a.y, b.y)); }
-INLINE __host__ __device__ double3 fminf(const double3& a, const double3& b){ return make_double3(fmin(a.x, b.x), fmin(a.y, b.y), fmin(a.z, b.z)); }
-INLINE __host__ __device__ double3 fminf(const double3& a, const float3& b){ return make_double3(fmin(a.x, b.x), fmin(a.y, b.y), fmin(a.z, b.z)); }
-INLINE __host__ __device__ double3 fminf(const float3& a, const double3& b){ return make_double3(fmin(a.x, b.x), fmin(a.y, b.y), fmin(a.z, b.z)); }
+INLINE __host__ __device__ double2 fminf(const float2& a, const double2& b){ return make_double2(fminf(a.x, b.x), fminf(a.y, b.y)); }
+INLINE __host__ __device__ double2 fminf(const double2& a, const float2& b){ return make_double2(fminf(a.x, b.x), fminf(a.y, b.y)); }
+INLINE __host__ __device__ double3 fminf(const double3& a, const double3& b){ return make_double3(fminf(a.x, b.x), fminf(a.y, b.y), fminf(a.z, b.z)); }
+INLINE __host__ __device__ double3 fminf(const double3& a, const float3& b){ return make_double3(fminf(a.x, b.x), fminf(a.y, b.y), fminf(a.z, b.z)); }
+INLINE __host__ __device__ double3 fminf(const float3& a, const double3& b){ return make_double3(fminf(a.x, b.x), fminf(a.y, b.y), fminf(a.z, b.z)); }
 INLINE __host__ __device__ float fmaxf(const float2& a){	return fmaxf(a.x, a.y);}
 INLINE __host__ __device__ float fmaxf(const float3& a){	return fmaxf(a.x, fmaxf(a.y, a.z));}
 INLINE __host__ __device__ float2 fmaxf(const float2& a, const float2& b){ return make_float2(fmax(a.x, b.x), fmax(a.y, b.y)); }
 INLINE __host__ __device__ float3 fmaxf(const float3& a, const float3& b){	return make_float3(fmaxf(a.x, b.x), fmaxf(a.y, b.y), fmaxf(a.z, b.z));}
-INLINE __host__ __device__ double2 fmaxf(const double2& a, const double2& b){ return make_double2(fmax(a.x, b.x), fmax(a.y, b.y)); }
-INLINE __host__ __device__ double2 fmaxf(const float2& a, const double2& b){ return make_double2(fmax(a.x, b.x), fmax(a.y, b.y)); }
-INLINE __host__ __device__ double2 fmaxf(const double2& a, const float2& b){ return make_double2(fmax(a.x, b.x), fmax(a.y, b.y)); }
-INLINE __host__ __device__ double3 fmaxf(const double3& a, const double3& b){ return make_double3(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z)); }
-INLINE __host__ __device__ double3 fmaxf(const double3& a, const float3& b){ return make_double3(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z)); }
-INLINE __host__ __device__ double3 fmaxf(const float3& a, const double3& b){ return make_double3(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z)); }
+INLINE __host__ __device__ double2 fmaxf(const double2& a, const double2& b){ return make_double2(fmaxf(a.x, b.x), fmaxf(a.y, b.y)); }
+INLINE __host__ __device__ double2 fmaxf(const float2& a, const double2& b){ return make_double2(fmaxf(a.x, b.x), fmaxf(a.y, b.y)); }
+INLINE __host__ __device__ double2 fmaxf(const double2& a, const float2& b){ return make_double2(fmaxf(a.x, b.x), fmaxf(a.y, b.y)); }
+INLINE __host__ __device__ double3 fmaxf(const double3& a, const double3& b){ return make_double3(fmaxf(a.x, b.x), fmaxf(a.y, b.y), fmaxf(a.z, b.z)); }
+INLINE __host__ __device__ double3 fmaxf(const double3& a, const float3& b){ return make_double3(fmaxf(a.x, b.x), fmaxf(a.y, b.y), fmaxf(a.z, b.z)); }
+INLINE __host__ __device__ double3 fmaxf(const float3& a, const double3& b){ return make_double3(fmaxf(a.x, b.x), fmaxf(a.y, b.y), fmaxf(a.z, b.z)); }
 
 INLINE __host__ __device__ float length(const float2& a){	return sqrtf(a.x * a.x + a.y * a.y);}
 INLINE __host__ __device__ float length(const float3& a){	return sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);}
+INLINE __host__ __device__ double length(const double2& a) { return sqrt(a.x * a.x + a.y * a.y); }
 INLINE __host__ __device__ double length(const double3& a){	return sqrt(a.x * a.x + a.y * a.y + a.z * a.z);}
-INLINE __host__ __device__ const float2 normalize(const float2& a){	return a / length(a);}
+
+//INLINE __host__ __device__ const float2 normalize(const float2& a){	return a / length(a);}
+INLINE __host__ __device__ const float2 normalize(float2 a) { return a / length(a); }
 INLINE __host__ __device__ const float3 normalize(const float3& a){	return a / length(a);}
+INLINE __host__ __device__ const double2 normalize(const double2& a) { return a / length(a); }
 INLINE __host__ __device__ const double3 normalize(const double3& a){	return a / length(a);}
+
+
 
 
 /// \brief square of input value
@@ -356,32 +669,6 @@ INLINE __host__ __device__ T bilierp(T v0, T v1, T v2, T v3, T t1, T t2)
 	return fma(t2, vv1, fma(-t2, vv0, vv0));
 }
 
-///// \brief Fast bilinear interpolation in double format
-//INLINE __device__ double bilerp(int2 v0, int2 v1, int2 v2, int2 v3, float t1, float t2)
-//{
-//	double v0_ = __hiloint2double(v0.y, v0.x);
-//	double v1_ = __hiloint2double(v1.y, v1.x);
-//	double v2_ = __hiloint2double(v2.y, v2.x);
-//	double v3_ = __hiloint2double(v3.y, v3.x);
-//
-//	double vv0 = v0_ * (1.0 - t1) + v1_ * t1;
-//	double vv1 = v2_ * (1.0 - t1) + v3_ * t1;
-//	return vv0 * (1 - t2) + vv1 * t2;
-//}
-//
-///// \brief Fast bilinear interpolation in double format
-//INLINE __device__ double bilerp(int2 v0, int2 v1, int2 v2, int2 v3, double t1, double t2)
-//{
-//	double v0_ = __hiloint2double(v0.y, v0.x);
-//	double v1_ = __hiloint2double(v1.y, v1.x);
-//	double v2_ = __hiloint2double(v2.y, v2.x);
-//	double v3_ = __hiloint2double(v3.y, v3.x);
-//
-//	double vv0 = v0_ * (1.0 - t1) + v1_ * t1;
-//	double vv1 = v2_ * (1.0 - t1) + v3_ * t1;
-//	return vv0 * (1 - t2) + vv1 * t2;
-//}
-
 
 
 INLINE __host__ __device__ bool intersectBox(
@@ -391,7 +678,7 @@ INLINE __host__ __device__ bool intersectBox(
 	const float3& boxmax,
 	float* tnear, float* tfar)
 {
-	const float3 invR = make_float3(1.0f / dir.x, 1.0f / dir.y, 1.0f / dir.z);
+	const float3 invR = make_float3(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
 	const float3 tbot = invR * (boxmin - sour);
 	const float3 ttop = invR * (boxmax - sour);
 
@@ -404,7 +691,6 @@ INLINE __host__ __device__ bool intersectBox(
 	*tfar = smallest_tmax;
 	return smallest_tmax > largest_tmin;
 }
-
 
 
 template<typename T>
@@ -427,6 +713,8 @@ INLINE __host__ __device__ void invRotVox(
 	virVox.y =-curVox.x * cossinT.y + curVox.y * cossinT.x;
 	virVox.z = curVox.z - zP;
 }
+
+
 
 INLINE __device__ float3 invRot(
 	const float3 inV,
@@ -495,8 +783,9 @@ namespace CTMBIR
 
 	};
 
+
 	template<typename T>
-	struct ConstantForBackProjection{
+	struct ConstantForBackProjection {
 
 		T x0;
 		T y0;
@@ -504,7 +793,7 @@ namespace CTMBIR
 
 		typedef thrust::tuple<T, T> InTuple;
 		ConstantForBackProjection(const T _x0, const T _y0, const T _z0)
-			: x0(_x0), y0(_y0), z0(_z0){}
+			: x0(_x0), y0(_y0), z0(_z0) {}
 
 		__device__ float3 operator()(const InTuple& tp)
 		{
@@ -537,7 +826,6 @@ namespace CTMBIR
 			return make_double3(cosT, sinT, zP);
 		}
 	};
-
 }
 
 
@@ -1467,204 +1755,6 @@ T calculateBetaForCG(thrust::device_vector<T>& gk, thrust::device_vector<T>& gk1
 
 
 
-/// \brief pointwise add
-/// \param a input vector a
-/// \param b input vector b
-/// \return a + b
-template<typename T>
-thrust::device_vector<T> operator+(thrust::device_vector<T>& a, thrust::device_vector<T>& b)
-{
-	thrust::device_vector<T> c(a.size(), 0);
-	thrust::transform(a.begin(), a.end(), b.begin(), c.begin(), thrust::plus<T>());
-	return c;
-}
-
-/// \brief pointwise add
-/// \param a input vector a
-/// \param b input vector b
-/// \return a + b
-template<typename T>
-std::vector<T> operator+(const std::vector<T>& a, const std::vector<T>& b)
-{
-	std::vector<T> c(a.size(), 0);
-	std::transform(a.begin(), a.end(), b.begin(), c.begin(), std::plus<T>());
-	return c;
-}
-/// \brief pointwise add
-/// \param a input vector a
-/// \param b input vector b
-/// \return a + b
-template<typename T>
-thrust::host_vector<T> operator+(thrust::host_vector<T>& a, thrust::host_vector<T>& b)
-{
-	thrust::host_vector<T> c(a.size(), 0);
-	thrust::transform(a.begin(), a.end(), b.begin(), c.begin(), thrust::plus<T>());
-	return c;
-}
-
-/// \brief pointwise minus
-/// \param a input vector a
-/// \param b input vector b
-/// \return a - b
-template<typename T>
-thrust::device_vector<T> operator-(thrust::device_vector<T>& a, thrust::device_vector<T>& b)
-{
-	thrust::device_vector<T> c(a.size(), 0);
-	thrust::transform(a.begin(), a.end(), b.begin(), c.begin(), thrust::minus<T>());
-	return c;
-}
-
-/// \brief pointwise minus
-/// \param a input vector a
-/// \param b input vector b
-/// \return a - b
-template<typename T>
-std::vector<T> operator-(const std::vector<T>& a, const std::vector<T>& b)
-{
-	std::vector<T> c(a.size(), 0);
-	std::transform(a.begin(), a.end(), b.begin(), c.begin(), std::minus<T>());
-	return c;
-}
-
-
-/// \brief pointwise multiplication
-/// \param a input vector a
-/// \param b input vector b
-/// \return a.*b
-template<typename T>
-thrust::device_vector<T> operator*(thrust::device_vector<T>& a, thrust::device_vector<T>& b)
-{
-	thrust::device_vector<T> c(a.size(), 0);
-	thrust::transform(a.begin(), a.end(), b.begin(), c.begin(), thrust::multiplies<T>());
-	return c;
-}
-
-/// \brief pointwise multiplication
-/// \param a input vector a
-/// \param b input vector b
-/// \return a.*b
-template<typename T>
-std::vector<T> operator*(const std::vector<T>& a, const std::vector<T>& b)
-{
-	std::vector<T> c(a.size(), 0);
-	std::transform(a.begin(), a.end(), b.begin(), c.begin(), std::multiplies<T>());
-	return c;
-}
-
-
-
-/// \brief scale-vector multiplication
-/// \param a input vector
-/// \param s scale in R
-/// \return the scaled vector of a
-template<typename T>
-thrust::device_vector<T> operator*(thrust::device_vector<T>& a, const T& s)
-{
-	thrust::device_vector<T> res(a.size(), 0);
-	thrust::transform(a.begin(), a.end(), res.begin(), _scale_functor<T>(s));
-	return res;
-}
-
-/// \brief operator overload for multiplication with device vector
-/// \param a input vector
-/// \param s scale in R
-/// \return the scaled vector of a
-template<typename T>
-thrust::device_vector<T> operator*(const T& s, thrust::device_vector<T>& a)
-{
-	thrust::device_vector<T> res(a.size(), 0);
-	thrust::transform(a.begin(), a.end(), res.begin(), _scale_functor<T>(s));
-	return res;
-}
-
-
-
-/// \brief operator overload for inner product of two vectors
-/// \param a one device vector
-/// \param b one device vector
-/// \return the inner product of two vectors
-template<typename T>
-T operator&(thrust::device_vector<T>& a, thrust::device_vector<T>& b)
-{
-	return thrust::inner_product(a.begin(), a.end(), b.begin(), 0.0);
-}
-
-/// \brief Operator overload
-/// \param a input vector a
-/// \param b input vector b
-/// \return a ./ b
-template<typename T>
-thrust::device_vector<T> operator/(thrust::device_vector<T>& a, thrust::device_vector<T>& b)
-{
-	thrust::device_vector<T> c(a.size(), 0);
-	thrust::transform(a.begin(), a.end(), b.begin(), c.begin(), _divide_functor<T>());
-	return c;
-}
-
-
-template<typename T>
-thrust::device_vector<T>& operator+=(thrust::device_vector<T>& lhs, const thrust::device_vector<T>& rhs)
-{
-	thrust::transform(lhs.begin(), lhs.end(), rhs.begin(), lhs.begin(), thrust::plus<T>());
-	return lhs;
-}
-
-template<typename T>
-thrust::device_vector<T>& operator-=(thrust::device_vector<T>& lhs, const thrust::device_vector<T>& rhs)
-{
-	thrust::transform(lhs.begin(), lhs.end(), rhs.begin(), lhs.begin(), thrust::minus<T>());
-	return lhs;
-}
-
-template<typename T>
-thrust::device_vector<T>& operator*=(thrust::device_vector<T>& lhs, const thrust::device_vector<T>& rhs)
-{
-	thrust::transform(lhs.begin(), lhs.end(), rhs.begin(), lhs.begin(), thrust::multiplies<T>());
-	return lhs;
-}
-
-template<typename T>
-thrust::device_vector<T>& operator/=(thrust::device_vector<T>& lhs, const thrust::device_vector<T>& rhs)
-{
-	thrust::transform(lhs.begin(), lhs.end(), rhs.begin(), lhs.begin(), _divide_functor<T>());
-	return lhs;
-}
-
-
-
-template<typename T>
-thrust::device_vector<T>& operator*=(thrust::device_vector<T>& lhs, const T& rhs)
-{
-	thrust::transform(lhs.begin(), lhs.end(), lhs.begin(), _scale_functor<T>(rhs));
-	return lhs;
-}
-
-
-/// \brief return the p norm of a vector
-/// \param v the vector
-/// \param p the p norm
-/// \return (sum(v^p))^(1/p)
-template<typename T>
-T operator^(const thrust::device_vector<T>& v, const T& p)
-{
-	return std::pow(thrust::transform_reduce(v.begin(), v.end(), _lp_functor<T>(p), 0.0, thrust::plus<T>()));
-}
-
-/// \brief Operator overload |, Get abs(a - b) vector of two vectors a and b
-/// \param lhs left vector
-/// \param rhs right vector
-/// \return abs(lhs - rhs)
-template<typename T>
-thrust::device_vector<T> operator|(
-	const thrust::device_vector<T>& lhs,
-	const thrust::device_vector<T>& rhs)
-{
-	thrust::device_vector<T> res(lhs.size(), 0);
-	thrust::transform(lhs.begin(), lhs.end(), rhs.begin(), res.begin(), _abs_minus_functor<T>());
-	return res;
-}
-
-
 /// \brief the rotation of the 2D vector according to cos(T) and sin(T)
 /// \param p original vector
 /// \param cosT cos(T)
@@ -1827,27 +1917,27 @@ __host__ __device__ inline T _trilinearInterpolation(
 }
 
 
-/// \brief SIDDON kernel function 1
-inline __host__	__device__ float dev_pFun(const float& alpha, const float& pstart, const float&pend)
-{
-	return pstart + alpha * (pend - pstart);
-}
+///// \brief SIDDON kernel function 1
+//inline __host__	__device__ float dev_pFun(const float& alpha, const float& pstart, const float&pend)
+//{
+//	return pstart + alpha * (pend - pstart);
+//}
 /// \brief SIDDON kernel function 1
 inline __host__	__device__ double dev_pFun(const double& alpha, const double& pstart, const double&pend)
 {
 	return pstart + alpha * (pend - pstart);
 }
 
-
-/// \brief SIDDON kernel function 2
-inline __host__	__device__ float dev_alpha_IFun(const float& b, const float& d, const float& pstart, const float& pend, const unsigned int& i)
-{
-	if (!IS_ZERO<float>(pend - pstart))
-	{
-		return ((b + (float) i*d) - pstart) / (pend - pstart);
-	}
-	else return 1000;//((b + i*d)-pstart)/(1e-6);
-}
+//
+///// \brief SIDDON kernel function 2
+//inline __host__	__device__ float dev_alpha_IFun(const float& b, const float& d, const float& pstart, const float& pend, const unsigned int& i)
+//{
+//	if (!IS_ZERO<float>(pend - pstart))
+//	{
+//		return ((b + (float) i*d) - pstart) / (pend - pstart);
+//	}
+//	else return 1000;//((b + i*d)-pstart)/(1e-6);
+//}
 /// \brief SIDDON kernel function 2
 inline __host__	__device__ double dev_alpha_IFun(const double& b, const double& d, const double& pstart, const double& pend, const unsigned int& i)
 {
@@ -1858,68 +1948,68 @@ inline __host__	__device__ double dev_alpha_IFun(const double& b, const double& 
 	else return 1000;//((b + i*d)-pstart)/(1e-6);
 }
 
-
-
-/// \brief SIDDON kernel function 3
-inline __host__	__device__ float dev_varphiFun(const float& alpha, const float& b, const float& d, const float& pstart, const float& pend)
-{
-	return (dev_pFun(alpha, pstart, pend) - b) / d;
-}
+//
+//
+///// \brief SIDDON kernel function 3
+//inline __host__	__device__ float dev_varphiFun(const float& alpha, const float& b, const float& d, const float& pstart, const float& pend)
+//{
+//	return (dev_pFun(alpha, pstart, pend) - b) / d;
+//}
 /// \brief SIDDON kernel function 3
 inline __host__	__device__ double dev_varphiFun(const double& alpha, const double& b, const double& d, const double& pstart, const double& pend)
 {
 	return (dev_pFun(alpha, pstart, pend) - b) / d;
 }
 
-
-
-/// \brief SIDDON kernel function 4
-inline	__host__ __device__ void dev_minmaxIdxFun(
-	const float& pstart, const float& pend,
-	const float& b, const float& d,
-	const float& alphaMIN, const float& alphaMAX,
-	const float& alphaPmin, const float& alphaPmax,
-	const unsigned int& Nplane, int* imin, int* imax)
-{
-	if (pstart < pend)
-	{
-		if (IS_ZERO<float>(alphaMIN - alphaPmin))
-		{
-			*imin = 1;
-		}
-		else
-		{
-			*imin = static_cast<int>(ceil(dev_varphiFun(alphaMIN, b, d, pstart, pend)));
-		}
-		if (IS_ZERO<float>(alphaMAX - alphaPmax))
-		{
-			*imax = Nplane - 1;
-		}
-		else
-		{
-			*imax = static_cast<int>(floor(dev_varphiFun(alphaMAX, b, d, pstart, pend)));
-		}
-	}
-	else
-	{
-		if (IS_ZERO<float>(alphaMIN - alphaPmin))
-		{
-			*imax = Nplane - 2;
-		}
-		else
-		{
-			*imax = static_cast<int>(floor(dev_varphiFun(alphaMIN, b, d, pstart, pend)));
-		}
-		if (IS_ZERO<float>(alphaMAX - alphaPmax))
-		{
-			*imin = 0;
-		}
-		else
-		{
-			*imin = static_cast<int>(ceil(dev_varphiFun(alphaMAX, b, d, pstart, pend)));
-		}
-	}
-}
+//
+//
+///// \brief SIDDON kernel function 4
+//inline	__host__ __device__ void dev_minmaxIdxFun(
+//	const float& pstart, const float& pend,
+//	const float& b, const float& d,
+//	const float& alphaMIN, const float& alphaMAX,
+//	const float& alphaPmin, const float& alphaPmax,
+//	const unsigned int& Nplane, int* imin, int* imax)
+//{
+//	if (pstart < pend)
+//	{
+//		if (IS_ZERO<float>(alphaMIN - alphaPmin))
+//		{
+//			*imin = 1;
+//		}
+//		else
+//		{
+//			*imin = static_cast<int>(ceil(dev_varphiFun(alphaMIN, b, d, pstart, pend)));
+//		}
+//		if (IS_ZERO<float>(alphaMAX - alphaPmax))
+//		{
+//			*imax = Nplane - 1;
+//		}
+//		else
+//		{
+//			*imax = static_cast<int>(floor(dev_varphiFun(alphaMAX, b, d, pstart, pend)));
+//		}
+//	}
+//	else
+//	{
+//		if (IS_ZERO<float>(alphaMIN - alphaPmin))
+//		{
+//			*imax = Nplane - 2;
+//		}
+//		else
+//		{
+//			*imax = static_cast<int>(floor(dev_varphiFun(alphaMIN, b, d, pstart, pend)));
+//		}
+//		if (IS_ZERO<float>(alphaMAX - alphaPmax))
+//		{
+//			*imin = 0;
+//		}
+//		else
+//		{
+//			*imin = static_cast<int>(ceil(dev_varphiFun(alphaMAX, b, d, pstart, pend)));
+//		}
+//	}
+//}
 
 
 /// \brief SIDDON kernel function 4
@@ -1970,16 +2060,16 @@ inline	__host__ __device__ void dev_minmaxIdxFun(
 	}
 }
 
-
-/// \brief SIDDON kernel function 5
-inline __host__ __device__  float dev_alphaU_Fun(const float& d, const float& startx, const float& endx)
-{
-	if (IS_ZERO<float>(startx - endx))
-	{
-		return 1000.0f;//(d/1e-6);
-	}
-	return d / fabsf(startx - endx);
-}
+//
+///// \brief SIDDON kernel function 5
+//inline __host__ __device__  float dev_alphaU_Fun(const float& d, const float& startx, const float& endx)
+//{
+//	if (IS_ZERO<float>(startx - endx))
+//	{
+//		return 1000.0f;//(d/1e-6);
+//	}
+//	return d / fabsf(startx - endx);
+//}
 
 /// \brief SIDDON kernel function 5
 inline __host__ __device__  double dev_alphaU_Fun(const double& d, const double& startx, const double& endx)
@@ -1992,12 +2082,6 @@ inline __host__ __device__  double dev_alphaU_Fun(const double& d, const double&
 }
 
 
-/// \brief SIDDON kernel function 6
-template<typename T>
-inline __host__ __device__  int dev_iu_Fun(const T& start, const T& end)
-{
-	return (start < end) ? 1 : -1;
-}
 
 
 /// \brief SIDDON line integral function in 2D
@@ -2773,6 +2857,26 @@ inline __host__ __device__ int intersectBox(Ray r, double3 boxmin, double3 boxma
 
 
 
+template<typename T>
+__host__ __device__ inline T intersectLength(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax)
+{
+	const T left = (fixedmin > varimin) ? fixedmin : varimin;
+	const T right = (fixedmax < varimax) ? fixedmax : varimax;
+	return abs(right - left) * static_cast<double>(right > left);
+}
+
+
+template<typename T>
+__device__ inline T intersectLength_device(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax)
+{
+	const T left = (fixedmin > varimin) ? fixedmin : varimin;
+	const T right = (fixedmax < varimax) ? fixedmax : varimax;
+	return fabsf(right - left) * static_cast<T>(right > left);
+}
+
+
+
+
 
 
 
@@ -2785,11 +2889,19 @@ inline __host__ __device__ int intersectBox(Ray r, double3 boxmin, double3 boxma
 //! @param x       input value
 //! @return        whether the input parameter is power of 2
 //////////////////////////////////////////////////////////////////////////
-template<typename T>
-inline __host__ __device__ bool isPow2(const T& x)
-{
-	return ((x&(x - 1)) == 0);
-}
+inline __host__ __device__ bool isPow2(const unsigned int& x){	return ((x&(x - 1)) == 0);}
+inline __host__ __device__ bool isPow2(unsigned int&x){	const unsigned int y(x);	return isPow2(y);}
+inline __host__ __device__ bool isPow2(int& x){	const unsigned int y(x);	return isPow2(y);}
+inline __host__ __device__ bool isPow2(const int& x){	const unsigned int y(x);	return isPow2(y);}
+inline __host__ __device__ bool isPow2(long& x){	const unsigned int y(x);	return isPow2(y);}
+inline __host__ __device__ bool isPow2(unsigned long& x){	const unsigned int y(x);	return isPow2(y);}
+inline __host__ __device__ bool isPow2(const long& x){	const unsigned int y(x);	return isPow2(y);}
+inline __host__ __device__ bool isPow2(const unsigned long& x){	const unsigned int y(x);	return isPow2(y);}
+inline __host__ __device__ bool isPow2(long long& x){	const unsigned int y(x);	return isPow2(y);}
+inline __host__ __device__ bool isPow2(unsigned long long& x){	const unsigned int y(x);	return isPow2(y);}
+inline __host__ __device__ bool isPow2(const long long& x){	const unsigned int y(x);	return isPow2(y);}
+inline __host__ __device__ bool isPow2(const unsigned long long& x){	const unsigned int y(x);	return isPow2(y);}
+
 
 
 
@@ -3166,12 +3278,19 @@ inline __host__ __device__ void SortProj(T(&grid)[4][3])
 	}
 }
 
+
 template<typename T>
-__host__ __device__ inline void SortProjection(T(&Grid)[4][3]) {
+__host__ __device__ inline void SortProjection(T(&Grid)[4][3])
+{
+	int i, j;
 	T td;
-	for (int i = 0; i < 3; i++)	{
-		for (int j = i + 1; j < 4; j++)	{
-			if (Grid[j][2] < Grid[i][2]) {
+	//mexPrintf("S0=%d,S1=%d,S2=%d,S3=%d\n",SSort[0],SSort[1],SSort[2],SSort[3]);
+	for (i = 0; i < 3; i++)
+	{
+		for (j = i + 1; j < 4; j++)
+		{
+			if (Grid[j][2] < Grid[i][2])
+			{
 				td = Grid[i][0];
 				Grid[i][0] = Grid[j][0];
 				Grid[j][0] = td;
@@ -3188,13 +3307,10 @@ __host__ __device__ inline void SortProjection(T(&Grid)[4][3]) {
 	}
 }
 
+
+
 template<typename T>
-inline __host__ __device__ T ComputeCoefficient(
-	const T(&Grid)[4][3],
-	const T(&SVA)[3],
-	const T(&SVB)[3],
-	const T(&SPoint)[2],
-	const T area)
+inline __host__ __device__ T ComputeCoefficient(const T(&Grid)[4][3], const T(&SVA)[3],	const T(&SVB)[3], const T(&SPoint)[2], const T area)
 {
 	T coef = 0;
 	T x0(0), y0(0), a(0), b(0), t(0);
@@ -3225,283 +3341,287 @@ inline __host__ __device__ T ComputeCoefficient(
 
 	switch (AI)
 	{
-		case 0:
+	case 0:
+	{
+		switch (BI)
 		{
-			switch (BI)
-			{
-			case 1:// case [0,1]
-			{
-				x0 = Grid[0][0] - SPoint[0];
-				y0 = Grid[0][1] - SPoint[1];
-				if (abs(SVB[0] * SVB[1]) > 0)
-				{
-					t = x0*SVB[1] - y0*SVB[0];
-					a = t / SVB[0];
-					b = t / SVB[1];
-					coef = 0.5*abs(a*b);
-				}
-				break;
-			}
-			case 2: // case [0,2]
-			{
-				x0 = abs(Grid[0][0] - Grid[1][0]);
-				y0 = abs(Grid[0][1] - Grid[1][1]);
-				if (x0 > y0) // line is on the x-direction
-				{
-					a = abs((Grid[0][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[0][1] - SPoint[1]));
-					b = abs((Grid[1][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[1][1] - SPoint[1]));
-					coef = (a + b)*x0*0.5;
-				}
-				else
-				{
-					a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVB[0] / SVB[1]);
-					b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVB[0] / SVB[1]);
-					coef = (a + b)*y0*0.5;
-				}
-				break;
-			}
-			case 3://case [0,3]
-			{    
-				x0 = Grid[3][0] - SPoint[0];
-				y0 = Grid[3][1] - SPoint[1];
-				if (abs(SVB[0] * SVB[1]) > 0)
-				{
-					t = x0*SVB[1] - y0*SVB[0];
-					a = t / SVB[0];
-					b = t / SVB[1];
-					coef = 0.5*abs(a*b);
-					coef = area - coef;
-				}
-				else
-					coef = area;
-				break;
-			}
-			case 4: // case [0,4]
-			{
-				coef = area;
-				break;
-			}
-			default: break;
-			}
-			break;
-		}//end case 0 of AI
-		case 1:
+		case 1:// case [0,1]
 		{
-			switch (BI)
+			x0 = Grid[0][0] - SPoint[0];
+			y0 = Grid[0][1] - SPoint[1];
+			if (abs(SVB[0] * SVB[1]) > 0)
 			{
-			case 1://case [1,1]
-			{
-				x0 = Grid[0][0] - SPoint[0];
-				y0 = Grid[0][1] - SPoint[1];
 				t = x0*SVB[1] - y0*SVB[0];
-				if (abs(SVB[0] * SVB[1]) > 0)
-				{
-					a = t / SVB[0];
-					b = t / SVB[1];
-					coef = 0.5*abs(a*b);
-				}
-				t = x0*SVA[1] - y0*SVA[0];
-				if (abs(SVA[0] * SVA[1]) > 0)
-				{
-					a = t / SVA[0];
-					b = t / SVA[1];
-					coef = abs(coef - 0.5*abs(a*b));
-				}
-				break;
-			}
-			case 2://case [1,2]
-			{
-				x0 = abs(Grid[0][0] - Grid[1][0]);
-				y0 = abs(Grid[0][1] - Grid[1][1]);
-				if (x0 > y0) // line is on the x-dirction
-				{
-					a = abs((Grid[0][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[0][1] - SPoint[1]));
-					b = abs((Grid[1][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[1][1] - SPoint[1]));
-					coef = (a + b)*x0*0.5;
-				}
-				else
-				{
-					a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVB[0] / SVB[1]);
-					b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVB[0] / SVB[1]);
-					coef = (a + b)*y0*0.5;
-				}
-				x0 = Grid[0][0] - SPoint[0];
-				y0 = Grid[0][1] - SPoint[1];
-				if (abs(SVA[0] * SVA[1]) > 0)
-				{
-					t = x0*SVA[1] - y0*SVA[0];
-					a = t / SVA[0];
-					b = t / SVA[1];
-					coef = abs(0.5*abs(a*b) - coef);
-				}
-				break;
-			}
-			case 3://case [1,3]
-			{
-				x0 = Grid[0][0] - SPoint[0];
-				y0 = Grid[0][1] - SPoint[1];
-				if (abs(SVA[0] * SVA[1]) > 0)
-				{
-					t = x0*SVA[1] - y0*SVA[0];
-					a = t / SVA[0];
-					b = t / SVA[1];
-					coef = area - 0.5*abs(a*b);
-				}
-				else
-					coef = area;
-				x0 = Grid[3][0] - SPoint[0];
-				y0 = Grid[3][1] - SPoint[1];
-				if (abs(SVB[0] * SVB[1]) > 0)
-				{
-					t = x0*SVB[1] - y0*SVB[0];
-					a = t / SVB[0];
-					b = t / SVB[1];
-					coef = coef - 0.5*abs(a*b);
-				}
-				break;
-			}
-			case 4://case [1,4]
-			{
-				x0 = Grid[0][0] - SPoint[0];
-				y0 = Grid[0][1] - SPoint[1];
-				if (abs(SVA[0] * SVA[1]) > 0)
-				{
-					t = x0*SVA[1] - y0*SVA[0];
-					a = t / SVA[0];
-					b = t / SVA[1];
-					coef = 0.5*abs(a*b);
-					coef = area - coef;
-				}
-				else
-					coef = area;
-				break;
-			}
-			default: break;
+				a = t / SVB[0];
+				b = t / SVB[1];
+				coef = 0.5*abs(a*b);
 			}
 			break;
-		}//end case 1 of AI
+		}
+		case 2: // case [0,2]
+		{
+			x0 = abs(Grid[0][0] - Grid[1][0]);
+			y0 = abs(Grid[0][1] - Grid[1][1]);
+			if (x0 > y0) // line is on the x-direction
+			{
+				a = abs((Grid[0][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[0][1] - SPoint[1]));
+				b = abs((Grid[1][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[1][1] - SPoint[1]));
+				coef = (a + b)*x0*0.5;
+			}
+			else
+			{
+				a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVB[0] / SVB[1]);
+				b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVB[0] / SVB[1]);
+				coef = (a + b)*y0*0.5;
+			}
+			break;
+		}
+		case 3://case [0,3]
+		{    x0 = Grid[3][0] - SPoint[0];
+		y0 = Grid[3][1] - SPoint[1];
+		if (abs(SVB[0] * SVB[1]) > 0)
+		{
+			t = x0*SVB[1] - y0*SVB[0];
+			a = t / SVB[0];
+			b = t / SVB[1];
+			coef = 0.5*abs(a*b);
+			coef = area - coef;
+		}
+		else
+			coef = area;
+		break;
+		}
+		case 4: // case [0,4]
+		{
+			coef = area;
+			break;
+		}
+		default: break;
+		}
+		break;
+	}//end case 0 of AI
+	case 1:
+	{
+		switch (BI)
+		{
+		case 1://case [1,1]
+		{
+			x0 = Grid[0][0] - SPoint[0];
+			y0 = Grid[0][1] - SPoint[1];
+			t = x0*SVB[1] - y0*SVB[0];
+			if (abs(SVB[0] * SVB[1]) > 0)
+			{
+				a = t / SVB[0];
+				b = t / SVB[1];
+				coef = 0.5*abs(a*b);
+			}
+			t = x0*SVA[1] - y0*SVA[0];
+			if (abs(SVA[0] * SVA[1]) > 0)
+			{
+				a = t / SVA[0];
+				b = t / SVA[1];
+				coef = abs(coef - 0.5*abs(a*b));
+			}
+			break;
+		}
+		case 2://case [1,2]
+		{
+			x0 = abs(Grid[0][0] - Grid[1][0]);
+			y0 = abs(Grid[0][1] - Grid[1][1]);
+			if (x0 > y0) // line is on the x-dirction
+			{
+				a = abs((Grid[0][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[0][1] - SPoint[1]));
+				b = abs((Grid[1][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[1][1] - SPoint[1]));
+				coef = (a + b)*x0*0.5;
+			}
+			else
+			{
+				a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVB[0] / SVB[1]);
+				b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVB[0] / SVB[1]);
+				coef = (a + b)*y0*0.5;
+			}
+			x0 = Grid[0][0] - SPoint[0];
+			y0 = Grid[0][1] - SPoint[1];
+			if (abs(SVA[0] * SVA[1]) > 0)
+			{
+				t = x0*SVA[1] - y0*SVA[0];
+				a = t / SVA[0];
+				b = t / SVA[1];
+				coef = abs(0.5*abs(a*b) - coef);
+			}
+			break;
+		}
+		case 3://case [1,3]
+		{
+			x0 = Grid[0][0] - SPoint[0];
+			y0 = Grid[0][1] - SPoint[1];
+			if (abs(SVA[0] * SVA[1]) > 0)
+			{
+				t = x0*SVA[1] - y0*SVA[0];
+				a = t / SVA[0];
+				b = t / SVA[1];
+				coef = area - 0.5*abs(a*b);
+			}
+			else
+				coef = area;
+			x0 = Grid[3][0] - SPoint[0];
+			y0 = Grid[3][1] - SPoint[1];
+			if (abs(SVB[0] * SVB[1]) > 0)
+			{
+				t = x0*SVB[1] - y0*SVB[0];
+				a = t / SVB[0];
+				b = t / SVB[1];
+				coef = coef - 0.5*abs(a*b);
+			}
+			break;
+		}
+		case 4://case [1,4]
+		{
+			x0 = Grid[0][0] - SPoint[0];
+			y0 = Grid[0][1] - SPoint[1];
+			if (abs(SVA[0] * SVA[1]) > 0)
+			{
+				t = x0*SVA[1] - y0*SVA[0];
+				a = t / SVA[0];
+				b = t / SVA[1];
+				coef = 0.5*abs(a*b);
+				coef = area - coef;
+			}
+			else
+				coef = area;
+			break;
+		}
+		default: break;
+		}
+		break;
+	}//end case 1 of AI
+	case 2:
+	{
+		switch (BI)
+		{
 		case 2:
 		{
-			switch (BI)
+			x0 = abs(Grid[0][0] - Grid[1][0]);
+			y0 = abs(Grid[0][1] - Grid[1][1]);
+			if (x0 > y0) // line is on the x-dirction
 			{
-			case 2:
-			{
-				x0 = abs(Grid[0][0] - Grid[1][0]);
-				y0 = abs(Grid[0][1] - Grid[1][1]);
-				if (x0 > y0) // line is on the x-dirction
-				{
-					a = abs((Grid[0][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[0][1] - SPoint[1]));
-					b = abs((Grid[1][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[1][1] - SPoint[1]));
-					coef = (a + b)*x0*0.5;
-					a = abs((Grid[0][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[0][1] - SPoint[1]));
-					b = abs((Grid[1][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[1][1] - SPoint[1]));
-					coef = abs(coef - (a + b)*x0*0.5);
-				}
-				else
-				{
-					a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVB[0] / SVB[1]);
-					b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVB[0] / SVB[1]);
-					coef = (a + b)*y0*0.5;
-					a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVA[0] / SVA[1]);
-					b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVA[0] / SVA[1]);
-					coef = abs(coef - (a + b)*y0*0.5);
-				}
-				break;
+				a = abs((Grid[0][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[0][1] - SPoint[1]));
+				b = abs((Grid[1][0] - SPoint[0])*SVB[1] / SVB[0] - (Grid[1][1] - SPoint[1]));
+				coef = (a + b)*x0*0.5;
+				a = abs((Grid[0][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[0][1] - SPoint[1]));
+				b = abs((Grid[1][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[1][1] - SPoint[1]));
+				coef = abs(coef - (a + b)*x0*0.5);
 			}
-			case 3:
+			else
 			{
-				x0 = abs(Grid[2][0] - Grid[3][0]);
-				y0 = abs(Grid[2][1] - Grid[3][1]);
-				if (x0 > y0) // line is on the x-dirction
-				{
-					a = abs((Grid[2][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[2][1] - SPoint[1]));
-					b = abs((Grid[3][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[3][1] - SPoint[1]));
-					coef = (a + b)*x0*0.5;
-				}
-				else
-				{
-					a = abs((Grid[2][0] - SPoint[0]) - (Grid[2][1] - SPoint[1])*SVA[0] / SVA[1]);
-					b = abs((Grid[3][0] - SPoint[0]) - (Grid[3][1] - SPoint[1])*SVA[0] / SVA[1]);
-					coef = (a + b)*y0*0.5;
-				}
-				x0 = Grid[3][0] - SPoint[0];
-				y0 = Grid[3][1] - SPoint[1];
-				if (abs(SVB[0] * SVB[1]) > 0)
-				{
-					t = x0*SVB[1] - y0*SVB[0];
-					a = t / SVB[0];
-					b = t / SVB[1];
-					coef = abs(0.5*abs(a*b) - coef);
-				}
-				break;
-			}
-			case 4:
-			{
-				x0 = abs(Grid[2][0] - Grid[3][0]);
-				y0 = abs(Grid[2][1] - Grid[3][1]);
-				if (x0 > y0) // line is on the x-dirction
-				{
-					a = abs((Grid[2][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[2][1] - SPoint[1]));
-					b = abs((Grid[3][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[3][1] - SPoint[1]));
-					coef = (a + b)*x0*0.5;
-				}
-				else // line is on the y-direction
-				{
-					a = abs((Grid[2][0] - SPoint[0]) - (Grid[2][1] - SPoint[1])*SVA[0] / SVA[1]);
-					b = abs((Grid[3][0] - SPoint[0]) - (Grid[3][1] - SPoint[1])*SVA[0] / SVA[1]);
-					coef = (a + b)*y0*0.5;
-				}
-				break;
-			}
-			default: break;
+				a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVB[0] / SVB[1]);
+				b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVB[0] / SVB[1]);
+				coef = (a + b)*y0*0.5;
+				a = abs((Grid[0][0] - SPoint[0]) - (Grid[0][1] - SPoint[1])*SVA[0] / SVA[1]);
+				b = abs((Grid[1][0] - SPoint[0]) - (Grid[1][1] - SPoint[1])*SVA[0] / SVA[1]);
+				coef = abs(coef - (a + b)*y0*0.5);
 			}
 			break;
-		}//end case 2 of AI
+		}
 		case 3:
 		{
-			switch (BI)
+			x0 = abs(Grid[2][0] - Grid[3][0]);
+			y0 = abs(Grid[2][1] - Grid[3][1]);
+			if (x0 > y0) // line is on the x-dirction
 			{
-			case 3:
-			{
-				x0 = Grid[3][0] - SPoint[0];
-				y0 = Grid[3][1] - SPoint[1];
-				if (abs(SVB[0] * SVB[1]) > 0)
-				{
-					t = x0*SVB[1] - y0*SVB[0];
-					a = t / SVB[0];
-					b = t / SVB[1];
-					coef = 0.5*abs(a*b);
-				}
-				if (abs(SVA[0] * SVA[1]) > 0)
-				{
-					t = x0*SVA[1] - y0*SVA[0];
-					a = t / SVA[0];
-					b = t / SVA[1];
-					coef = abs(coef - 0.5*abs(a*b));
-				}
-				break;
+				a = abs((Grid[2][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[2][1] - SPoint[1]));
+				b = abs((Grid[3][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[3][1] - SPoint[1]));
+				coef = (a + b)*x0*0.5;
 			}
-			case 4:
+			else
 			{
-				x0 = Grid[3][0] - SPoint[0];
-				y0 = Grid[3][1] - SPoint[1];
-				if (abs(SVA[0] * (SVA[1])) > 0)
-				{
-					t = x0*SVA[1] - y0*SVA[0];
-					a = t / SVA[0];
-					b = t / SVA[1];
-					coef = 0.5*abs(a*b);
-				}
-				break;
+				a = abs((Grid[2][0] - SPoint[0]) - (Grid[2][1] - SPoint[1])*SVA[0] / SVA[1]);
+				b = abs((Grid[3][0] - SPoint[0]) - (Grid[3][1] - SPoint[1])*SVA[0] / SVA[1]);
+				coef = (a + b)*y0*0.5;
 			}
-			default: break;
+			x0 = Grid[3][0] - SPoint[0];
+			y0 = Grid[3][1] - SPoint[1];
+			if (abs(SVB[0] * SVB[1]) > 0)
+			{
+				t = x0*SVB[1] - y0*SVB[0];
+				a = t / SVB[0];
+				b = t / SVB[1];
+				coef = abs(0.5*abs(a*b) - coef);
 			}
 			break;
-		}//end case 3 of AI
+		}
+		case 4:
+		{
+			x0 = abs(Grid[2][0] - Grid[3][0]);
+			y0 = abs(Grid[2][1] - Grid[3][1]);
+			if (x0 > y0) // line is on the x-dirction
+			{
+				a = abs((Grid[2][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[2][1] - SPoint[1]));
+				b = abs((Grid[3][0] - SPoint[0])*SVA[1] / SVA[0] - (Grid[3][1] - SPoint[1]));
+				coef = (a + b)*x0*0.5;
+			}
+			else // line is on the y-direction
+			{
+				a = abs((Grid[2][0] - SPoint[0]) - (Grid[2][1] - SPoint[1])*SVA[0] / SVA[1]);
+				b = abs((Grid[3][0] - SPoint[0]) - (Grid[3][1] - SPoint[1])*SVA[0] / SVA[1]);
+				coef = (a + b)*y0*0.5;
+			}
+			break;
+		}
+		default: break;
+		}
+		break;
+	}//end case 2 of AI
+	case 3:
+	{
+		switch (BI)
+		{
+		case 3:
+		{
+			x0 = Grid[3][0] - SPoint[0];
+			y0 = Grid[3][1] - SPoint[1];
+			if (abs(SVB[0] * SVB[1]) > 0)
+			{
+				t = x0*SVB[1] - y0*SVB[0];
+				a = t / SVB[0];
+				b = t / SVB[1];
+				coef = 0.5*abs(a*b);
+			}
+			if (abs(SVA[0] * SVA[1]) > 0)
+			{
+				t = x0*SVA[1] - y0*SVA[0];
+				a = t / SVA[0];
+				b = t / SVA[1];
+				coef = abs(coef - 0.5*abs(a*b));
+			}
+			break;
+		}
+		case 4:
+		{
+			x0 = Grid[3][0] - SPoint[0];
+			y0 = Grid[3][1] - SPoint[1];
+			if (abs(SVA[0] * (SVA[1])) > 0)
+			{
+				t = x0*SVA[1] - y0*SVA[0];
+				a = t / SVA[0];
+				b = t / SVA[1];
+				coef = 0.5*abs(a*b);
+				//mexPrintf("x0=%f,y0=%f,SVA[0]=%f,SVA[1]=%f,t=%f,a=%f,b=%f;coef=%f\n",x0,y0,SVA[0],SVA[1],t,a,b,coef);
+			}
+			break;
+		}
+		default: break;
+		}
+		break;
+	}//end case 3 of AI
 	}//end of switch AI
 	return coef;
 }
 
+
+
+
+// Generate projection matrix
 // Generate The projection matrix in AIM model
 template<typename T>
 void genProj_AIM(
@@ -3747,7 +3867,8 @@ void genProj_AIM(std::vector<int>& rowIdx, std::vector<int>& colIdx, std::vector
 
 
 template<typename T>
-void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img) {
+void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img)
+{
 	unsigned int angIdx = 0;
 	std::vector < int> rowIdx;
 	std::vector < int > colIdx;
@@ -3765,11 +3886,14 @@ void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img) {
 	std::string f1;
 	std::string f2;
 	std::string f3;
-	if (sizeof(T) == 4)	{
+	if (sizeof(T) == 4)
+	{
 		f1 = "prjAIM" + ss.str() + "f.row";
 		f2 = "prjAIM" + ss.str() + "f.col";
 		f3 = "prjAIM" + ss.str() + "f.cof";
-	} else if (sizeof(T) == 8) {
+	}
+	else if (sizeof(T) == 8)
+	{
 		f1 = "prjAIM" + ss.str() + "d.row";
 		f2 = "prjAIM" + ss.str() + "d.col";
 		f3 = "prjAIM" + ss.str() + "d.cof";
@@ -3788,10 +3912,12 @@ void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img) {
 	rowFile.close();
 	colFile.close();
 	coeFile.close();
+
 }
 
 template<typename T>
-void genProjectionMatrix_AIM_template(const FanEAGeo FanGeo, const Image Img) {
+void genProjectionMatrix_AIM_template(const FanEAGeo FanGeo, const Image Img)
+{
 	int angIdx = 0;
 	std::vector < int> rowIdx;
 	std::vector < int > colIdx;
@@ -3900,34 +4026,65 @@ int calZeroNorm(const thrust::device_vector<T>& v, thrust::device_vector<int>& I
 
 
 
+
+
+
 template<typename T>
-void DD3Boundaries(int nrBoundaries, T*pCenters, T *pBoundaries) {
+void DD3Boundaries(int nrBoundaries, T*pCenters, T *pBoundaries)
+{
 	int i;
-	if (nrBoundaries >= 3) {
+	if (nrBoundaries >= 3)
+	{
 		*pBoundaries++ = 1.5 * *pCenters - 0.5 * *(pCenters + 1);
-		for (i = 1; i <= (nrBoundaries - 2); i++) {
+		for (i = 1; i <= (nrBoundaries - 2); i++)
+		{
 			*pBoundaries++ = 0.5 * *pCenters + 0.5 * *(pCenters + 1);
 			pCenters++;
 		}
 		*pBoundaries = 1.5 * *pCenters - 0.5 * *(pCenters - 1);
-	} else {
+	}
+	else
+	{
 		*pBoundaries = *pCenters - 0.5;
 		*(pBoundaries + 1) = *pCenters + 0.5;
 	}
+
 }
 
-template<typename T>
-void DD3Boundaries(int nrBoundaries, std::vector<T>& Centers, std::vector<T>& Boundaries) {
-	int i;
-	T* pBoundaries = &Boundaries[0];
-	T* pCenters = &Centers[0];
-	DD3Boundaries(nrBoundaries, pCenters, pBoundaries);
-}
 
 template<typename T>
-void DD3Boundaries(int nrBoundaries, thrust::host_vector<T>& Centers, thrust::host_vector<T>& Boundaries) {
+void DD3Boundaries(int nrBoundaries, std::vector<T>& Centers, std::vector<T>& Boundaries)
+{
 	DD3Boundaries<T>(nrBoundaries, &Centers[0], &Boundaries[0]);
 }
+
+template<typename T>
+void DD3Boundaries(int nrBoundaries, thrust::host_vector<T>& Centers, thrust::host_vector<T>& Boundaries)
+{
+	DD3Boundaries<T>(nrBoundaries, &Centers[0], &Boundaries[0]);
+}
+
+
+
+
+
+template<typename T>
+T SIGN(const T& v)
+{
+	if (v > 0)
+	{
+		return 1;
+	}
+	else if (v < 0)
+	{
+		return -1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 
 template<typename T>
 std::vector<T>& operator+(std::vector<T>& v, const T& ms)
@@ -3956,11 +4113,21 @@ std::ostream& operator<<(std::ostream& os, std::vector<T>& dt)
 
 
 template<typename T>
-const T mean(std::vector<T>& v) {
-	if (v.empty()) {
+const T mean(std::vector<T>& v)
+{
+	T summ = 0;
+	for (unsigned int i = 0; i != v.size(); ++i)
+	{
+		summ += v[i];
+	}
+	if (v.size() == 0)
+	{
 		return 0;
 	}
-	return std::accumulate(begin(v), end(v), 0) / static_cast<T>(v.size());
+	else
+	{
+		return (summ / static_cast<T>(v.size()));
+	}
 }
 
 
@@ -4012,31 +4179,40 @@ void prjWeight(T* prj, // projection data to be updated
 		int N) // total elements number
 {
 #pragma omp parallel for
-	for (int i = 0; i < N; ++i)	{
-		if (rowSum[i] > _EPSILON) {
+	for (int i = 0; i < N; ++i)
+	{
+		if (rowSum[i] > _EPSILON)
+		{
 			prj[i] = (realPrj[i] - prj[i]) / rowSum[i];
-		} else {
+		}
+		else
+		{
 			prj[i] = 0;
 		}
 	}
 }
 
 template<typename T>
-void prjWeight(std::vector<T>& prj, std::vector<T>& realPrj, std::vector<T>& rowSum) {
-
-	struct prjFunctor {
+void prjWeight(std::vector<T>& prj, std::vector<T>& realPrj, std::vector<T>& rowSum)
+{
+	struct prjFunctor
+	{
 		typedef thrust::tuple<T,T,T> InputTuple;
 		T operator()(InputTuple& in)
 		{
 			T prj_ = thrust::get<0>(in);
 			T realPrj_ = thrust::get<1>(in);
 			T rowSum_ = thrust::get<2>(in);
-			if(rowSum_> _EPSILON) {
+			if(rowSum_> _EPSILON)
+			{
 				return (realPrj_ - prj_) / rowSum_;
-			} else {
+			}
+			else
+			{
 				return 0;
 			}
 		}
+
 	};
 
 	thrust::transform(
@@ -4125,20 +4301,175 @@ void FISTA(T* lasImg, T* currentImg, T t1, T t2, int N)
 template<typename T>
 void FISTA(std::vector<T>& lasImg, std::vector<T>&  currentImg, T t1, T t2, int N)
 {
-	FISTA(&(currentImg[0]), &(lasImg[0]), t1, t2, N);
+	struct FISTA_functor
+	{
+		T t1;
+		T t2;
+		FISTA_functor(const T& _t1, const T& _t2) :t1(_t1), t2(_t2){}
+		__host__ __device__ T operator()(T curImg, T lasImg)
+		{
+			return curImg + (t1 - 1.0) / t2 * (curImg - lasImg);
+		}
+
+	};
+	thrust::transform(currentImg.begin(), currentImg.end(), lasImg.begin(), currentImg, FISTA_functor(t1, t2));
 }
 
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+// Get one sub-volume from the whole volume.
+// Assume that the volumes are stored in Z, X, Y order
 template<typename T>
-__host__ __device__ inline T intersectLength(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax)
+void getSubVolume(const T* vol,
+	const size_t XN, const size_t YN, const size_t ZN,
+	const size_t ZIdx_Start, const size_t ZIdx_End, T* subVol)
 {
-	const T left = (fixedmin > varimin) ? fixedmin : varimin;
-	const T right = (fixedmax < varimax) ? fixedmax : varimax;
-	return (sizeof(T) == 4 ? fabsf(right - left) : fabs(right - left)) * static_cast<double>(right > left);
+	const size_t SZN = ZIdx_End - ZIdx_Start;
+	for (size_t yIdx = 0; yIdx != YN; ++yIdx)
+	{
+		for (size_t xIdx = 0; xIdx != XN; ++xIdx)
+		{
+			for (size_t zIdx = ZIdx_Start; zIdx != ZIdx_End; ++zIdx)
+			{
+				subVol[(yIdx * XN + xIdx) * SZN + (zIdx - ZIdx_Start)] = vol[(yIdx * XN + xIdx) * ZN + zIdx];
+			}
+		}
+	}
 }
 
 template<typename T>
-__device__ inline T intersectLength_device(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax) {
-	const T left = (fixedmin > varimin) ? fixedmin : varimin;
-	const T right = (fixedmax < varimax) ? fixedmax : varimax;
-	return (sizeof(T) == 4 ? fabsf(right - left) : fabs(right - left)) * static_cast<double>(right > left);
+void getSubVolume(const T* vol,
+	const size_t XYN, const size_t ZN,
+	const size_t ZIdx_Start, const size_t ZIdx_End, T* subVol)
+{
+	const size_t SZN = ZIdx_End - ZIdx_Start;
+	for (size_t xyIdx = 0; xyIdx != XYN; ++xyIdx)
+	{
+		for (size_t zIdx = ZIdx_Start; zIdx != ZIdx_End; ++zIdx)
+		{
+			subVol[xyIdx * SZN + (zIdx - ZIdx_Start)] = vol[xyIdx * ZN + zIdx];
+		}
+	}
 }
+///////////////////////////////////////////////////////////////////////////////////
+
+// For projection, before we divide the volume into serveral sub-volumes, we have
+// to calculate the Z index range
+template<typename T>
+void getVolZIdxPair(const thrust::host_vector<T>& zPos, // Z position of the source.
+														//NOTE: We only assume the spiral CT case that zPos is increasing.
+	const size_t PrjIdx_Start, const size_t PrjIdx_End,
+	const T detCntIdxV, const T detStpZ, const int DNV,
+	const T objCntIdxZ, const T dz, const int ZN, // Size of the volume
+	int& ObjIdx_Start, int& ObjIdx_End) // The end is not included
+{
+	const T lowerPart = (detCntIdxV + 0.5) * detStpZ;
+	const T upperPart = DNV * detStpZ - lowerPart;
+	const T startPos = zPos[PrjIdx_Start] - lowerPart;
+	const T endPos = zPos[PrjIdx_End - 1] + upperPart;
+
+	ObjIdx_Start = floor((startPos / dz) + objCntIdxZ - 1);
+	ObjIdx_End = ceil((endPos / dz) + objCntIdxZ + 1) + 1;
+
+	ObjIdx_Start = (ObjIdx_Start < 0) ? 0 : ObjIdx_Start;
+	ObjIdx_Start = (ObjIdx_Start > ZN) ? ZN : ObjIdx_Start;
+
+	ObjIdx_End = (ObjIdx_End < 0) ? 0 : ObjIdx_End;
+	ObjIdx_End = (ObjIdx_End > ZN) ? ZN : ObjIdx_End;
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// For backprojection, after decide the subvolume range, we have to decide the
+// projection range to cover the subvolume.
+template<typename T>
+void getPrjIdxPair(const thrust::host_vector<T>& zPos, // Z Position of the source.
+													   // NOTE: we assume that it is pre sorted
+	const size_t ObjZIdx_Start, const size_t ObjZIdx_End, // sub vol range,
+														  // NOTE: the objZIdx_End is not included
+	const T objCntIdxZ, const T dz, const int ZN,
+	const T detCntIdxV, const T detStpZ, const int DNV,
+	int& prjIdx_Start, int& prjIdx_End)
+{
+	const int PN = zPos.size();
+
+	const T lowerPartV = (ObjZIdx_Start - objCntIdxZ - 0.5) * dz;
+	const T highrPartV = lowerPartV + (ObjZIdx_End - ObjZIdx_Start) * dz;
+
+	const T lowerPartDet = (detCntIdxV + 0.5) * detStpZ;
+	const T upperPartDet = DNV * detStpZ - lowerPartDet;
+
+	//The source position
+	const T sourLPos = lowerPartV - upperPartDet;
+	const T sourHPos = highrPartV + lowerPartDet;
+
+	prjIdx_Start = thrust::upper_bound(zPos.begin(), zPos.end(), sourLPos) - zPos.begin() - 1;
+	prjIdx_End = thrust::upper_bound(zPos.begin(), zPos.end(), sourHPos) - zPos.begin() + 2;
+	prjIdx_Start = (prjIdx_Start < 0) ? 0 : prjIdx_Start;
+	prjIdx_Start = (prjIdx_Start > PN) ? PN : prjIdx_Start;
+
+	prjIdx_End = (prjIdx_End < 0) ? 0 : prjIdx_End;
+	prjIdx_End = (prjIdx_End > PN) ? PN : prjIdx_End;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+// The volume is also stored in Z, X, Y order
+// Not tested yet.
+template<typename T>
+void combineVolume(
+	T* vol, // The volume to be combined
+	const int XN, const int YN, const int ZN,
+	T** subVol, // All sub volumes
+	const int* SZN, // Number of slices for each subVolume
+	const int subVolNum) // Number of sub volumes
+{
+	int kk = 0;
+	for (size_t yIdx = 0; yIdx != YN; ++yIdx)
+	{
+		for (size_t xIdx = 0; xIdx != XN; ++xIdx)
+		{
+			kk = 0;
+			for (size_t volIdx = 0; volIdx != subVolNum; ++volIdx)
+			{
+				for (size_t zIdx = 0; zIdx != SZN[volIdx]; ++zIdx)
+				{
+					vol[(yIdx * XN + xIdx) * ZN + kk] = subVol[volIdx][(yIdx * XN + xIdx) * SZN[volIdx] + zIdx];
+					kk = kk + 1;
+				}
+			}
+		}
+	}
+}
+
+
+template<typename T>
+void combineVolume(
+	T* vol, // The volume to be combined
+	const int XN, const int YN, const int ZN,
+	thrust::host_vector<thrust::host_vector<T> >& subVol, // All sub volumes
+	const int* SZN, // Number of slices for each subVolume
+	const int subVolNum) // Number of sub volumes
+{
+	int kk = 0;
+	for (size_t yIdx = 0; yIdx != YN; ++yIdx)
+	{
+		for (size_t xIdx = 0; xIdx != XN; ++xIdx)
+		{
+			kk = 0;
+			for (size_t volIdx = 0; volIdx != subVolNum; ++volIdx)
+			{
+				for (size_t zIdx = 0; zIdx != SZN[volIdx]; ++zIdx)
+				{
+					vol[(yIdx * XN + xIdx) * ZN + kk] = subVol[volIdx][(yIdx * XN + xIdx) * SZN[volIdx] + zIdx];
+					kk = kk + 1;
+				}
+			}
+		}
+	}
+}
+
