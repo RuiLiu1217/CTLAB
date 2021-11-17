@@ -8,11 +8,9 @@
 #define BLKY 8
 #define BLKZ 1
 
-
-
 //Create texture object and corresponding cudaArray function
 template<typename T>
-void createTextureObject2(
+void createTextureObject(
 	cudaTextureObject_t& texObj, //return: texture object pointing to the cudaArray
 	cudaArray* d_prjArray, // return: cudaArray storing the data
 	int Width, int Height, int Depth, // data size
@@ -54,7 +52,7 @@ void createTextureObject2(
 }
 
 // Destroy a GPU array and corresponding TextureObject
-void destroyTextureObject2(cudaTextureObject_t& texObj, cudaArray* d_array)
+void destroyTextureObject(cudaTextureObject_t& texObj, cudaArray* d_array)
 {
 	cudaDestroyTextureObject(texObj);
 	cudaFreeArray(d_array);
@@ -63,13 +61,11 @@ void destroyTextureObject2(cudaTextureObject_t& texObj, cudaArray* d_array)
 template<typename Ta, typename Tb>
 __global__ void naive_copyToTwoVolumes(Ta* in_ZXY,
 	Tb* out_ZXY, Tb* out_ZYX,
-	int XN, int YN, int ZN)
-{
-	int idz = threadIdx.x + blockIdx.x * blockDim.x;
-	int idx = threadIdx.y + blockIdx.y * blockDim.y;
-	int idy = threadIdx.z + blockIdx.z * blockDim.z;
-	if (idx < XN && idy < YN && idz < ZN)
-	{
+	int XN, int YN, int ZN) {
+	const int idz = threadIdx.x + blockIdx.x * blockDim.x; // Z dimension major
+	const int idx = threadIdx.y + blockIdx.y * blockDim.y;
+	const int idy = threadIdx.z + blockIdx.z * blockDim.z;
+	if (idx < XN && idy < YN && idz < ZN) {
 		int i = (idy * XN + idx) * ZN + idz;
 		int ni = (idy * (XN + 1) + (idx + 1)) * (ZN + 1) + idz + 1;
 		int nj = (idx * (YN + 1) + (idy + 1)) * (ZN + 1) + idz + 1;
@@ -80,14 +76,11 @@ __global__ void naive_copyToTwoVolumes(Ta* in_ZXY,
 }
 
 template<typename Ta, typename Tb>
-__global__ void naive_herizontalIntegral(Ta* in, Tb* out, int N, int ZN)
-{
-	int zi = threadIdx.x + blockIdx.x * blockDim.x;
-	if (zi < ZN)
-	{
+__global__ void naive_herizontalIntegral(Ta* in, Tb* out, int N, int ZN) {
+	const int zi = threadIdx.x + blockIdx.x * blockDim.x;
+	if (zi < ZN) {
 		out[zi] = in[zi];
-		for (int i = 1; i < N; ++i)
-		{
+		for (int i = 1; i < N; ++i) {
 			out[i * ZN + zi] = out[(i - 1) * ZN + zi]
 				+ in[i * ZN + zi];
 		}
@@ -95,32 +88,26 @@ __global__ void naive_herizontalIntegral(Ta* in, Tb* out, int N, int ZN)
 }
 
 template<typename Ta, typename Tb>
-__global__ void naive_verticalIntegral(Ta* in, Tb* out, int N, int ZN)
-{
+__global__ void naive_verticalIntegral(Ta* in, Tb* out, int N, int ZN) {
 	int xyi = threadIdx.x + blockIdx.x * blockDim.x;
-	if (xyi < N)
-	{
+	if (xyi < N) {
 		out[xyi * ZN] = in[xyi * ZN];
-		for (int ii = 1; ii < ZN; ++ii)
-		{
+		for (int ii = 1; ii < ZN; ++ii)	{
 			out[xyi * ZN + ii] = out[xyi * ZN + ii - 1]
 				+ in[xyi * ZN + ii];
 		}
-
 	}
 }
+
 // template specialization for double precision into int2 datatype
 template<>
-__global__ void naive_verticalIntegral(double*  in, int2* out, int N, int ZN)
-{
+__global__ void naive_verticalIntegral(double*  in, int2* out, int N, int ZN) {
 	int xyi = threadIdx.x + blockIdx.x * blockDim.x;
-	if (xyi < N)
-	{
+	if (xyi < N) {
 		double temp = in[xyi * ZN];
 		out[xyi * ZN] = make_int2(__double2loint(temp), __double2hiint(temp));
 		double temp2 = 0;
-		for (int ii = 1; ii < ZN; ++ii)
-		{
+		for (int ii = 1; ii < ZN; ++ii) {
 			temp2 = temp + in[xyi * ZN + ii];
 			out[xyi * ZN + ii] = make_int2(__double2loint(temp2), __double2hiint(temp2));
 			temp = temp2;
@@ -128,87 +115,29 @@ __global__ void naive_verticalIntegral(double*  in, int2* out, int N, int ZN)
 	}
 }
 
-
 template<typename T>
-__global__ void verticalIntegral(T* prj, int ZN, int N)
-{
+__global__ void verticalIntegral(T* prj, int ZN, int N) {
 	int idx = threadIdx.x + blockIdx.x * blockDim.x;
-	if (idx < N)
-	{
+	if (idx < N) {
 		int currentHead = idx * ZN;
-		for (int ii = 1; ii < ZN; ++ii)
-		{
-			prj[currentHead + ii] = prj[currentHead + ii] + prj[currentHead + ii - 1];
+		for (int ii = 1; ii < ZN; ++ii) {
+			prj[currentHead + ii] += prj[currentHead + ii - 1];
 		}
 	}
 }
 
 template<typename T>
-__global__ void horizontalIntegral(T* prj, int DNU, int DNV, int PN)
-{
+__global__ void horizontalIntegral(T* prj, int DNU, int DNV, int PN) {
 	int idv = threadIdx.x + blockIdx.x * blockDim.x;
 	int pIdx = threadIdx.y + blockIdx.y * blockDim.y;
-	if (idv < DNV && pIdx < PN)
-	{
+	if (idv < DNV && pIdx < PN)	{
 		int headPtr = pIdx * DNU * DNV + idv;
-		for (int ii = 1; ii < DNU; ++ii)
-		{
-			prj[headPtr + ii * DNV] = prj[headPtr + ii * DNV] + prj[headPtr + (ii - 1) * DNV];
+		for (int ii = 1; ii < DNU; ++ii) {
+			prj[headPtr + ii * DNV] += prj[headPtr + (ii - 1) * DNV];
 		}
 	}
 }
 
-
-
-
-
-__global__ void naive_vertialIntegral(double* in, int2* out, int N, int ZN)
-{
-	int xyi = threadIdx.x + blockIdx.x * blockDim.x;
-	if (xyi < N)
-	{
-		double temp = in[xyi * ZN];
-		out[xyi * ZN] = make_int2(__double2loint(temp), __double2hiint(temp));
-		double temp2 = 0;
-		for (int ii = 0; ii < ZN; ++ii)
-		{
-			temp2 = temp + in[xyi * ZN + ii];
-			out[xyi * ZN + ii] = make_int2(__double2loint(temp2), __double2hiint(temp2));
-			temp = temp2;
-		}
-	}
-}
-
-
-
-__global__ void verticalIntegral(float* prj, int ZN, int N)
-{
-	int idx = threadIdx.x + blockIdx.x * blockDim.x;
-	if (idx < N)
-	{
-		int currentHead = idx * ZN;
-		for (int ii = 1; ii < ZN; ++ii)
-		{
-			prj[currentHead + ii] = prj[currentHead + ii] + prj[currentHead + ii - 1];
-		}
-	}
-}
-
-
-
-__global__ void horizontalIntegral(float* prj, int DNU, int DNV, int PN)
-{
-	int idv = threadIdx.x + blockIdx.x * blockDim.x;
-	int pIdx = threadIdx.y + blockIdx.y * blockDim.y;
-	if (idv < DNV && pIdx < PN)
-	{
-		int headPrt = pIdx * DNU * DNV + idv;
-		for (int ii = 1; ii < DNU; ++ii)
-		{
-			prj[headPrt + ii * DNV] = prj[headPrt + ii * DNV] + prj[headPrt + (ii - 1) * DNV];
-		}
-	}
-}
 
 void genSAT_fof_Volume(float* hvol,
 	thrust::device_vector<float>&ZXY,
@@ -1401,7 +1330,7 @@ void DD3_gpu_proj_volumerendering(float x0, float y0, float z0, int DNU, int DNV
 	cudaTextureObject_t texObj;
 	cudaArray* d_volumeArray = nullptr;
 
-	createTextureObject2<float>(texObj, d_volumeArray, ZN, XN, YN, hvol,
+	createTextureObject<float>(texObj, d_volumeArray, ZN, XN, YN, hvol,
 		cudaMemcpyHostToDevice, cudaAddressModeBorder,
 		cudaFilterModeLinear, cudaReadModeElementType, false);
 
@@ -1411,7 +1340,7 @@ void DD3_gpu_proj_volumerendering(float x0, float y0, float z0, int DNU, int DNV
 		objCtrIdx, dx, dz, XN, YN, ZN, DNU, DNV, PN);
 
 	thrust::copy(prj.begin(), prj.end(), hprj);
-	destroyTextureObject2(texObj, d_volumeArray);
+	destroyTextureObject(texObj, d_volumeArray);
 }
 
 
@@ -2220,7 +2149,7 @@ void DD3_gpu_proj_doubleprecisionbranchless(
 	cudaArray* d_volumeArray1 = nullptr;
 	cudaTextureObject_t texObj1;
 
-	createTextureObject2<int2>(texObj1, d_volumeArray1, ZN + 1, XN + 1, YN,
+	createTextureObject<int2>(texObj1, d_volumeArray1, ZN + 1, XN + 1, YN,
 		thrust::raw_pointer_cast(&in_ZXY_summ[0]),
 		cudaMemcpyDeviceToDevice, cudaAddressModeClamp, cudaFilterModePoint,
 		cudaReadModeElementType, false);
@@ -2245,7 +2174,7 @@ void DD3_gpu_proj_doubleprecisionbranchless(
 	cudaArray* d_volumeArray2 = nullptr;
 	cudaTextureObject_t texObj2;
 
-	createTextureObject2<int2>(texObj2, d_volumeArray2, ZN + 1, YN + 1, XN,
+	createTextureObject<int2>(texObj2, d_volumeArray2, ZN + 1, YN + 1, XN,
 		thrust::raw_pointer_cast(&in_ZYX_summ[0]),
 		cudaMemcpyDeviceToDevice, cudaAddressModeClamp, cudaFilterModePoint,
 		cudaReadModeElementType, false);
@@ -2302,8 +2231,8 @@ void DD3_gpu_proj_doubleprecisionbranchless(
 	CUDA_SAFE_CALL(cudaDestroyTextureObject(texObj1));
 	CUDA_SAFE_CALL(cudaDestroyTextureObject(texObj2));
 
-	destroyTextureObject2(texObj1, d_volumeArray1);
-	destroyTextureObject2(texObj2, d_volumeArray2);
+	destroyTextureObject(texObj1, d_volumeArray1);
+	destroyTextureObject(texObj2, d_volumeArray2);
 	prj.clear();
 	angs.clear();
 	zPos.clear();
