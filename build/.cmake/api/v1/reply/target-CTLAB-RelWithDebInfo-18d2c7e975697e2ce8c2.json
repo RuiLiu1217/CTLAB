@@ -12,7 +12,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "lib/Release/CTLAB.lib"
+			"path" : "lib/RelWithDebInfo/CTLAB.lib"
 		}
 	],
 	"backtrace" : 2,
@@ -38,7 +38,7 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 135,
+				"line" : 136,
 				"parent" : 0
 			},
 			{
@@ -50,7 +50,7 @@
 			{
 				"command" : 2,
 				"file" : 1,
-				"line" : 127,
+				"line" : 128,
 				"parent" : 0
 			},
 			{
@@ -73,7 +73,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc  -openmp /MD /O2 /Ob2 /DNDEBUG"
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc  -openmp /MD /Zi /O2 /Ob1 /DNDEBUG"
 				}
 			],
 			"includes" : 
@@ -209,7 +209,8 @@
 				62,
 				63,
 				64,
-				65
+				65,
+				66
 			]
 		}
 	],
@@ -569,6 +570,11 @@
 		{
 			"backtrace" : 2,
 			"path" : "src/CTLAB.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/TextureObjectProvider.h",
 			"sourceGroupIndex" : 3
 		}
 	],

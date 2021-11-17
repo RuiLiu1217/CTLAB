@@ -56,6 +56,7 @@ SET(CTLAB_HEADERS
 	Geometry.h
 	OldCodes.h
 	CTLAB.h
+	TextureObjectProvider.h
 	
 )
 
