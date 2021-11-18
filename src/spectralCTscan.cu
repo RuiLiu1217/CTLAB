@@ -209,24 +209,24 @@ namespace SPECTRALCT{
 		const double angStp = 3.14159265358979323846264 * 2.0 / angN;
 
 		double* proj;
-		checkCudaErrors(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * angN));
-		checkCudaErrors(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * angN));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * angN));
+		CUDA_CHECK_RETURN(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * angN));
 
 		double* A;
-		checkCudaErrors(cudaMalloc((void**) &A, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(A, cyl.A, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &A, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(A, cyl.A, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* R;
-		checkCudaErrors(cudaMalloc((void**) &R, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(R, cyl.R, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &R, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(R, cyl.R, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* posx;
-		checkCudaErrors(cudaMalloc((void**) &posx, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(posx, cyl.posx, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &posx, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(posx, cyl.posx, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* posy;
-		checkCudaErrors(cudaMalloc((void**) &posy, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(posy, cyl.posy, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &posy, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(posy, cyl.posy, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double height = cyl.height;
 
@@ -265,7 +265,7 @@ namespace SPECTRALCT{
 		}
 
 		double* hproj = new double[DNi * DNj * angN];
-		checkCudaErrors(cudaMemcpy(hproj, proj, sizeof(double) * DNi * DNj * angN, cudaMemcpyDeviceToHost));
+		CUDA_CHECK_RETURN(cudaMemcpy(hproj, proj, sizeof(double) * DNi * DNj * angN, cudaMemcpyDeviceToHost));
 
 		std::ofstream fou("res.raw", std::ios::binary);
 		fou.write((char*) hproj, sizeof(double) * DNi * DNj * angN);
@@ -300,24 +300,24 @@ namespace SPECTRALCT{
 		T vx, vy, vz;
 
 		T* proj;
-		checkCudaErrors(cudaMalloc((void**) &proj, sizeof(T) * DNi * DNj * angN));
-		checkCudaErrors(cudaMemset(proj, 0, sizeof(T) * DNi * DNj * angN));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &proj, sizeof(T) * DNi * DNj * angN));
+		CUDA_CHECK_RETURN(cudaMemset(proj, 0, sizeof(T) * DNi * DNj * angN));
 
 		T* A;
-		checkCudaErrors(cudaMalloc((void**) &A, sizeof(T) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(A, cyl.A, sizeof(T) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &A, sizeof(T) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(A, cyl.A, sizeof(T) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		T* R;
-		checkCudaErrors(cudaMalloc((void**) &R, sizeof(T) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(R, cyl.R, sizeof(T) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &R, sizeof(T) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(R, cyl.R, sizeof(T) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		T* posx;
-		checkCudaErrors(cudaMalloc((void**) &posx, sizeof(T) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(posx, cyl.posx, sizeof(T) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &posx, sizeof(T) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(posx, cyl.posx, sizeof(T) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		T* posy;
-		checkCudaErrors(cudaMalloc((void**) &posy, sizeof(T) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(posy, cyl.posy, sizeof(T) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &posy, sizeof(T) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(posy, cyl.posy, sizeof(T) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		T height = cyl.height;
 
@@ -353,7 +353,7 @@ namespace SPECTRALCT{
 		}
 
 		T* hproj = new T[DNi * DNj * angN];
-		checkCudaErrors(cudaMemcpy(hproj, proj, sizeof(T) * DNi * DNj * angN, cudaMemcpyDeviceToHost));
+		CUDA_CHECK_RETURN(cudaMemcpy(hproj, proj, sizeof(T) * DNi * DNj * angN, cudaMemcpyDeviceToHost));
 
 		std::ofstream fou(ProjFileName.c_str(), std::ios::binary);
 		fou.write((char*) hproj, sizeof(T) * DNi * DNj * angN);
@@ -426,24 +426,24 @@ namespace SPECTRALCT{
 		const double angStp = 3.14159265358979323846264 * 2.0 / angN;
 
 		double* proj;
-		checkCudaErrors(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * angN));
-		checkCudaErrors(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * angN));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * angN));
+		CUDA_CHECK_RETURN(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * angN));
 
 		double* A;
-		checkCudaErrors(cudaMalloc((void**) &A, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(A, cyl.A, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &A, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(A, cyl.A, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* R;
-		checkCudaErrors(cudaMalloc((void**) &R, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(R, cyl.R, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &R, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(R, cyl.R, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* posx;
-		checkCudaErrors(cudaMalloc((void**) &posx, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(posx, cyl.posx, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &posx, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(posx, cyl.posx, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* posy;
-		checkCudaErrors(cudaMalloc((void**) &posy, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(posy, cyl.posy, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &posy, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(posy, cyl.posy, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double height = cyl.height;
 
@@ -482,7 +482,7 @@ namespace SPECTRALCT{
 		}
 
 		double* hproj = new double[DNi * DNj * angN];
-		checkCudaErrors(cudaMemcpy(hproj, proj, sizeof(double) * DNi * DNj * angN, cudaMemcpyDeviceToHost));
+		CUDA_CHECK_RETURN(cudaMemcpy(hproj, proj, sizeof(double) * DNi * DNj * angN, cudaMemcpyDeviceToHost));
 
 		std::ofstream fou("res.raw", std::ios::binary);
 		fou.write((char*) hproj, sizeof(double) * DNi * DNj * angN);
@@ -816,47 +816,47 @@ namespace SPECTRALCT{
 		sumChannelSpectrum[7] = thrust::reduce(channelRatio[7], channelRatio[7] + EnergiesChannels);
 
 		double* dspRatio;
-		checkCudaErrors(cudaMalloc((void**) &dspRatio, sizeof(double) * EnergiesChannels));
-		checkCudaErrors(cudaMemcpy(dspRatio, spRatio, sizeof(double) *EnergiesChannels, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dspRatio, sizeof(double) * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMemcpy(dspRatio, spRatio, sizeof(double) *EnergiesChannels, cudaMemcpyHostToDevice));
 		double* multiSpectrumProj = new double[matrixRowNum];
 		double* dmultiSpectrumProj;
-		checkCudaErrors(cudaMalloc((void**) &dmultiSpectrumProj, sizeof(double) * matrixRowNum));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dmultiSpectrumProj, sizeof(double) * matrixRowNum));
 		double* channelProj[8];
 		double* dchannelProj[8];
 		double* dchannelRatio[8];
 		for (size_t i = 0; i < 8; i++)
 		{
 			channelProj[i] = new double[matrixRowNum];
-			checkCudaErrors(cudaMalloc((void**) &dchannelProj[i], sizeof(double) * matrixRowNum));
+			CUDA_CHECK_RETURN(cudaMalloc((void**) &dchannelProj[i], sizeof(double) * matrixRowNum));
 
-			checkCudaErrors(cudaMalloc((void**) &dchannelRatio[i], sizeof(double) * EnergiesChannels));
-			checkCudaErrors(cudaMemcpy(dchannelRatio[i], channelRatio[i], sizeof(double) * EnergiesChannels, cudaMemcpyHostToDevice));
+			CUDA_CHECK_RETURN(cudaMalloc((void**) &dchannelRatio[i], sizeof(double) * EnergiesChannels));
+			CUDA_CHECK_RETURN(cudaMemcpy(dchannelRatio[i], channelRatio[i], sizeof(double) * EnergiesChannels, cudaMemcpyHostToDevice));
 		}
 
 
 		double* proj; //All energies channels
-		checkCudaErrors(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * EnergiesChannels));
-		checkCudaErrors(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * EnergiesChannels));
 
 		int* A; //Different materials
-		checkCudaErrors(cudaMalloc((void**) &A, sizeof(int) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(A, cyl.A, sizeof(int) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &A, sizeof(int) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(A, cyl.A, sizeof(int) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* R;
-		checkCudaErrors(cudaMalloc((void**) &R, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(R, cyl.R, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &R, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(R, cyl.R, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* posx;
-		checkCudaErrors(cudaMalloc((void**) &posx, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(posx, cyl.posx, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &posx, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(posx, cyl.posx, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* posy;
-		checkCudaErrors(cudaMalloc((void**) &posy, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(posy, cyl.posy, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &posy, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(posy, cyl.posy, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* materials;
-		checkCudaErrors(cudaMalloc((void**) &materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL));
-		checkCudaErrors(cudaMemcpy(materials, cyl.materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL));
+		CUDA_CHECK_RETURN(cudaMemcpy(materials, cyl.materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL, cudaMemcpyHostToDevice));
 
 		double height = cyl.height;
 
@@ -900,15 +900,15 @@ namespace SPECTRALCT{
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[5], 1, &ZERO, dchannelProj[5], 1);
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[6], 1, &ZERO, dchannelProj[6], 1);
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[7], 1, &ZERO, dchannelProj[7], 1);
-			checkCudaErrors(cudaMemcpy(multiSpectrumProj, dmultiSpectrumProj, sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[0], dchannelProj[0], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[1], dchannelProj[1], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[2], dchannelProj[2], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[3], dchannelProj[3], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[4], dchannelProj[4], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[5], dchannelProj[5], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[6], dchannelProj[6], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[7], dchannelProj[7], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(multiSpectrumProj, dmultiSpectrumProj, sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[0], dchannelProj[0], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[1], dchannelProj[1], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[2], dchannelProj[2], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[3], dchannelProj[3], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[4], dchannelProj[4], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[5], dchannelProj[5], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[6], dchannelProj[6], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[7], dchannelProj[7], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
 
 
 			thrust::transform(multiSpectrumProj, multiSpectrumProj + matrixRowNum, multiSpectrumProj, divideConstValue_functor<double>(sumSpectrum));
@@ -1598,31 +1598,31 @@ namespace SPECTRALCT{
 		sumChannelSpectrum[7] = thrust::reduce(channelRatio[7], channelRatio[7] + EnergiesChannels);
 
 		double* dspRatio;
-		checkCudaErrors(cudaMalloc((void**) &dspRatio, sizeof(double) * EnergiesChannels));
-		checkCudaErrors(cudaMemcpy(dspRatio, spRatio, sizeof(double) *EnergiesChannels, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dspRatio, sizeof(double) * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMemcpy(dspRatio, spRatio, sizeof(double) *EnergiesChannels, cudaMemcpyHostToDevice));
 		double* multiSpectrumProj = new double[matrixRowNum];
 		double* dmultiSpectrumProj;
-		checkCudaErrors(cudaMalloc((void**) &dmultiSpectrumProj, sizeof(double) * matrixRowNum));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dmultiSpectrumProj, sizeof(double) * matrixRowNum));
 		double* channelProj[8];
 		double* dchannelProj[8];
 		double* dchannelRatio[8];
 		for (size_t i = 0; i < 8; i++)
 		{
 			channelProj[i] = new double[matrixRowNum];
-			checkCudaErrors(cudaMalloc((void**) &dchannelProj[i], sizeof(double) * matrixRowNum));
+			CUDA_CHECK_RETURN(cudaMalloc((void**) &dchannelProj[i], sizeof(double) * matrixRowNum));
 
-			checkCudaErrors(cudaMalloc((void**) &dchannelRatio[i], sizeof(double) * EnergiesChannels));
-			checkCudaErrors(cudaMemcpy(dchannelRatio[i], channelRatio[i], sizeof(double) * EnergiesChannels, cudaMemcpyHostToDevice));
+			CUDA_CHECK_RETURN(cudaMalloc((void**) &dchannelRatio[i], sizeof(double) * EnergiesChannels));
+			CUDA_CHECK_RETURN(cudaMemcpy(dchannelRatio[i], channelRatio[i], sizeof(double) * EnergiesChannels, cudaMemcpyHostToDevice));
 		}
 
 
 		double* proj; //All energies channels
-		checkCudaErrors(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * EnergiesChannels));
-		checkCudaErrors(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * EnergiesChannels));
 
 		int* M; //Different materials
-		checkCudaErrors(cudaMalloc((void**) &M, sizeof(int) * 10));
-		checkCudaErrors(cudaMemcpy(M, cyl.M, sizeof(int) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &M, sizeof(int) * 10));
+		CUDA_CHECK_RETURN(cudaMemcpy(M, cyl.M, sizeof(int) * 10, cudaMemcpyHostToDevice));
 
 		double* haxisX = new double[10];
 		double* haxisY = new double[10];
@@ -1650,24 +1650,24 @@ namespace SPECTRALCT{
 		double* coreY;
 		double* coreZ;
 		double* rots;
-		checkCudaErrors(cudaMalloc((void**) &axisX, sizeof(double) * 10));
-		checkCudaErrors(cudaMalloc((void**) &axisY, sizeof(double) * 10));
-		checkCudaErrors(cudaMalloc((void**) &axisZ, sizeof(double) * 10));
-		checkCudaErrors(cudaMalloc((void**) &coreX, sizeof(double) * 10));
-		checkCudaErrors(cudaMalloc((void**) &coreY, sizeof(double) * 10));
-		checkCudaErrors(cudaMalloc((void**) &coreZ, sizeof(double) * 10));
-		checkCudaErrors(cudaMalloc((void**) &rots, sizeof(double) * 10));
-		checkCudaErrors(cudaMemcpy(axisX, haxisX, sizeof(double) * 10, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(axisY, haxisY, sizeof(double) * 10, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(axisZ, haxisZ, sizeof(double) * 10, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(coreX, hcoreX, sizeof(double) * 10, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(coreY, hcoreY, sizeof(double) * 10, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(coreZ, hcoreZ, sizeof(double) * 10, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(rots, hrots, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &axisX, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &axisY, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &axisZ, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &coreX, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &coreY, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &coreZ, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &rots, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMemcpy(axisX, haxisX, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(axisY, haxisY, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(axisZ, haxisZ, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(coreX, hcoreX, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(coreY, hcoreY, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(coreZ, hcoreZ, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(rots, hrots, sizeof(double) * 10, cudaMemcpyHostToDevice));
 
 		double* materials;
-		checkCudaErrors(cudaMalloc((void**) &materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL));
-		checkCudaErrors(cudaMemcpy(materials, cyl.materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL));
+		CUDA_CHECK_RETURN(cudaMemcpy(materials, cyl.materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL, cudaMemcpyHostToDevice));
 
 
 		dim3 blk(4, 4, 2);
@@ -1701,7 +1701,7 @@ namespace SPECTRALCT{
 				ux, uy, uz, vx, vy, vz, detustp, detvstp, DNi, DNj, M, materials, EnergiesChannels,
 				axisX, axisY, axisZ, coreX, coreY, coreZ, rots, blk, gid);
 
-			checkCudaErrors(cudaMemcpy(hostproj, proj, sizeof(double) * DNi * DNj * EnergiesChannels, cudaMemcpyDeviceToHost)); //if you want to save all the channels
+			CUDA_CHECK_RETURN(cudaMemcpy(hostproj, proj, sizeof(double) * DNi * DNj * EnergiesChannels, cudaMemcpyDeviceToHost)); //if you want to save all the channels
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dspRatio, 1, &ZERO, dmultiSpectrumProj, 1);
 
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[0], 1, &ZERO, dchannelProj[0], 1);
@@ -1712,15 +1712,15 @@ namespace SPECTRALCT{
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[5], 1, &ZERO, dchannelProj[5], 1);
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[6], 1, &ZERO, dchannelProj[6], 1);
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[7], 1, &ZERO, dchannelProj[7], 1);
-			checkCudaErrors(cudaMemcpy(multiSpectrumProj, dmultiSpectrumProj, sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[0], dchannelProj[0], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[1], dchannelProj[1], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[2], dchannelProj[2], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[3], dchannelProj[3], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[4], dchannelProj[4], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[5], dchannelProj[5], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[6], dchannelProj[6], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[7], dchannelProj[7], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(multiSpectrumProj, dmultiSpectrumProj, sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[0], dchannelProj[0], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[1], dchannelProj[1], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[2], dchannelProj[2], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[3], dchannelProj[3], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[4], dchannelProj[4], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[5], dchannelProj[5], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[6], dchannelProj[6], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[7], dchannelProj[7], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
 
 
 			thrust::transform(multiSpectrumProj, multiSpectrumProj + matrixRowNum, multiSpectrumProj, divideConstValue_functor<double>(sumSpectrum));
@@ -1866,31 +1866,31 @@ namespace SPECTRALCT{
 		sumChannelSpectrum[7] = thrust::reduce(channelRatio[7], channelRatio[7] + EnergiesChannels);
 
 		double* dspRatio;
-		checkCudaErrors(cudaMalloc((void**) &dspRatio, sizeof(double) * EnergiesChannels));
-		checkCudaErrors(cudaMemcpy(dspRatio, spRatio, sizeof(double) *EnergiesChannels, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dspRatio, sizeof(double) * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMemcpy(dspRatio, spRatio, sizeof(double) *EnergiesChannels, cudaMemcpyHostToDevice));
 		double* multiSpectrumProj = new double[matrixRowNum];
 		double* dmultiSpectrumProj;
-		checkCudaErrors(cudaMalloc((void**) &dmultiSpectrumProj, sizeof(double) * matrixRowNum));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dmultiSpectrumProj, sizeof(double) * matrixRowNum));
 		double* channelProj[8];
 		double* dchannelProj[8];
 		double* dchannelRatio[8];
 		for (size_t i = 0; i < 8; i++)
 		{
 			channelProj[i] = new double[matrixRowNum];
-			checkCudaErrors(cudaMalloc((void**) &dchannelProj[i], sizeof(double) * matrixRowNum));
+			CUDA_CHECK_RETURN(cudaMalloc((void**) &dchannelProj[i], sizeof(double) * matrixRowNum));
 
-			checkCudaErrors(cudaMalloc((void**) &dchannelRatio[i], sizeof(double) * EnergiesChannels));
-			checkCudaErrors(cudaMemcpy(dchannelRatio[i], channelRatio[i], sizeof(double) * EnergiesChannels, cudaMemcpyHostToDevice));
+			CUDA_CHECK_RETURN(cudaMalloc((void**) &dchannelRatio[i], sizeof(double) * EnergiesChannels));
+			CUDA_CHECK_RETURN(cudaMemcpy(dchannelRatio[i], channelRatio[i], sizeof(double) * EnergiesChannels, cudaMemcpyHostToDevice));
 		}
 
 
 		double* proj; //All energies channels
-		checkCudaErrors(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * EnergiesChannels));
-		checkCudaErrors(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * EnergiesChannels));
 
 		int* M; //Different materials
-		checkCudaErrors(cudaMalloc((void**) &M, sizeof(int) * 10));
-		checkCudaErrors(cudaMemcpy(M, cyl.M, sizeof(int) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &M, sizeof(int) * 10));
+		CUDA_CHECK_RETURN(cudaMemcpy(M, cyl.M, sizeof(int) * 10, cudaMemcpyHostToDevice));
 
 		double* haxisX = new double[10];
 		double* haxisY = new double[10];
@@ -1918,24 +1918,24 @@ namespace SPECTRALCT{
 		double* coreY;
 		double* coreZ;
 		double* rots;
-		checkCudaErrors(cudaMalloc((void**) &axisX, sizeof(double) * 10));
-		checkCudaErrors(cudaMalloc((void**) &axisY, sizeof(double) * 10));
-		checkCudaErrors(cudaMalloc((void**) &axisZ, sizeof(double) * 10));
-		checkCudaErrors(cudaMalloc((void**) &coreX, sizeof(double) * 10));
-		checkCudaErrors(cudaMalloc((void**) &coreY, sizeof(double) * 10));
-		checkCudaErrors(cudaMalloc((void**) &coreZ, sizeof(double) * 10));
-		checkCudaErrors(cudaMalloc((void**) &rots, sizeof(double) * 10));
-		checkCudaErrors(cudaMemcpy(axisX, haxisX, sizeof(double) * 10, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(axisY, haxisY, sizeof(double) * 10, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(axisZ, haxisZ, sizeof(double) * 10, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(coreX, hcoreX, sizeof(double) * 10, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(coreY, hcoreY, sizeof(double) * 10, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(coreZ, hcoreZ, sizeof(double) * 10, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(rots, hrots, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &axisX, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &axisY, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &axisZ, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &coreX, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &coreY, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &coreZ, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &rots, sizeof(double) * 10));
+		CUDA_CHECK_RETURN(cudaMemcpy(axisX, haxisX, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(axisY, haxisY, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(axisZ, haxisZ, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(coreX, hcoreX, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(coreY, hcoreY, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(coreZ, hcoreZ, sizeof(double) * 10, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(rots, hrots, sizeof(double) * 10, cudaMemcpyHostToDevice));
 
 		double* materials;
-		checkCudaErrors(cudaMalloc((void**) &materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL));
-		checkCudaErrors(cudaMemcpy(materials, cyl.materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL));
+		CUDA_CHECK_RETURN(cudaMemcpy(materials, cyl.materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL, cudaMemcpyHostToDevice));
 
 
 		dim3 blk(4, 4, 2);
@@ -1970,7 +1970,7 @@ namespace SPECTRALCT{
 				ux, uy, uz, vx, vy, vz, detustp, detvstp, DNi, DNj, M, materials, EnergiesChannels,
 				axisX, axisY, axisZ, coreX, coreY, coreZ, rots, blk, gid);
 
-			checkCudaErrors(cudaMemcpy(hostproj, proj, sizeof(double) * DNi * DNj * EnergiesChannels, cudaMemcpyDeviceToHost)); //if you want to save all the channels
+			CUDA_CHECK_RETURN(cudaMemcpy(hostproj, proj, sizeof(double) * DNi * DNj * EnergiesChannels, cudaMemcpyDeviceToHost)); //if you want to save all the channels
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dspRatio, 1, &ZERO, dmultiSpectrumProj, 1);
 
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[0], 1, &ZERO, dchannelProj[0], 1);
@@ -1982,15 +1982,15 @@ namespace SPECTRALCT{
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[6], 1, &ZERO, dchannelProj[6], 1);
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[7], 1, &ZERO, dchannelProj[7], 1);
 
-			checkCudaErrors(cudaMemcpy(multiSpectrumProj, dmultiSpectrumProj, sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[0], dchannelProj[0], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[1], dchannelProj[1], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[2], dchannelProj[2], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[3], dchannelProj[3], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[4], dchannelProj[4], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[5], dchannelProj[5], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[6], dchannelProj[6], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[7], dchannelProj[7], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(multiSpectrumProj, dmultiSpectrumProj, sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[0], dchannelProj[0], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[1], dchannelProj[1], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[2], dchannelProj[2], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[3], dchannelProj[3], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[4], dchannelProj[4], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[5], dchannelProj[5], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[6], dchannelProj[6], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[7], dchannelProj[7], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
 
 
 			thrust::transform(multiSpectrumProj, multiSpectrumProj + matrixRowNum, multiSpectrumProj, divideConstValue_functor<double>(sumSpectrum));
@@ -2096,24 +2096,24 @@ namespace SPECTRALCT{
 		const double angStp = 3.14159265358979323846264 * 2.0 / angN;
 
 		double* proj;
-		checkCudaErrors(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * angN));
-		checkCudaErrors(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * angN));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * angN));
+		CUDA_CHECK_RETURN(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * angN));
 
 		double* A;
-		checkCudaErrors(cudaMalloc((void**) &A, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(A, cyl.A, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &A, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(A, cyl.A, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* R;
-		checkCudaErrors(cudaMalloc((void**) &R, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(R, cyl.R, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &R, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(R, cyl.R, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* posx;
-		checkCudaErrors(cudaMalloc((void**) &posx, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(posx, cyl.posx, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &posx, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(posx, cyl.posx, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* posy;
-		checkCudaErrors(cudaMalloc((void**) &posy, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(posy, cyl.posy, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &posy, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(posy, cyl.posy, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double height = cyl.height;
 
@@ -2202,7 +2202,7 @@ namespace SPECTRALCT{
 		}
 
 		double* hproj = new double[DNi * DNj * angN];
-		checkCudaErrors(cudaMemcpy(hproj, proj, sizeof(double) * DNi * DNj * angN, cudaMemcpyDeviceToHost));
+		CUDA_CHECK_RETURN(cudaMemcpy(hproj, proj, sizeof(double) * DNi * DNj * angN, cudaMemcpyDeviceToHost));
 
 		std::ofstream fou("maanScanningRes.raw", std::ios::binary);
 		fou.write((char*) hproj, sizeof(double) * DNi * DNj * angN);
@@ -2263,56 +2263,56 @@ namespace SPECTRALCT{
 		std::fill(channelRatio[7] + 419, channelRatio[7] + NUM_OF_ENERGYCHANNEL, 1.0);
 
 		double* dphotonNum; //各个通道的光子数;
-		checkCudaErrors(cudaMalloc((void**) &dphotonNum, sizeof(double) * EnergiesChannels));
-		checkCudaErrors(cudaMemcpy(dphotonNum, photonNum, sizeof(double) *EnergiesChannels, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dphotonNum, sizeof(double) * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMemcpy(dphotonNum, photonNum, sizeof(double) *EnergiesChannels, cudaMemcpyHostToDevice));
 
 		double* spRatio = new double[EnergiesChannels];
 		for (unsigned int i = 0; i != EnergiesChannels; ++i) { spRatio[i] = 1.0; }
 		double* dspRatio;
-		checkCudaErrors(cudaMalloc((void**) &dspRatio, sizeof(double) * EnergiesChannels));
-		checkCudaErrors(cudaMemcpy(dspRatio, spRatio, sizeof(double) * EnergiesChannels, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dspRatio, sizeof(double) * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMemcpy(dspRatio, spRatio, sizeof(double) * EnergiesChannels, cudaMemcpyHostToDevice));
 
 
 
 		double* multiSpectrumProj = new double[matrixRowNum];
 		double* dmultiSpectrumProj;
-		checkCudaErrors(cudaMalloc((void**) &dmultiSpectrumProj, sizeof(double) * matrixRowNum));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dmultiSpectrumProj, sizeof(double) * matrixRowNum));
 		double* channelProj[8];
 		double* dchannelProj[8];
 		double* dchannelRatio[8];
 		for (size_t i = 0; i < 8; i++)
 		{
 			channelProj[i] = new double[matrixRowNum];
-			checkCudaErrors(cudaMalloc((void**) &dchannelProj[i], sizeof(double) * matrixRowNum));
+			CUDA_CHECK_RETURN(cudaMalloc((void**) &dchannelProj[i], sizeof(double) * matrixRowNum));
 
-			checkCudaErrors(cudaMalloc((void**) &dchannelRatio[i], sizeof(double) * EnergiesChannels));
-			checkCudaErrors(cudaMemcpy(dchannelRatio[i], channelRatio[i], sizeof(double) * EnergiesChannels, cudaMemcpyHostToDevice));
+			CUDA_CHECK_RETURN(cudaMalloc((void**) &dchannelRatio[i], sizeof(double) * EnergiesChannels));
+			CUDA_CHECK_RETURN(cudaMemcpy(dchannelRatio[i], channelRatio[i], sizeof(double) * EnergiesChannels, cudaMemcpyHostToDevice));
 		}
 
 
 		double* proj; //All energies channels
-		checkCudaErrors(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * EnergiesChannels));
-		checkCudaErrors(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &proj, sizeof(double) * DNi * DNj * EnergiesChannels));
+		CUDA_CHECK_RETURN(cudaMemset(proj, 0, sizeof(double) * DNi * DNj * EnergiesChannels));
 
 		int* A; //Different materials
-		checkCudaErrors(cudaMalloc((void**) &A, sizeof(int) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(A, cyl.A, sizeof(int) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &A, sizeof(int) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(A, cyl.A, sizeof(int) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* R;
-		checkCudaErrors(cudaMalloc((void**) &R, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(R, cyl.R, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &R, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(R, cyl.R, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* posx;
-		checkCudaErrors(cudaMalloc((void**) &posx, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(posx, cyl.posx, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &posx, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(posx, cyl.posx, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* posy;
-		checkCudaErrors(cudaMalloc((void**) &posy, sizeof(double) * NUM_OF_CYLINDER));
-		checkCudaErrors(cudaMemcpy(posy, cyl.posy, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &posy, sizeof(double) * NUM_OF_CYLINDER));
+		CUDA_CHECK_RETURN(cudaMemcpy(posy, cyl.posy, sizeof(double) * NUM_OF_CYLINDER, cudaMemcpyHostToDevice));
 
 		double* materials;
-		checkCudaErrors(cudaMalloc((void**) &materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL));
-		checkCudaErrors(cudaMemcpy(materials, cyl.materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL));
+		CUDA_CHECK_RETURN(cudaMemcpy(materials, cyl.materials, sizeof(double) * 7 * NUM_OF_ENERGYCHANNEL, cudaMemcpyHostToDevice));
 
 		double height = cyl.height;
 
@@ -2350,7 +2350,7 @@ namespace SPECTRALCT{
 			// Get I = I0 * exp(-\mu)
 
 
-			checkCudaErrors(cudaMemcpy(hostproj, proj, sizeof(double) * DNi * DNj * EnergiesChannels, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(hostproj, proj, sizeof(double) * DNi * DNj * EnergiesChannels, cudaMemcpyDeviceToHost));
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dspRatio, 1, &ZERO, dmultiSpectrumProj, 1);
 
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[0], 1, &ZERO, dchannelProj[0], 1);
@@ -2361,15 +2361,15 @@ namespace SPECTRALCT{
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[5], 1, &ZERO, dchannelProj[5], 1);
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[6], 1, &ZERO, dchannelProj[6], 1);
 			cublasDgemv(handle, CUBLAS_OP_N, matrixRowNum, matrixColNum, &ONE, proj, matrixRowNum, dchannelRatio[7], 1, &ZERO, dchannelProj[7], 1);
-			checkCudaErrors(cudaMemcpy(multiSpectrumProj, dmultiSpectrumProj, sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[0], dchannelProj[0], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[1], dchannelProj[1], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[2], dchannelProj[2], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[3], dchannelProj[3], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[4], dchannelProj[4], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[5], dchannelProj[5], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[6], dchannelProj[6], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
-			checkCudaErrors(cudaMemcpy(channelProj[7], dchannelProj[7], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(multiSpectrumProj, dmultiSpectrumProj, sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[0], dchannelProj[0], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[1], dchannelProj[1], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[2], dchannelProj[2], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[3], dchannelProj[3], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[4], dchannelProj[4], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[5], dchannelProj[5], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[6], dchannelProj[6], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
+			CUDA_CHECK_RETURN(cudaMemcpy(channelProj[7], dchannelProj[7], sizeof(double) * matrixRowNum, cudaMemcpyDeviceToHost));
 
 			std::stringstream ss;
 			ss << i;

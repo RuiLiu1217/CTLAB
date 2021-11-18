@@ -57,6 +57,7 @@ SET(CTLAB_HEADERS
 	OldCodes.h
 	CTLAB.h
 	TextureObjectProvider.h
+	GenerateSummedAreaTable.h
 	
 )
 
@@ -88,6 +89,7 @@ SET(CTLAB_SRC
 	BackprojectionModelMap.cpp
 	Geometry.cpp
 	CTLAB.cpp
+	GenerateSummedAreaTable.cu
 )
 
 

@@ -101,19 +101,19 @@ void FMVM(float* y, float* A, float* x, int m, int n)
 	float *d_y;
 
 	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float4>();
-	checkCudaErrors(cudaMallocArray(&d_A, &channelDesc, width >> 2, height));
-	checkCudaErrors(cudaMemcpy2DToArray(d_A, 0, 0, A, n * sizeof(float), n * sizeof(float), m, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaBindTextureToArray(texRefA, d_A));
-	checkCudaErrors(cudaMalloc((void**) &d_x, n * sizeof(float)));
-	checkCudaErrors(cudaMalloc((void**) &d_y, m * sizeof(float)));
+	CUDA_CHECK_RETURN(cudaMallocArray(&d_A, &channelDesc, width >> 2, height));
+	CUDA_CHECK_RETURN(cudaMemcpy2DToArray(d_A, 0, 0, A, n * sizeof(float), n * sizeof(float), m, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaBindTextureToArray(texRefA, d_A));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_x, n * sizeof(float)));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_y, m * sizeof(float)));
 
-	checkCudaErrors(cudaMemcpy(d_x, x, n * sizeof(float), cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemcpy(d_x, x, n * sizeof(float), cudaMemcpyHostToDevice));
 	FMVM_KER << < grid, threads >> >(d_y, d_A, d_x, m, n);
-	checkCudaErrors(cudaMemcpy(y, d_y, m * sizeof(float), cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaFree(d_y));
-	checkCudaErrors(cudaFree(d_x));
-	checkCudaErrors(cudaUnbindTexture(texRefA));
-	checkCudaErrors(cudaFreeArray(d_A));
+	CUDA_CHECK_RETURN(cudaMemcpy(y, d_y, m * sizeof(float), cudaMemcpyDeviceToHost));
+	CUDA_CHECK_RETURN(cudaFree(d_y));
+	CUDA_CHECK_RETURN(cudaFree(d_x));
+	CUDA_CHECK_RETURN(cudaUnbindTexture(texRefA));
+	CUDA_CHECK_RETURN(cudaFreeArray(d_A));
 
 }
 
@@ -126,13 +126,13 @@ void FMVM_device(float* d_y, float* dA, float* d_x, int m, int n)
 	cudaArray *d_A;
 
 	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float4>();
-	checkCudaErrors(cudaMallocArray(&d_A, &channelDesc, width >> 2, height));
-	checkCudaErrors(cudaMemcpy2DToArray(d_A, 0, 0, dA, n * sizeof(float), n * sizeof(float), m, cudaMemcpyDeviceToDevice));
-	checkCudaErrors(cudaBindTextureToArray(texRefA, d_A));
+	CUDA_CHECK_RETURN(cudaMallocArray(&d_A, &channelDesc, width >> 2, height));
+	CUDA_CHECK_RETURN(cudaMemcpy2DToArray(d_A, 0, 0, dA, n * sizeof(float), n * sizeof(float), m, cudaMemcpyDeviceToDevice));
+	CUDA_CHECK_RETURN(cudaBindTextureToArray(texRefA, d_A));
 
-	FMVM_KER << < grid, threads >> >(d_y, d_A, d_x, m, n);
-	checkCudaErrors(cudaUnbindTexture(texRefA));
-	checkCudaErrors(cudaFreeArray(d_A));
+	FMVM_KER <<<grid, threads>>>(d_y, d_A, d_x, m, n);
+	CUDA_CHECK_RETURN(cudaUnbindTexture(texRefA));
+	CUDA_CHECK_RETURN(cudaFreeArray(d_A));
 }
 void testFMVM()
 {
@@ -152,22 +152,17 @@ void testFMVM()
 	x[1] = 2;
 	x[2] = 3;
 	float* d_x, *d_y, *d_A;
-	checkCudaErrors(cudaMalloc((void**) &d_x, sizeof(float) * 3));
-	checkCudaErrors(cudaMalloc((void**) &d_y, sizeof(float) * 3));
-	checkCudaErrors(cudaMalloc((void**) &d_A, sizeof(float) * 9));
-	checkCudaErrors(cudaMemcpy(d_x, x, sizeof(float) * 3, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(d_y, y, sizeof(float) * 3, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(d_A, A, sizeof(float) * 9, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_x, sizeof(float) * 3));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_y, sizeof(float) * 3));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_A, sizeof(float) * 9));
+	CUDA_CHECK_RETURN(cudaMemcpy(d_x, x, sizeof(float) * 3, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemcpy(d_y, y, sizeof(float) * 3, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemcpy(d_A, A, sizeof(float) * 9, cudaMemcpyHostToDevice));
 
 	FMVM_device(d_y, d_A, d_x, 3, 3);
-	checkCudaErrors(cudaMemcpy(y, d_y, sizeof(float) * 3, cudaMemcpyDeviceToHost));
+	CUDA_CHECK_RETURN(cudaMemcpy(y, d_y, sizeof(float) * 3, cudaMemcpyDeviceToHost));
 	std::cout << y[0] << " " << y[1] << " " << y[2];
 }
-
-
-
-
-
 
 
 template<typename T>
@@ -294,12 +289,12 @@ void generateModiPhantom_template(
 	dim3 gridSize((lenReso + blockSize.x - 1) / blockSize.x, (widReso + blockSize.y - 1) / blockSize.y, (heiReso + blockSize.z - 1) / blockSize.z);
 
 
-	checkCudaErrors(cudaMalloc((void**) &d_PhPar, sizeof(T) * 110));
-	checkCudaErrors(cudaMalloc((void**) &d_phantom, sizeof(T) * totSize));
-	checkCudaErrors(cudaMalloc((void**) &d_axis, sizeof(T) * 30));
-	checkCudaErrors(cudaMemcpy(d_axis, axis, sizeof(T) * 30, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemset(d_phantom, 0, sizeof(T)*totSize));
-	checkCudaErrors(cudaMemcpy(d_PhPar, PhPar, sizeof(T) * 110, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_PhPar, sizeof(T) * 110));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_phantom, sizeof(T) * totSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_axis, sizeof(T) * 30));
+	CUDA_CHECK_RETURN(cudaMemcpy(d_axis, axis, sizeof(T) * 30, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemset(d_phantom, 0, sizeof(T)*totSize));
+	CUDA_CHECK_RETURN(cudaMemcpy(d_PhPar, PhPar, sizeof(T) * 110, cudaMemcpyHostToDevice));
 
 	T halfx = (lenReso - 1) * 0.5f;
 	T halfy = (widReso - 1) * 0.5f;
@@ -310,7 +305,7 @@ void generateModiPhantom_template(
 
 	genModiPhKer<T> << <gridSize, blockSize >> >(d_phantom, d_PhPar, d_axis, halfx, halfy, halfz, deltax, deltay, deltaz, lenReso, widReso, heiReso);
 
-	checkCudaErrors(cudaMemcpy(phantom, d_phantom, sizeof(T)*totSize, cudaMemcpyDeviceToHost));
+	CUDA_CHECK_RETURN(cudaMemcpy(phantom, d_phantom, sizeof(T)*totSize, cudaMemcpyDeviceToHost));
 	std::ofstream fout("out.raw", std::ios::binary);
 	fout.write((char*) phantom, sizeof(T)*lenReso*widReso*heiReso);
 	fout.close();
@@ -858,7 +853,7 @@ void SART(thrust::host_vector<float>& himg,
 
 	for (iters = 0; iters != iterNum; ++iters)
 	{
-		checkCudaErrors(cudaMemset(pcorImg, 0, sizeof(float) * imgReso));
+		CUDA_CHECK_RETURN(cudaMemset(pcorImg, 0, sizeof(float) * imgReso));
 		//Projection
 		proj(pimg, pcorPrj, pprj, FanGeo, Img, prjBlk, prjGid);
 		//Backprojection
@@ -909,7 +904,7 @@ void SART(thrust::host_vector<float>& himg,
 
 	for (iters = 0; iters != iterNum; ++iters)
 	{
-		checkCudaErrors(cudaMemset(pcorImg, 0, sizeof(float) * imgReso));
+		CUDA_CHECK_RETURN(cudaMemset(pcorImg, 0, sizeof(float) * imgReso));
 		//Projection
 		proj(pimg, pcorPrj, pprj, FanGeo, Img, prjBlk, prjGid); // ÓÐÎÊÌâ;
 		//Backprojection
@@ -966,7 +961,7 @@ void OS_SART(thrust::host_vector<float>& himg,
 	{
 		std::cout << ".";
 
-		checkCudaErrors(cudaMemset(pcorImg, 0, sizeof(float) * imgReso));
+		CUDA_CHECK_RETURN(cudaMemset(pcorImg, 0, sizeof(float) * imgReso));
 		//ÔÚsubsetÖÐÍ¶Ó°;
 		proj(pimg, pcorPrj, pprj, FanGeo, Img, numPerSubSet, subSetNum, curSubIdx, prjBlk, prjGid);
 
@@ -1010,19 +1005,19 @@ void OS_SART(float* himg, float* hprj, float* himgWeg, float* hmask, const FanEA
 	float* dcorPrj = nullptr;
 	float* dmask = nullptr;
 
-	checkCudaErrors(cudaMalloc((void**) &dimg, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMalloc((void**) &dprj, sizeof(float) * prjSize));
-	checkCudaErrors(cudaMalloc((void**) &dimgWeg, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMalloc((void**) &dcorImg, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMalloc((void**) &dcorPrj, sizeof(float) * FanGeo.m_DetN * numPerSubSet));
-	checkCudaErrors(cudaMalloc((void**) &dmask, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dimg, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dprj, sizeof(float) * prjSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dimgWeg, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dcorImg, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dcorPrj, sizeof(float) * FanGeo.m_DetN * numPerSubSet));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dmask, sizeof(float) * imgSize));
 
-	checkCudaErrors(cudaMemset(dimg, 0, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMemcpy(dprj, hprj, sizeof(float) * prjSize, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(dimgWeg, himgWeg, sizeof(float) * imgSize, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(dmask, hmask, sizeof(float) * imgSize, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemset(dcorImg, 0, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMemset(dcorPrj, 0, sizeof(float) * FanGeo.m_DetN * numPerSubSet));
+	CUDA_CHECK_RETURN(cudaMemset(dimg, 0, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMemcpy(dprj, hprj, sizeof(float) * prjSize, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemcpy(dimgWeg, himgWeg, sizeof(float) * imgSize, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemcpy(dmask, hmask, sizeof(float) * imgSize, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemset(dcorImg, 0, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMemset(dcorPrj, 0, sizeof(float) * FanGeo.m_DetN * numPerSubSet));
 
 	unsigned int iters = 0;
 
@@ -1040,7 +1035,7 @@ void OS_SART(float* himg, float* hprj, float* himgWeg, float* hmask, const FanEA
 	for (iters = 0; iters != realIters; ++iters)
 	{
 		std::cout << ".";
-		checkCudaErrors(cudaMemset(dcorImg, 0, sizeof(float) * imgSize));
+		CUDA_CHECK_RETURN(cudaMemset(dcorImg, 0, sizeof(float) * imgSize));
 		//ÔÚsubsetÖÐÍ¶Ó°;
 		proj(dimg, dcorPrj, dprj, true, FanGeo, Img, numPerSubSet, subSetNum, curSubIdx, prjBlk, prjGid);
 		//proj_Ker<<<prjGid,prjBlk>>>(dimg, dcorPrj,dprj, true, FanGeo,  Img,  numPerSubSet, subSetNum, curSubIdx);
@@ -1056,11 +1051,11 @@ void OS_SART(float* himg, float* hprj, float* himgWeg, float* hmask, const FanEA
 		curSubIdx = (curSubIdx + 1) % subSetNum;
 	}
 
-	checkCudaErrors(cudaMemcpy(himg, dimg, sizeof(float) * imgSize, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaFree(dprj));
-	checkCudaErrors(cudaFree(dimgWeg));
-	checkCudaErrors(cudaFree(dcorPrj));
-	checkCudaErrors(cudaFree(dimg));
+	CUDA_CHECK_RETURN(cudaMemcpy(himg, dimg, sizeof(float) * imgSize, cudaMemcpyDeviceToHost));
+	CUDA_CHECK_RETURN(cudaFree(dprj));
+	CUDA_CHECK_RETURN(cudaFree(dimgWeg));
+	CUDA_CHECK_RETURN(cudaFree(dcorPrj));
+	CUDA_CHECK_RETURN(cudaFree(dimg));
 }
 
 
@@ -1115,7 +1110,7 @@ void OS_SART_SD(thrust::host_vector<float>& himg,
 	{
 		std::cout << ".";
 
-		checkCudaErrors(cudaMemset(pcorImg, 0, sizeof(float) * imgReso));
+		CUDA_CHECK_RETURN(cudaMemset(pcorImg, 0, sizeof(float) * imgReso));
 		//ÔÚsubsetÖÐÍ¶Ó°;
 		proj(pimg, pcorPrj, pprj, FanGeo, Img, numPerSubSet, subSetNum, curSubIdx, prjBlk, prjGid);
 
@@ -1172,22 +1167,21 @@ void OS_SART_SD(float* himg, float* hprj, float* himgWeg, float* hmask, const Fa
 
 	float* ddiff = nullptr;
 
-	checkCudaErrors(cudaMalloc((void**) &dimg, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMalloc((void**) &dprj, sizeof(float) * prjSize));
-	checkCudaErrors(cudaMalloc((void**) &dimgWeg, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMalloc((void**) &dcorImg, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMalloc((void**) &dcorPrj, sizeof(float) * FanGeo.m_DetN * numPerSubSet));
-	checkCudaErrors(cudaMalloc((void**) &dmask, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMalloc((void**) &ddiff, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dimg, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dprj, sizeof(float) * prjSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dimgWeg, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dcorImg, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dcorPrj, sizeof(float) * FanGeo.m_DetN * numPerSubSet));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dmask, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &ddiff, sizeof(float) * imgSize));
 
-
-	checkCudaErrors(cudaMemset(dimg, 0, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMemcpy(dprj, hprj, sizeof(float) * prjSize, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(dimgWeg, himgWeg, sizeof(float) * imgSize, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(dmask, hmask, sizeof(float) * imgSize, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemset(dcorImg, 0, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMemset(dcorPrj, 0, sizeof(float) * FanGeo.m_DetN * numPerSubSet));
-	checkCudaErrors(cudaMemset(ddiff, 0, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMemset(dimg, 0, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMemcpy(dprj, hprj, sizeof(float) * prjSize, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemcpy(dimgWeg, himgWeg, sizeof(float) * imgSize, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemcpy(dmask, hmask, sizeof(float) * imgSize, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemset(dcorImg, 0, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMemset(dcorPrj, 0, sizeof(float) * FanGeo.m_DetN * numPerSubSet));
+	CUDA_CHECK_RETURN(cudaMemset(ddiff, 0, sizeof(float) * imgSize));
 
 	unsigned int iters = 0;
 
@@ -1211,7 +1205,7 @@ void OS_SART_SD(float* himg, float* hprj, float* himgWeg, float* hmask, const Fa
 	for (iters = 0; iters != realIters; ++iters)
 	{
 		std::cout << ".";
-		checkCudaErrors(cudaMemset(dcorImg, 0, sizeof(float) * imgSize));
+		CUDA_CHECK_RETURN(cudaMemset(dcorImg, 0, sizeof(float) * imgSize));
 		//ÔÚsubsetÖÐÍ¶Ó°;
 		//proj_Ker<<<prjGid,prjBlk>>>(dimg, dcorPrj,dprj, true, FanGeo,  Img,  numPerSubSet, subSetNum, curSubIdx);
 		proj(dimg, dcorPrj, dprj, true, FanGeo, Img, numPerSubSet, subSetNum, curSubIdx, prjBlk, prjGid);
@@ -1237,11 +1231,11 @@ void OS_SART_SD(float* himg, float* hprj, float* himgWeg, float* hmask, const Fa
 		curSubIdx = (curSubIdx + 1) % subSetNum;
 	}
 
-	checkCudaErrors(cudaMemcpy(himg, dimg, sizeof(float) * imgSize, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaFree(dprj));
-	checkCudaErrors(cudaFree(dimgWeg));
-	checkCudaErrors(cudaFree(dcorPrj));
-	checkCudaErrors(cudaFree(dimg));
+	CUDA_CHECK_RETURN(cudaMemcpy(himg, dimg, sizeof(float) * imgSize, cudaMemcpyDeviceToHost));
+	CUDA_CHECK_RETURN(cudaFree(dprj));
+	CUDA_CHECK_RETURN(cudaFree(dimgWeg));
+	CUDA_CHECK_RETURN(cudaFree(dcorPrj));
+	CUDA_CHECK_RETURN(cudaFree(dimg));
 }
 
 
@@ -1267,23 +1261,23 @@ void OS_SART_STF(float* himg, float* hprj, float* himgWeg, float* hmask, const F
 	float* dres = nullptr;
 	float* ddiff = nullptr;
 
-	checkCudaErrors(cudaMalloc((void**) &dimg, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMalloc((void**) &dprj, sizeof(float) * prjSize));
-	checkCudaErrors(cudaMalloc((void**) &dimgWeg, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMalloc((void**) &dcorImg, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMalloc((void**) &dcorPrj, sizeof(float) * FanGeo.m_DetN * numPerSubSet));
-	checkCudaErrors(cudaMalloc((void**) &dmask, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMalloc((void**) &ddiff, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMalloc((void**) &dres, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dimg, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dprj, sizeof(float) * prjSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dimgWeg, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dcorImg, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dcorPrj, sizeof(float) * FanGeo.m_DetN * numPerSubSet));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dmask, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &ddiff, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dres, sizeof(float) * imgSize));
 
-	checkCudaErrors(cudaMemset(dimg, 0, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMemcpy(dprj, hprj, sizeof(float) * prjSize, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(dimgWeg, himgWeg, sizeof(float) * imgSize, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemcpy(dmask, hmask, sizeof(float) * imgSize, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemset(dcorImg, 0, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMemset(dcorPrj, 0, sizeof(float) * FanGeo.m_DetN * numPerSubSet));
-	checkCudaErrors(cudaMemset(ddiff, 0, sizeof(float) * imgSize));
-	checkCudaErrors(cudaMemset(dres, 0, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMemset(dimg, 0, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMemcpy(dprj, hprj, sizeof(float) * prjSize, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemcpy(dimgWeg, himgWeg, sizeof(float) * imgSize, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemcpy(dmask, hmask, sizeof(float) * imgSize, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemset(dcorImg, 0, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMemset(dcorPrj, 0, sizeof(float) * FanGeo.m_DetN * numPerSubSet));
+	CUDA_CHECK_RETURN(cudaMemset(ddiff, 0, sizeof(float) * imgSize));
+	CUDA_CHECK_RETURN(cudaMemset(dres, 0, sizeof(float) * imgSize));
 	unsigned int iters = 0;
 
 
@@ -1303,7 +1297,7 @@ void OS_SART_STF(float* himg, float* hprj, float* himgWeg, float* hmask, const F
 	for (iters = 0; iters != realIters; ++iters)
 	{
 		std::cout << ".";
-		checkCudaErrors(cudaMemset(dcorImg, 0, sizeof(float) * imgSize));
+		CUDA_CHECK_RETURN(cudaMemset(dcorImg, 0, sizeof(float) * imgSize));
 		//ÔÚsubsetÖÐÍ¶Ó°;
 		proj(dimg, dcorPrj, dprj, true, FanGeo, Img, numPerSubSet, subSetNum, curSubIdx, prjBlk, prjGid);
 		//subsetÖÐ·ŽÍ¶Ó°;
@@ -1337,11 +1331,11 @@ void OS_SART_STF(float* himg, float* hprj, float* himgWeg, float* hmask, const F
 		curSubIdx = (curSubIdx + 1) % subSetNum;
 	}
 
-	checkCudaErrors(cudaMemcpy(himg, dimg, sizeof(float) * imgSize, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaFree(dprj));
-	checkCudaErrors(cudaFree(dimgWeg));
-	checkCudaErrors(cudaFree(dcorPrj));
-	checkCudaErrors(cudaFree(dimg));
+	CUDA_CHECK_RETURN(cudaMemcpy(himg, dimg, sizeof(float) * imgSize, cudaMemcpyDeviceToHost));
+	CUDA_CHECK_RETURN(cudaFree(dprj));
+	CUDA_CHECK_RETURN(cudaFree(dimgWeg));
+	CUDA_CHECK_RETURN(cudaFree(dcorPrj));
+	CUDA_CHECK_RETURN(cudaFree(dimg));
 }
 
 
@@ -1394,7 +1388,7 @@ void OS_SART_STF(thrust::host_vector<float>& himg,
 	{
 		std::cout << ".";
 
-		checkCudaErrors(cudaMemset(pcorImg, 0, sizeof(float) * imgReso));
+		CUDA_CHECK_RETURN(cudaMemset(pcorImg, 0, sizeof(float) * imgReso));
 		//ÔÚsubsetÖÐÍ¶Ó°;
 		proj(pimg, pcorPrj, pprj, FanGeo, Img, numPerSubSet, subSetNum, curSubIdx, prjBlk, prjGid);
 
@@ -1496,7 +1490,7 @@ void SART_MULTISLICES(
 	uint iters = 0;
 	while (iters != iterNum)
 	{
-		checkCudaErrors(cudaMemset(pcorImg, 0, sizeof(float) * totVolReso));
+		CUDA_CHECK_RETURN(cudaMemset(pcorImg, 0, sizeof(float) * totVolReso));
 
 		//Proj for all slices;
 		proj(pimg, pcorPrj, pprj, FanGeo, Img, prjBlk, prjGid, sliceNum);
@@ -1911,7 +1905,7 @@ void DEMO4()
 void ProjectionThenBackProjection(float* dimg, float* dres, const FanEAGeo& FanGeo, const Image& Img)
 {
 	float* dprj;
-	checkCudaErrors(cudaMalloc((void**) &dprj, sizeof(float) * FanGeo.m_ViwN * FanGeo.m_DetN));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dprj, sizeof(float) * FanGeo.m_ViwN * FanGeo.m_DetN));
 	dim3 prjB(256, 4);
 	dim3 prjG(
 		(FanGeo.m_DetN + prjB.x - 1) / prjB.x,
@@ -1928,7 +1922,7 @@ void ProjectionThenBackProjection(float* dimg, float* dres, const FanEAGeo& FanG
 void ProjectionThenBackProjection(float* dimg, float* dres, const FanEDGeo& FanGeo, const Image& Img)
 {
 	float* dprj;
-	checkCudaErrors(cudaMalloc((void**) &dprj, sizeof(float) * FanGeo.m_ViwN * FanGeo.m_DetN));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dprj, sizeof(float) * FanGeo.m_ViwN * FanGeo.m_DetN));
 	dim3 prjB(256, 4);
 	dim3 prjG(
 		(FanGeo.m_DetN + prjB.x - 1) / prjB.x,
@@ -1969,7 +1963,7 @@ __global__ void demo5_update(float* origImg, float* updImg, const unsigned int l
 //ÓÃÏßÐÔŽúÊýµÄ·œ·šÀŽ×öÖØ¹¹
 void DEMO5()
 {
-	checkCudaErrors(cudaDeviceReset());
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 	cusparseHandle_t handle = 0;
 	cusparseMatDescr_t descr = 0;
 	const int detR = 1024;
@@ -1998,12 +1992,12 @@ void DEMO5()
 	int* cscColIdx;
 	float* csrValIdx;
 	float* cscValIdx;
-	checkCudaErrors(cudaMallocManaged((void**) &csrRowIdx, (rowNum + 1) * sizeof(int)));
-	checkCudaErrors(cudaMallocManaged((void**) &csrColIdx, nnz * sizeof(int)));
-	checkCudaErrors(cudaMallocManaged((void**) &csrValIdx, nnz * sizeof(float)));
-	checkCudaErrors(cudaMallocManaged((void**) &cscColIdx, (colNum + 1) * sizeof(int)));
-	checkCudaErrors(cudaMallocManaged((void**) &cscRowIdx, nnz * sizeof(int)));
-	checkCudaErrors(cudaMallocManaged((void**) &cscValIdx, nnz * sizeof(float)));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &csrRowIdx, (rowNum + 1) * sizeof(int)));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &csrColIdx, nnz * sizeof(int)));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &csrValIdx, nnz * sizeof(float)));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &cscColIdx, (colNum + 1) * sizeof(int)));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &cscRowIdx, nnz * sizeof(int)));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &cscValIdx, nnz * sizeof(float)));
 
 	csrRowFile.read((char*) csrRowIdx, sizeof(int) * (rowNum + 1));
 	csrColFile.read((char*) csrColIdx, sizeof(int) * nnz);
@@ -2027,23 +2021,23 @@ void DEMO5()
 
 
 	//Establish the matrix
-	checkCudaErrors(cudaDeviceSynchronize());
+	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 
 
 	float* image;
 	float* prj;
 	float* tempproj;
 	float* tempimg;
-	checkCudaErrors(cudaMallocManaged((void**) &image, sizeof(float) * colNum));
-	checkCudaErrors(cudaMallocManaged((void**) &prj, sizeof(float) * rowNum));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &image, sizeof(float) * colNum));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &prj, sizeof(float) * rowNum));
 
-	checkCudaErrors(cudaMallocManaged((void**) &tempimg, sizeof(float) * colNum));
-	checkCudaErrors(cudaMallocManaged((void**) &tempproj, sizeof(float) * rowNum));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &tempimg, sizeof(float) * colNum));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &tempproj, sizeof(float) * rowNum));
 
-	checkCudaErrors(cudaMemsetAsync(image, 0, sizeof(float) * colNum));
-	checkCudaErrors(cudaMemsetAsync(tempimg, 0, sizeof(float) * colNum));
-	checkCudaErrors(cudaMemsetAsync(tempproj, 0, sizeof(float) * rowNum));
-	checkCudaErrors(cudaDeviceSynchronize());
+	CUDA_CHECK_RETURN(cudaMemsetAsync(image, 0, sizeof(float) * colNum));
+	CUDA_CHECK_RETURN(cudaMemsetAsync(tempimg, 0, sizeof(float) * colNum));
+	CUDA_CHECK_RETURN(cudaMemsetAsync(tempproj, 0, sizeof(float) * rowNum));
+	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 
 	std::ifstream prjID("demo5_prjj.prj", std::ios::binary);
 	prjID.read((char*) prj, sizeof(float) * rowNum);
@@ -2083,16 +2077,16 @@ void DEMO5()
 		std::cout << "iteration " << i << std::endl;
 	}
 
-	checkCudaErrors(cudaDeviceSynchronize());
+	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 	std::ofstream fou("demo5_reimg.raw", std::ios::binary);
 	fou.write((char*) image, sizeof(float) * colNum);
 	fou.close();
-	checkCudaErrors(cudaDeviceReset());
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 }
 
 void DEMO5_1()
 {
-	checkCudaErrors(cudaDeviceReset());
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 
 	cusparseHandle_t handle = 0;
 	cusparseMatDescr_t descr = 0;
@@ -2112,9 +2106,9 @@ void DEMO5_1()
 	int* cooColIdx;
 	float* cooValIdx;
 
-	checkCudaErrors(cudaMallocManaged((void**) &cooRowIdx, sizeof(int) * nnz));
-	checkCudaErrors(cudaMallocManaged((void**) &cooColIdx, sizeof(int) * nnz));
-	checkCudaErrors(cudaMallocManaged((void**) &cooValIdx, sizeof(float) *nnz));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &cooRowIdx, sizeof(int) * nnz));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &cooColIdx, sizeof(int) * nnz));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &cooValIdx, sizeof(float) *nnz));
 	//Read the file
 	std::string cooRowF = "demo5_rowIdx208932896.max";
 	std::string cooColF = "demo5_colIdx208932896.max";
@@ -2126,7 +2120,7 @@ void DEMO5_1()
 	if (!(cooRowFile.is_open() && cooColFile.is_open() && cooValFile.is_open()))
 	{
 		std::cerr << "Cannot open the file\n";
-		checkCudaErrors(cudaDeviceReset());
+		CUDA_CHECK_RETURN(cudaDeviceReset());
 		exit(-1);
 	}
 	cooRowFile.read((char*) cooRowIdx, sizeof(int) * nnz);
@@ -2144,30 +2138,30 @@ void DEMO5_1()
 	int* cscColIdx;
 	float* cscValIdx;
 	float* csrValIdx = cooValIdx;
-	checkCudaErrors(cudaMallocManaged((void**) &csrRowIdx, (rowNum + 1) * sizeof(int)));
-	checkCudaErrors(cudaMallocManaged((void**) &cscColIdx, (colNum + 1) * sizeof(int)));
-	checkCudaErrors(cudaMallocManaged((void**) &cscRowIdx, nnz * sizeof(int)));
-	checkCudaErrors(cudaMallocManaged((void**) &cscValIdx, nnz * sizeof(float)));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &csrRowIdx, (rowNum + 1) * sizeof(int)));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &cscColIdx, (colNum + 1) * sizeof(int)));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &cscRowIdx, nnz * sizeof(int)));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &cscValIdx, nnz * sizeof(float)));
 	cusparseXcoo2csr(handle, cooRowIdx, nnz, rowNum, csrRowIdx, CUSPARSE_INDEX_BASE_ZERO);
 	cudaDeviceSynchronize();
 	// cusparseScsr2csc(handle, rowNum, colNum, nnz, csrValIdx, csrRowIdx, csrColIdx, cscValIdx, cscRowIdx, cscColIdx, CUSPARSE_ACTION_NUMERIC, CUSPARSE_INDEX_BASE_ZERO);
-	checkCudaErrors(cudaDeviceSynchronize());
+	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 
 
 	float* image;
 	float* proj;
 	float* tempproj;
 	float* tempimg;
-	checkCudaErrors(cudaMallocManaged((void**) &image, sizeof(float) * colNum));
-	checkCudaErrors(cudaMallocManaged((void**) &proj, sizeof(float) * rowNum));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &image, sizeof(float) * colNum));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &proj, sizeof(float) * rowNum));
 
-	checkCudaErrors(cudaMallocManaged((void**) &tempimg, sizeof(float) * colNum));
-	checkCudaErrors(cudaMallocManaged((void**) &tempproj, sizeof(float) * rowNum));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &tempimg, sizeof(float) * colNum));
+	CUDA_CHECK_RETURN(cudaMallocManaged((void**) &tempproj, sizeof(float) * rowNum));
 
-	checkCudaErrors(cudaMemsetAsync(image, 0, sizeof(float) * colNum));
-	checkCudaErrors(cudaMemsetAsync(tempimg, 0, sizeof(float) * colNum));
-	checkCudaErrors(cudaMemsetAsync(tempproj, 0, sizeof(float) * rowNum));
-	checkCudaErrors(cudaDeviceSynchronize());
+	CUDA_CHECK_RETURN(cudaMemsetAsync(image, 0, sizeof(float) * colNum));
+	CUDA_CHECK_RETURN(cudaMemsetAsync(tempimg, 0, sizeof(float) * colNum));
+	CUDA_CHECK_RETURN(cudaMemsetAsync(tempproj, 0, sizeof(float) * rowNum));
+	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 
 	std::ifstream prj("demo5_1_prjj.prj", std::ios::binary);
 	prj.read((char*) proj, sizeof(float) * rowNum);
@@ -2207,12 +2201,12 @@ void DEMO5_1()
 	}
 
 
-	checkCudaErrors(cudaDeviceSynchronize());
+	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 	std::ofstream fou("demo5_1_reimg.raw", std::ios::binary);
 	fou.write((char*) image, sizeof(float) * colNum);
 	fou.close();
 
-	checkCudaErrors(cudaDeviceReset());
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 }
 
 
@@ -2222,7 +2216,7 @@ void DEMO5_1()
 //This is the demo test the boxed back projection function in one angle
 void DEMO7()
 {
-	checkCudaErrors(cudaDeviceReset());
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 	ConeEDGeo ConeGeo(85.0f, 15.0f, 360, 0.0f, _TWOPI, make_float2(34.0f, 34.0f), make_int2(1024, 1024));
 	Volume Vol(512, 512, 512, 20.0f, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f);
 
@@ -2245,19 +2239,19 @@ void DEMO7()
 
 	float* d_prj;
 	float* d_vol;
-	checkCudaErrors(cudaMalloc((void**) &d_prj, sizeof(float) * prjSize));
-	checkCudaErrors(cudaMalloc((void**) &d_vol, sizeof(float) * volSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_prj, sizeof(float) * prjSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_vol, sizeof(float) * volSize));
 
 
-	checkCudaErrors(cudaMemcpy(d_prj, h_prj, sizeof(float) * prjSize, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemset(d_vol, 0, sizeof(float) * volSize));
+	CUDA_CHECK_RETURN(cudaMemcpy(d_prj, h_prj, sizeof(float) * prjSize, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemset(d_vol, 0, sizeof(float) * volSize));
 	dim3 blk(1024);
 	dim3 gid((Vol.m_Reso.x * Vol.m_Reso.y * Vol.m_Reso.z + blk.x - 1) / blk.x);
 
 	// demo7_allBack;
 	bakproj_BOXED(d_prj, d_vol, 0, ConeGeo, Vol, blk, gid);
 
-	checkCudaErrors(cudaMemcpy(h_vol, d_vol, sizeof(float) * volSize, cudaMemcpyDeviceToHost));
+	CUDA_CHECK_RETURN(cudaMemcpy(h_vol, d_vol, sizeof(float) * volSize, cudaMemcpyDeviceToHost));
 	std::ofstream fou("demo7_res.raw", std::ios::binary);
 	fou.write((char*) h_vol, sizeof(float) * volSize);
 	fou.close();
@@ -2266,7 +2260,7 @@ void DEMO7()
 
 void DEMO7_1()
 {
-	checkCudaErrors(cudaDeviceReset());
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 	ConeEDGeo ConeGeo(85.0f, 15.0f, 360, 0.0f, _TWOPI, make_float2(34.0f, 3.4f), make_int2(512, 512));
 	Volume Vol(512, 512, 512, 20.0f, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f);
 
@@ -2289,12 +2283,12 @@ void DEMO7_1()
 
 	float* d_prj;
 	float* d_vol;
-	checkCudaErrors(cudaMalloc((void**) &d_prj, sizeof(float) * prjSize));
-	checkCudaErrors(cudaMalloc((void**) &d_vol, sizeof(float) * volSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_prj, sizeof(float) * prjSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_vol, sizeof(float) * volSize));
 
 
-	checkCudaErrors(cudaMemcpy(d_prj, h_prj, sizeof(float) * prjSize, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemset(d_vol, 0, sizeof(float) * volSize));
+	CUDA_CHECK_RETURN(cudaMemcpy(d_prj, h_prj, sizeof(float) * prjSize, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemset(d_vol, 0, sizeof(float) * volSize));
 	dim3 blk(1024);
 	dim3 gid((Vol.m_Reso.x * Vol.m_Reso.y * Vol.m_Reso.z + blk.x - 1) / blk.x);
 
@@ -2303,11 +2297,11 @@ void DEMO7_1()
 
 
 
-	checkCudaErrors(cudaMemcpy(h_vol, d_vol, sizeof(float) * volSize, cudaMemcpyDeviceToHost));
+	CUDA_CHECK_RETURN(cudaMemcpy(h_vol, d_vol, sizeof(float) * volSize, cudaMemcpyDeviceToHost));
 	std::ofstream fou("demo7_1_res.raw", std::ios::binary);
 	fou.write((char*) h_vol, sizeof(float) * volSize);
 	fou.close();
-	checkCudaErrors(cudaDeviceReset());
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 }
 
 
@@ -2385,7 +2379,7 @@ __global__ void proj_demo8(T* d_output, const ConeEDGeo ConeGeo, const Volume Vo
 void DEMO8()
 {
 
-	checkCudaErrors(cudaDeviceReset());
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 	ConeEDGeo ConeGeo;
 	Volume Vol;
 
@@ -2414,7 +2408,7 @@ void DEMO8()
 
 	//create 3D array
 	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float>();
-	checkCudaErrors(cudaMalloc3DArray(&demo8_volarray, &channelDesc, volumeSize));
+	CUDA_CHECK_RETURN(cudaMalloc3DArray(&demo8_volarray, &channelDesc, volumeSize));
 
 	// copy data to 3D array
 	cudaMemcpy3DParms copyParams = { 0 };
@@ -2422,7 +2416,7 @@ void DEMO8()
 	copyParams.dstArray = demo8_volarray;
 	copyParams.extent = volumeSize;
 	copyParams.kind = cudaMemcpyHostToDevice;
-	checkCudaErrors(cudaMemcpy3D(&copyParams));
+	CUDA_CHECK_RETURN(cudaMemcpy3D(&copyParams));
 
 	// set texture parameters
 	demo8_volTex.normalized = false;                      // access with normalized texture coordinates
@@ -2431,11 +2425,11 @@ void DEMO8()
 	demo8_volTex.addressMode[1] = cudaAddressModeClamp;
 
 	// bind array to 3D texture
-	checkCudaErrors(cudaBindTextureToArray(demo8_volTex, demo8_volarray, channelDesc));
+	CUDA_CHECK_RETURN(cudaBindTextureToArray(demo8_volTex, demo8_volarray, channelDesc));
 
 	//create 3D array
 	cudaChannelFormatDesc channelDesc2 = cudaCreateChannelDesc<float>();
-	checkCudaErrors(cudaMalloc3DArray(&demo8_prjarray, &channelDesc2, projSize));
+	CUDA_CHECK_RETURN(cudaMalloc3DArray(&demo8_prjarray, &channelDesc2, projSize));
 
 	// copy data to 3D array
 	cudaMemcpy3DParms copyParams2 = { 0 };
@@ -2443,7 +2437,7 @@ void DEMO8()
 	copyParams2.dstArray = demo8_prjarray;
 	copyParams2.extent = projSize;
 	copyParams2.kind = cudaMemcpyHostToDevice;
-	checkCudaErrors(cudaMemcpy3D(&copyParams2));
+	CUDA_CHECK_RETURN(cudaMemcpy3D(&copyParams2));
 
 	// set texture parameters
 	demo8_prjTex.normalized = false;                      // access with normalized texture coordinates
@@ -2452,7 +2446,7 @@ void DEMO8()
 	demo8_prjTex.addressMode[1] = cudaAddressModeClamp;
 
 	// bind array to 3D texture
-	checkCudaErrors(cudaBindTextureToArray(demo8_prjTex, demo8_prjarray, channelDesc2));
+	CUDA_CHECK_RETURN(cudaBindTextureToArray(demo8_prjTex, demo8_prjarray, channelDesc2));
 
 	//initCuda((void*)h_volume, volumeSize);
 	delete [] h_volume;
@@ -2467,20 +2461,20 @@ void DEMO8()
 
 	float* d_output = nullptr;
 	//float* d_depth;
-	checkCudaErrors(cudaMalloc((void **) &d_output, prjS * sizeof(float)));
-	checkCudaErrors(cudaMemset(d_output, 0, prjS * sizeof(float)));
+	CUDA_CHECK_RETURN(cudaMalloc((void **) &d_output, prjS * sizeof(float)));
+	CUDA_CHECK_RETURN(cudaMemset(d_output, 0, prjS * sizeof(float)));
 
 	proj_demo8 << <gridSize, blockSize >> >(d_output, ConeGeo, Vol);
-	checkCudaErrors(cudaDeviceSynchronize());
+	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 	// Get elapsed time and throughput, then log to sample and master logs
 
 	//getLastCudaError("Error: render_kernel() execution FAILED");
-	checkCudaErrors(cudaDeviceSynchronize());
+	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 
 	float *h_output = new float[prjS];
-	checkCudaErrors(cudaMemcpy(h_output, d_output, sizeof(float) * prjS, cudaMemcpyDeviceToHost));
+	CUDA_CHECK_RETURN(cudaMemcpy(h_output, d_output, sizeof(float) * prjS, cudaMemcpyDeviceToHost));
 
-	checkCudaErrors(cudaFree(d_output));
+	CUDA_CHECK_RETURN(cudaFree(d_output));
 
 	std::ofstream fou("demo8_1024x512x360.prj", std::ios::binary);
 	fou.write((char*) h_output, sizeof(float) * prjS);
@@ -2515,18 +2509,18 @@ void CG_recon(float* himg, float* hprj, const FanEAGeo& FanGeo, const Image& Img
 
 
 
-	checkCudaErrors(cudaMalloc((void**) &X, sizeof(float) * imgReso));
-	checkCudaErrors(cudaMalloc((void**) &realp, sizeof(float) * prjReso));
-	checkCudaErrors(cudaMalloc((void**) &R, sizeof(float) * imgReso));
-	checkCudaErrors(cudaMalloc((void**) &D, sizeof(float) * imgReso));
-	checkCudaErrors(cudaMalloc((void**) &tem, sizeof(float) * prjReso));
-	checkCudaErrors(cudaMalloc((void**) &tem2, sizeof(float) * imgReso));
-	checkCudaErrors(cudaMalloc((void**) &nR, sizeof(float) * imgReso));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &X, sizeof(float) * imgReso));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &realp, sizeof(float) * prjReso));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &R, sizeof(float) * imgReso));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &D, sizeof(float) * imgReso));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &tem, sizeof(float) * prjReso));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &tem2, sizeof(float) * imgReso));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &nR, sizeof(float) * imgReso));
 
-	checkCudaErrors(cudaMemcpy(realp, hprj, sizeof(float) * prjReso, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaMemset(X, 0, sizeof(float) * imgReso));
+	CUDA_CHECK_RETURN(cudaMemcpy(realp, hprj, sizeof(float) * prjReso, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemset(X, 0, sizeof(float) * imgReso));
 	bakproj_PIXEL(realp, R, FanGeo, Img, bakblk, bakgid);
-	checkCudaErrors(cudaMemcpy(D, R, sizeof(float) * imgReso, cudaMemcpyDeviceToDevice));
+	CUDA_CHECK_RETURN(cudaMemcpy(D, R, sizeof(float) * imgReso, cudaMemcpyDeviceToDevice));
 	unsigned int iter(0);
 	float alpha(0.0f), beta(0.0f);
 	thrust::device_ptr<float> pX(X);
@@ -2554,9 +2548,9 @@ void CG_recon(float* himg, float* hprj, const FanEAGeo& FanGeo, const Image& Img
 		norm3 = norm3 * norm3;
 		norm4 = norm4 * norm4;
 		beta = norm3 / norm4;
-		checkCudaErrors(cudaMemcpy(R, nR, sizeof(float) * imgReso, cudaMemcpyDeviceToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(R, nR, sizeof(float) * imgReso, cudaMemcpyDeviceToDevice));
 		thrust::transform(pR, pR + imgReso, pD, pD, CG_update3_functor<float>(beta));
-		checkCudaErrors(cudaMemcpy(tempfou, X, sizeof(float) * imgReso, cudaMemcpyDeviceToHost));
+		CUDA_CHECK_RETURN(cudaMemcpy(tempfou, X, sizeof(float) * imgReso, cudaMemcpyDeviceToHost));
 		std::stringstream ss;
 		ss << iter;
 		std::string fil = "demo12_iterRecon" + ss.str() + ".raw";
@@ -2845,25 +2839,24 @@ void DEMO11()
 	//allocate the memory on devices
 	for (i = 0; i != 3; ++i)
 	{
-		checkCudaErrors(cudaSetDevice(i));
-		checkCudaErrors(cudaStreamCreate(&streams[i]));
+		CUDA_CHECK_RETURN(cudaSetDevice(i));
+		CUDA_CHECK_RETURN(cudaStreamCreate(&streams[i]));
 
-		//·ÖÅäÏÔŽæ;
-		checkCudaErrors(cudaMalloc((void**) &dimg[i], sizeof(float) * totalVolBytes));
-		checkCudaErrors(cudaMalloc((void**) &dprj[i], sizeof(float) * totalPrjBytes));
-		checkCudaErrors(cudaMalloc((void**) &dimgWeg[i], sizeof(float) * sliceReso));
-		checkCudaErrors(cudaMalloc((void**) &dcorImg[i], sizeof(float) * totalVolBytes));
-		checkCudaErrors(cudaMalloc((void**) &dcorPrj[i], sizeof(float) * FanGeo.m_DetN * numPerSubSet * sliceNum));
-		checkCudaErrors(cudaMalloc((void**) &dmask[i], sizeof(float) * sliceReso));
-		checkCudaErrors(cudaMalloc((void**) &dlas[i], sizeof(float) * totalVolBytes));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dimg[i], sizeof(float) * totalVolBytes));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dprj[i], sizeof(float) * totalPrjBytes));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dimgWeg[i], sizeof(float) * sliceReso));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dcorImg[i], sizeof(float) * totalVolBytes));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dcorPrj[i], sizeof(float) * FanGeo.m_DetN * numPerSubSet * sliceNum));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dmask[i], sizeof(float) * sliceReso));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dlas[i], sizeof(float) * totalVolBytes));
 
-		checkCudaErrors(cudaMemset(dimg[i], 0, sizeof(float) * totalVolBytes));
-		checkCudaErrors(cudaMemcpy(dprj[i], prj[i], sizeof(float) * totalPrjBytes, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dimgWeg[i], weg[i], sizeof(float) * sliceReso, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemset(dcorImg[i], 0, sizeof(float) * totalVolBytes));
-		checkCudaErrors(cudaMemset(dcorPrj[i], 0, sizeof(float) * FanGeo.m_DetN * numPerSubSet  * sliceNum));
-		checkCudaErrors(cudaMemcpy(dmask[i], mask[i], sizeof(float) * sliceReso, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemset(dlas[i], 0, sizeof(float) * totalVolBytes));
+		CUDA_CHECK_RETURN(cudaMemset(dimg[i], 0, sizeof(float) * totalVolBytes));
+		CUDA_CHECK_RETURN(cudaMemcpy(dprj[i], prj[i], sizeof(float) * totalPrjBytes, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(dimgWeg[i], weg[i], sizeof(float) * sliceReso, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemset(dcorImg[i], 0, sizeof(float) * totalVolBytes));
+		CUDA_CHECK_RETURN(cudaMemset(dcorPrj[i], 0, sizeof(float) * FanGeo.m_DetN * numPerSubSet  * sliceNum));
+		CUDA_CHECK_RETURN(cudaMemcpy(dmask[i], mask[i], sizeof(float) * sliceReso, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemset(dlas[i], 0, sizeof(float) * totalVolBytes));
 	}
 	thrust::device_ptr<float> pimg0(dimg[0]);
 	thrust::device_ptr<float> pimg1(dimg[1]);
@@ -2881,26 +2874,26 @@ void DEMO11()
 		}
 		t2 = (1 + sqrtf(1 + 4.0f * t1 * t1)) * 0.5f;
 
-		checkCudaErrors(cudaSetDevice(0));
-		checkCudaErrors(cudaMemset(dcorImg[0], 0, sizeof(float) * totalVolBytes));
-		checkCudaErrors(cudaMemcpy(dlas[0], dimg[0], sizeof(float) * totalVolBytes, cudaMemcpyDeviceToDevice));
+		CUDA_CHECK_RETURN(cudaSetDevice(0));
+		CUDA_CHECK_RETURN(cudaMemset(dcorImg[0], 0, sizeof(float) * totalVolBytes));
+		CUDA_CHECK_RETURN(cudaMemcpy(dlas[0], dimg[0], sizeof(float) * totalVolBytes, cudaMemcpyDeviceToDevice));
 		proj(dimg[0], dcorPrj[0], dprj[0], FanGeo, Img, numPerSubSet, subSetNum, cursubIdx, prjBlk, prjGid, sliceNum, streams[0]);
 		bakproj_PIXEL(dcorPrj[0], dcorImg[0], FanGeo, Img, numPerSubSet, subSetNum, cursubIdx, bakBlk, bakGid, sliceNum, streams[0]);
 		updateImg_demo11 << <updGid, updBlk, 0, streams[0] >> >(dimg[0], dcorImg[0], dimgWeg[0], dmask[0], curLambda * subSetNum, Img.m_Reso.x, Img.m_Reso.y, sliceNum);
 		thrust::transform(pimg0, pimg0 + totalVolBytes, plas0, pimg0, _FISTA_demo11<float>(t1, t2));
 
-		checkCudaErrors(cudaSetDevice(1));
-		checkCudaErrors(cudaMemset(dcorImg[1], 0, sizeof(float) *totalVolBytes));
-		checkCudaErrors(cudaMemcpy(dlas[1], dimg[1], sizeof(float) * totalVolBytes, cudaMemcpyDeviceToDevice));
+		CUDA_CHECK_RETURN(cudaSetDevice(1));
+		CUDA_CHECK_RETURN(cudaMemset(dcorImg[1], 0, sizeof(float) *totalVolBytes));
+		CUDA_CHECK_RETURN(cudaMemcpy(dlas[1], dimg[1], sizeof(float) * totalVolBytes, cudaMemcpyDeviceToDevice));
 		proj(dimg[1], dcorPrj[1], dprj[1], FanGeo, Img, numPerSubSet, subSetNum, cursubIdx, prjBlk, prjGid, sliceNum, streams[1]);
 		bakproj_PIXEL(dcorPrj[1], dcorImg[1], FanGeo, Img, numPerSubSet, subSetNum, cursubIdx, bakBlk, bakGid, sliceNum, streams[1]);
 		updateImg_demo11 << <updGid, updBlk, 0, streams[1] >> >(dimg[1], dcorImg[1], dimgWeg[1], dmask[1], curLambda * subSetNum, Img.m_Reso.x, Img.m_Reso.y, sliceNum);
 		thrust::transform(pimg1, pimg1 + totalVolBytes, plas1, pimg1, _FISTA_demo11<float>(t1, t2));
 
 
-		checkCudaErrors(cudaSetDevice(2));
-		checkCudaErrors(cudaMemset(dcorImg[2], 0, sizeof(float) * totalVolBytes));
-		checkCudaErrors(cudaMemcpy(dlas[2], dimg[2], sizeof(float) * totalVolBytes, cudaMemcpyDeviceToDevice));
+		CUDA_CHECK_RETURN(cudaSetDevice(2));
+		CUDA_CHECK_RETURN(cudaMemset(dcorImg[2], 0, sizeof(float) * totalVolBytes));
+		CUDA_CHECK_RETURN(cudaMemcpy(dlas[2], dimg[2], sizeof(float) * totalVolBytes, cudaMemcpyDeviceToDevice));
 		proj(dimg[2], dcorPrj[2], dprj[2], FanGeo, Img, numPerSubSet, subSetNum, cursubIdx, prjBlk, prjGid, sliceNum, streams[2]);
 		bakproj_PIXEL(dcorPrj[2], dcorImg[2], FanGeo, Img, numPerSubSet, subSetNum, cursubIdx, bakBlk, bakGid, sliceNum, streams[2]);
 		updateImg_demo11 << <updGid, updBlk, 0, streams[2] >> >(dimg[2], dcorImg[2], dimgWeg[2], dmask[2], curLambda * subSetNum, Img.m_Reso.x, Img.m_Reso.y, sliceNum);
@@ -2914,14 +2907,14 @@ void DEMO11()
 		cursubIdx = (cursubIdx + 1) % subSetNum;
 		++iters;
 	}
-	checkCudaErrors(cudaSetDevice(0));
-	checkCudaErrors(cudaMemcpy(totvol, dimg[0],
+	CUDA_CHECK_RETURN(cudaSetDevice(0));
+	CUDA_CHECK_RETURN(cudaMemcpy(totvol, dimg[0],
 		sizeof(float) * totalVolBytes, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaSetDevice(1));
-	checkCudaErrors(cudaMemcpy(totvol + totalVolBytes, dimg[1],
+	CUDA_CHECK_RETURN(cudaSetDevice(1));
+	CUDA_CHECK_RETURN(cudaMemcpy(totvol + totalVolBytes, dimg[1],
 		sizeof(float) * totalVolBytes, cudaMemcpyDeviceToHost));
-	checkCudaErrors(cudaSetDevice(2));
-	checkCudaErrors(cudaMemcpy(totvol + totalVolBytes * 2, dimg[2],
+	CUDA_CHECK_RETURN(cudaSetDevice(2));
+	CUDA_CHECK_RETURN(cudaMemcpy(totvol + totalVolBytes * 2, dimg[2],
 		sizeof(float) * totalVolBytes, cudaMemcpyDeviceToHost));
 
 	std::ofstream fou(FouName.c_str(), std::ios::binary);
@@ -2995,22 +2988,22 @@ void EM(float* hprj, float* himg, const FanEAGeo& FanGeo, const Image& Img, cuin
 	float* LAM;
 	cuint prjReso = FanGeo.m_DetN * FanGeo.m_ViwN;
 	cuint imgReso = Img.m_Reso.x * Img.m_Reso.y;
-	checkCudaErrors(cudaMalloc((void**) &dprj, sizeof(float) * prjReso));
-	checkCudaErrors(cudaMalloc((void**) &dimg, sizeof(float) * imgReso));
-	checkCudaErrors(cudaMalloc((void**) &dta, sizeof(float) * prjReso));
-	checkCudaErrors(cudaMalloc((void**) &dtb, sizeof(float) * imgReso));
-	checkCudaErrors(cudaMalloc((void**) &LAM, sizeof(float) * imgReso));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dprj, sizeof(float) * prjReso));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dimg, sizeof(float) * imgReso));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dta, sizeof(float) * prjReso));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dtb, sizeof(float) * imgReso));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &LAM, sizeof(float) * imgReso));
 	thrust::device_ptr<float> pprj(dprj);
 	thrust::device_ptr<float> pta(dta);
 	thrust::device_ptr<float> pimg(dimg);
 	thrust::device_ptr<float> ptb(dtb);
 	thrust::device_ptr<float> pLAM(LAM);
 
-	checkCudaErrors(cudaMemcpy(dprj, hprj, sizeof(float) * prjReso, cudaMemcpyHostToDevice));
-	/*checkCudaErrors(cudaMemset(dimg,1,sizeof(float) * imgReso));
-	checkCudaErrors(cudaMemset(dta,1,sizeof(float) * prjReso));
-	checkCudaErrors(cudaMemset(dtb,0,sizeof(float) * imgReso));
-	checkCudaErrors(cudaMemset(LAM,0,sizeof(float) * imgReso));*/
+	CUDA_CHECK_RETURN(cudaMemcpy(dprj, hprj, sizeof(float) * prjReso, cudaMemcpyHostToDevice));
+	/*CUDA_CHECK_RETURN(cudaMemset(dimg,1,sizeof(float) * imgReso));
+	CUDA_CHECK_RETURN(cudaMemset(dta,1,sizeof(float) * prjReso));
+	CUDA_CHECK_RETURN(cudaMemset(dtb,0,sizeof(float) * imgReso));
+	CUDA_CHECK_RETURN(cudaMemset(LAM,0,sizeof(float) * imgReso));*/
 
 	thrust::fill(pimg, pimg + imgReso, 1.0f);
 	thrust::fill(pta, pta + prjReso, 1.0f);
@@ -3045,7 +3038,7 @@ void EM(float* hprj, float* himg, const FanEAGeo& FanGeo, const Image& Img, cuin
 
 	}
 
-	checkCudaErrors(cudaMemcpy(himg, dimg, sizeof(float) * imgReso, cudaMemcpyDeviceToHost));
+	CUDA_CHECK_RETURN(cudaMemcpy(himg, dimg, sizeof(float) * imgReso, cudaMemcpyDeviceToHost));
 }
 
 
@@ -3248,23 +3241,23 @@ void DEMO15()
 
 		float* dimg;
 		float* dprj;
-		checkCudaErrors(cudaMalloc((void**) &dimg, imgReso));
-		checkCudaErrors(cudaMalloc((void**) &dprj, prjReso));
-		checkCudaErrors(cudaMemcpy(dimg, himg, sizeof(float) * imgReso, cudaMemcpyHostToDevice));
-		checkCudaErrors(cudaMemcpy(dprj, hprj, sizeof(float) * prjReso, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dimg, imgReso));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dprj, prjReso));
+		CUDA_CHECK_RETURN(cudaMemcpy(dimg, himg, sizeof(float) * imgReso, cudaMemcpyHostToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(dprj, hprj, sizeof(float) * prjReso, cudaMemcpyHostToDevice));
 
 		cudaEvent_t start, stop;
-		checkCudaErrors(cudaEventCreate(&start));
-		checkCudaErrors(cudaEventCreate(&stop));
-		checkCudaErrors(cudaEventRecord(start, 0));
+		CUDA_CHECK_RETURN(cudaEventCreate(&start));
+		CUDA_CHECK_RETURN(cudaEventCreate(&stop));
+		CUDA_CHECK_RETURN(cudaEventRecord(start, 0));
 		proj(dimg, dprj, FanGeo, Img, prjBlk, prjGid);
-		checkCudaErrors(cudaEventRecord(stop, 0));
-		checkCudaErrors(cudaEventSynchronize(stop));
+		CUDA_CHECK_RETURN(cudaEventRecord(stop, 0));
+		CUDA_CHECK_RETURN(cudaEventSynchronize(stop));
 		float elapsedTime;
-		checkCudaErrors(cudaEventElapsedTime(&elapsedTime, start, stop));
+		CUDA_CHECK_RETURN(cudaEventElapsedTime(&elapsedTime, start, stop));
 		tims[imgLReso - 128] = elapsedTime;
 
-		checkCudaErrors(cudaMemcpy(hprj, dprj, sizeof(float) * prjReso, cudaMemcpyDeviceToHost));
+		CUDA_CHECK_RETURN(cudaMemcpy(hprj, dprj, sizeof(float) * prjReso, cudaMemcpyDeviceToHost));
 		std::stringstream ss;
 		ss << imgReso;
 		std::string FileName = "From" + ss.str() + "image.raw";
@@ -3274,8 +3267,8 @@ void DEMO15()
 
 		delete []himg;
 
-		checkCudaErrors(cudaFree(dimg));
-		checkCudaErrors(cudaFree(dprj));
+		CUDA_CHECK_RETURN(cudaFree(dimg));
+		CUDA_CHECK_RETURN(cudaFree(dprj));
 
 
 
@@ -3438,24 +3431,24 @@ void DEMO16()
 	cudaStream_t streams[3];
 	for (i = 0; i < 3; i++)
 	{
-		checkCudaErrors(cudaSetDevice(i));
-		checkCudaErrors(cudaStreamCreate(&streams[i]));
+		CUDA_CHECK_RETURN(cudaSetDevice(i));
+		CUDA_CHECK_RETURN(cudaStreamCreate(&streams[i]));
 
-		checkCudaErrors(cudaMalloc((void**) &dimg[i], sizeof(DataType) * imgReso * sliceNum));
-		checkCudaErrors(cudaMalloc((void**) &dprj[i], sizeof(DataType) * prjReso * sliceNum));
-		checkCudaErrors(cudaMalloc((void**) &dimgWeg[i], sizeof(DataType) * imgReso));
-		checkCudaErrors(cudaMalloc((void**) &dcorImg[i], sizeof(DataType) * imgReso * sliceNum));
-		checkCudaErrors(cudaMalloc((void**) &dcorPrj[i], sizeof(DataType) * prjReso * sliceNum));
-		checkCudaErrors(cudaMalloc((void**) &dmask[i], sizeof(DataType) * imgReso));
-		checkCudaErrors(cudaMalloc((void**) &dlas[i], sizeof(DataType) * imgReso * sliceNum));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dimg[i], sizeof(DataType) * imgReso * sliceNum));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dprj[i], sizeof(DataType) * prjReso * sliceNum));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dimgWeg[i], sizeof(DataType) * imgReso));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dcorImg[i], sizeof(DataType) * imgReso * sliceNum));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dcorPrj[i], sizeof(DataType) * prjReso * sliceNum));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dmask[i], sizeof(DataType) * imgReso));
+		CUDA_CHECK_RETURN(cudaMalloc((void**) &dlas[i], sizeof(DataType) * imgReso * sliceNum));
 
-		checkCudaErrors(cudaMemsetAsync(dimg[i], 0, sizeof(DataType) * imgReso * sliceNum, streams[i]));
-		checkCudaErrors(cudaMemcpyAsync(dprj[i], prj[i], sizeof(DataType) * prjReso * sliceNum, cudaMemcpyHostToDevice, streams[i]));
-		checkCudaErrors(cudaMemcpyAsync(dimgWeg[i], weg[i], sizeof(DataType) * imgReso, cudaMemcpyHostToDevice, streams[i]));
-		checkCudaErrors(cudaMemsetAsync(dcorImg[i], 0, sizeof(DataType) * imgReso * sliceNum, streams[i]));
-		checkCudaErrors(cudaMemsetAsync(dcorPrj[i], 0, sizeof(DataType) * FanGeo.m_DetN * numPerSubSet  * sliceNum, streams[i]));
-		checkCudaErrors(cudaMemcpyAsync(dmask[i], mask[i], sizeof(DataType) * imgReso, cudaMemcpyHostToDevice, streams[i]));
-		checkCudaErrors(cudaMemsetAsync(dlas[i], 0, sizeof(DataType) * imgReso * sliceNum, streams[i]));
+		CUDA_CHECK_RETURN(cudaMemsetAsync(dimg[i], 0, sizeof(DataType) * imgReso * sliceNum, streams[i]));
+		CUDA_CHECK_RETURN(cudaMemcpyAsync(dprj[i], prj[i], sizeof(DataType) * prjReso * sliceNum, cudaMemcpyHostToDevice, streams[i]));
+		CUDA_CHECK_RETURN(cudaMemcpyAsync(dimgWeg[i], weg[i], sizeof(DataType) * imgReso, cudaMemcpyHostToDevice, streams[i]));
+		CUDA_CHECK_RETURN(cudaMemsetAsync(dcorImg[i], 0, sizeof(DataType) * imgReso * sliceNum, streams[i]));
+		CUDA_CHECK_RETURN(cudaMemsetAsync(dcorPrj[i], 0, sizeof(DataType) * FanGeo.m_DetN * numPerSubSet  * sliceNum, streams[i]));
+		CUDA_CHECK_RETURN(cudaMemcpyAsync(dmask[i], mask[i], sizeof(DataType) * imgReso, cudaMemcpyHostToDevice, streams[i]));
+		CUDA_CHECK_RETURN(cudaMemsetAsync(dlas[i], 0, sizeof(DataType) * imgReso * sliceNum, streams[i]));
 	}
 	std::cout << "Begin DEMO16 5 \n";
 	thrust::device_ptr<DataType> pimg0(dimg[0]);
@@ -3477,19 +3470,19 @@ void DEMO16()
 	while (iters != realIter)
 	{
 		t2 = (1.0 + sqrt(1.0 + 4.0 * t1 * t1)) * 0.5;
-		checkCudaErrors(cudaSetDevice(0));
-		checkCudaErrors(cudaMemset(dcorImg[0], 0, sizeof(DataType) *imgReso * sliceNum));
-		checkCudaErrors(cudaMemcpy(dlas[0], dimg[0], sizeof(DataType) * imgReso * sliceNum, cudaMemcpyDeviceToDevice));
+		CUDA_CHECK_RETURN(cudaSetDevice(0));
+		CUDA_CHECK_RETURN(cudaMemset(dcorImg[0], 0, sizeof(DataType) *imgReso * sliceNum));
+		CUDA_CHECK_RETURN(cudaMemcpy(dlas[0], dimg[0], sizeof(DataType) * imgReso * sliceNum, cudaMemcpyDeviceToDevice));
 		//plas0 = pimg0;
 		proj_AIM(dimg[0], dcorPrj[0], dprj[0], FanGeo, Img, numPerSubSet, subSetNum, curSubSetIdx, prjBlk, prjGid, sliceNum, streams[0]);
 		bakproj_AIM(dcorPrj[0], dimg[0], FanGeo, Img, numPerSubSet, subSetNum, curSubSetIdx, bakBlk, bakGid, sliceNum, streams[0]);
 		updateImg<DataType> << <updGid, updBlk, 0, streams[0] >> >(dimg[0], dcorImg[0], dimgWeg[0], dmask[0], lambda, Img.m_Reso.x, Img.m_Reso.y, sliceNum);
 		thrust::transform(pimg0, pimg0 + imgReso * sliceNum, plas0, pimg0, FISTA_functor<DataType>(t1, t2));
 
-		checkCudaErrors(cudaSetDevice(1));
-		checkCudaErrors(cudaMemset(dcorImg[1], 0, sizeof(DataType) *imgReso * sliceNum));
+		CUDA_CHECK_RETURN(cudaSetDevice(1));
+		CUDA_CHECK_RETURN(cudaMemset(dcorImg[1], 0, sizeof(DataType) *imgReso * sliceNum));
 		//thrust::fill(pcorImg1, pcorImg1 + imgReso * sliceNum, 0.0);
-		checkCudaErrors(cudaMemcpy(dlas[1], dimg[1], sizeof(DataType) * imgReso * sliceNum, cudaMemcpyDeviceToDevice));
+		CUDA_CHECK_RETURN(cudaMemcpy(dlas[1], dimg[1], sizeof(DataType) * imgReso * sliceNum, cudaMemcpyDeviceToDevice));
 		plas1 = pimg1;
 		proj_AIM(dimg[1], dcorPrj[1], dprj[1], FanGeo, Img, numPerSubSet, subSetNum, curSubSetIdx, prjBlk, prjGid, sliceNum, streams[1]);
 		bakproj_AIM(dcorPrj[1], dimg[1], FanGeo, Img, numPerSubSet, subSetNum, curSubSetIdx, bakBlk, bakGid, sliceNum, streams[1]);
@@ -3497,27 +3490,27 @@ void DEMO16()
 		thrust::transform(pimg1, pimg1 + imgReso * sliceNum, plas1, pimg1, FISTA_functor<DataType>(t1, t2));
 
 
-		checkCudaErrors(cudaSetDevice(2));
-		checkCudaErrors(cudaMemset(dcorImg[2], 0, sizeof(DataType) *imgReso * sliceNum));
-		checkCudaErrors(cudaMemcpy(dlas[2], dimg[2], sizeof(DataType) * imgReso * sliceNum, cudaMemcpyDeviceToDevice));
+		CUDA_CHECK_RETURN(cudaSetDevice(2));
+		CUDA_CHECK_RETURN(cudaMemset(dcorImg[2], 0, sizeof(DataType) *imgReso * sliceNum));
+		CUDA_CHECK_RETURN(cudaMemcpy(dlas[2], dimg[2], sizeof(DataType) * imgReso * sliceNum, cudaMemcpyDeviceToDevice));
 		//plas2 = pimg2;
 		proj_AIM(dimg[2], dcorPrj[2], dprj[2], FanGeo, Img, numPerSubSet, subSetNum, curSubSetIdx, prjBlk, prjGid, sliceNum, streams[2]);
 		bakproj_AIM(dcorPrj[2], dimg[2], FanGeo, Img, numPerSubSet, subSetNum, curSubSetIdx, bakBlk, bakGid, sliceNum, streams[2]);
 		updateImg<DataType> << <updGid, updBlk, 0, streams[2] >> >(dimg[2], dcorImg[2], dimgWeg[2], dmask[2], lambda, Img.m_Reso.x, Img.m_Reso.y, sliceNum);
 		thrust::transform(pimg2, pimg2 + imgReso * sliceNum, plas2, pimg2, FISTA_functor<DataType>(t1, t2));
 
-		checkCudaErrors(cudaDeviceSynchronize());
+		CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 		t1 = t2;
 		std::cout << "Iters: " << iters << std::endl;
 		curSubSetIdx = (curSubSetIdx + 1) % subSetNum; // 
 		++iters;
 	}
 
-	checkCudaErrors(cudaMemcpyAsync(totVol, dimg[0],
+	CUDA_CHECK_RETURN(cudaMemcpyAsync(totVol, dimg[0],
 		sizeof(DataType) * Img.m_Reso.x * Img.m_Reso.y * sliceNum, cudaMemcpyDeviceToHost, streams[0]));
-	checkCudaErrors(cudaMemcpyAsync(totVol + (Img.m_Reso.x * Img.m_Reso.y * sliceNum), dimg[1],
+	CUDA_CHECK_RETURN(cudaMemcpyAsync(totVol + (Img.m_Reso.x * Img.m_Reso.y * sliceNum), dimg[1],
 		sizeof(DataType) * Img.m_Reso.x * Img.m_Reso.y * sliceNum, cudaMemcpyDeviceToHost, streams[1]));
-	checkCudaErrors(cudaMemcpyAsync(totVol + (Img.m_Reso.x * Img.m_Reso.y * sliceNum) + (Img.m_Reso.x * Img.m_Reso.y * sliceNum), dimg[2],
+	CUDA_CHECK_RETURN(cudaMemcpyAsync(totVol + (Img.m_Reso.x * Img.m_Reso.y * sliceNum) + (Img.m_Reso.x * Img.m_Reso.y * sliceNum), dimg[2],
 		sizeof(DataType) * Img.m_Reso.x * Img.m_Reso.y * sliceNum, cudaMemcpyDeviceToHost, streams[2]));
 
 	std::cout << "Begin DEMO16 7 \n";
@@ -3532,7 +3525,7 @@ void DEMO16()
 
 void DEMO17()
 {
-	checkCudaErrors(cudaSetDevice(0));
+	CUDA_CHECK_RETURN(cudaSetDevice(0));
 	/// Statistical Iterative Reconstruction OS-SART ÖØ¹¹;
 	ConeEDGeo ConeGeo(167.80, 93.91, 720, 0.0f, 6.2744586609196148290406615555556, make_float2(50.6, 50.6), make_int2(1012, 1012));
 	ConeGeo.m_DetCntIdx.x = ConeGeo.m_DetN.x * 0.5 + 63.4;
@@ -3555,11 +3548,11 @@ void DEMO17()
 	}
 	fid.read((char*) hprj, sizeof(float) * prjReso);
 
-	checkCudaErrors(cudaSetDevice(2));
+	CUDA_CHECK_RETURN(cudaSetDevice(2));
 	float* dprj;
-	checkCudaErrors(cudaMalloc((void**) &dprj, sizeof(float) * prjReso));
-	checkCudaErrors(cudaMemcpy(dprj, hprj, sizeof(float)*prjReso, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaSetDevice(0));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dprj, sizeof(float) * prjReso));
+	CUDA_CHECK_RETURN(cudaMemcpy(dprj, hprj, sizeof(float)*prjReso, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaSetDevice(0));
 
 
 
@@ -3602,7 +3595,7 @@ void DEMO17()
 		for (unsigned int i = 0; i != ConeGeo.m_ViwN; ++i)
 		{
 			back_proj_DEMO17(palloneproj, pbakLambda, ConeGeo, Vol, i, volBlk, volGid);
-			checkCudaErrors(cudaDeviceSynchronize());
+			CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 			std::cout << i << std::endl;
 		}
 		hv = dbakLambda;
@@ -3717,7 +3710,7 @@ void DEMO17()
 			{
 				angIdx = subsetIdx + subangIdx *subSetNum;
 				//cudaMemcpy(prawproj, hprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyHostToDevice);
-				checkCudaErrors(cudaMemcpy(prawproj, dprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyDeviceToDevice));
+				CUDA_CHECK_RETURN(cudaMemcpy(prawproj, dprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyDeviceToDevice));
 				proj_DEMO17(pvolume, pweightedproj, prawproj, ConeGeo, Vol, angIdx, prjBlk, prjGid);
 				//projection;
 				//bakprojection
@@ -3757,7 +3750,7 @@ void DEMO17(
 	const std::vector<int>& subsetNumberSeries,
 	const int iterNum)
 {
-	checkCudaErrors(cudaSetDevice(0));
+	CUDA_CHECK_RETURN(cudaSetDevice(0));
 	/// Statistical Iterative Reconstruction OS-SART ÖØ¹¹;
 
 	cuint volReso = Vol.m_Reso.x * Vol.m_Reso.y * Vol.m_Reso.z;
@@ -3776,11 +3769,11 @@ void DEMO17(
 	}
 	fid.read((char*) hprj, sizeof(float) * prjReso);
 
-	checkCudaErrors(cudaSetDevice(2));
+	CUDA_CHECK_RETURN(cudaSetDevice(2));
 	float* dprj;
-	checkCudaErrors(cudaMalloc((void**) &dprj, sizeof(float) * prjReso));
-	checkCudaErrors(cudaMemcpy(dprj, hprj, sizeof(float)*prjReso, cudaMemcpyHostToDevice));
-	checkCudaErrors(cudaSetDevice(0));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &dprj, sizeof(float) * prjReso));
+	CUDA_CHECK_RETURN(cudaMemcpy(dprj, hprj, sizeof(float)*prjReso, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaSetDevice(0));
 
 
 
@@ -3826,7 +3819,7 @@ void DEMO17(
 		for (unsigned int i = 0; i != ConeGeo.m_ViwN; ++i)
 		{
 			back_proj_DEMO17(palloneproj, pbakLambda, ConeGeo, Vol, i, volBlk, volGid);
-			checkCudaErrors(cudaDeviceSynchronize());
+			CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 			std::cout << i << std::endl;
 		}
 		hv = dbakLambda;
@@ -3901,7 +3894,7 @@ void DEMO17(
 			{
 				angIdx = subsetIdx + subangIdx *subSetNum;
 				//cudaMemcpy(prawproj, hprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyHostToDevice);
-				checkCudaErrors(cudaMemcpy(prawproj, dprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyDeviceToDevice));
+				CUDA_CHECK_RETURN(cudaMemcpy(prawproj, dprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyDeviceToDevice));
 				proj_DEMO17(pvolume, pweightedproj, prawproj, ConeGeo, Vol, angIdx, prjBlk, prjGid);
 				//projection;
 				//bakprojection
@@ -3934,7 +3927,7 @@ void DEMO17(
 
 void DEMO18()
 {
-	checkCudaErrors(cudaSetDevice(2));
+	CUDA_CHECK_RETURN(cudaSetDevice(2));
 	/// Statistical Iterative Reconstruction OS-SART ÖØ¹¹;
 	ConeEDGeo ConeGeo(167.80, 93.91, 400, 0.0f, 3.4906585039886591538473777777778, make_float2(50.6, 50.6), make_int2(1012, 1012));
 	ConeGeo.m_DetCntIdx.x = ConeGeo.m_DetN.x * 0.5 + 65.4;
@@ -3997,7 +3990,7 @@ void DEMO18()
 		for (unsigned int i = 0; i != ConeGeo.m_ViwN; ++i)
 		{
 			back_proj_DEMO17(palloneproj, pbakLambda, ConeGeo, Vol, i, volBlk, volGid);
-			checkCudaErrors(cudaDeviceSynchronize());
+			CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 			std::cout << i << std::endl;
 		}
 		hv = dbakLambda;
@@ -4111,7 +4104,7 @@ void DEMO18()
 			for (subangIdx = 0; subangIdx != numPerSubSet; ++subangIdx)
 			{
 				angIdx = subsetIdx + subangIdx *subSetNum;
-				checkCudaErrors(cudaMemcpy(prawproj, hprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyHostToDevice));
+				CUDA_CHECK_RETURN(cudaMemcpy(prawproj, hprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyHostToDevice));
 				//cudaMemcpy(prawproj, dprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyDeviceToDevice);
 				proj_DEMO17(pvolume, pweightedproj, prawproj, ConeGeo, Vol, angIdx, prjBlk, prjGid);
 				//bakprojection
@@ -4151,7 +4144,7 @@ void DEMO18(
 	const std::vector < int >& subSetNumSeries,
 	const int iterNum)
 {
-	checkCudaErrors(cudaSetDevice(0));
+	CUDA_CHECK_RETURN(cudaSetDevice(0));
 	/// Statistical Iterative Reconstruction OS-SART ÖØ¹¹;
 
 	cuint volReso = Vol.m_Reso.x * Vol.m_Reso.y * Vol.m_Reso.z;
@@ -4210,7 +4203,7 @@ void DEMO18(
 		for (unsigned int i = 0; i != ConeGeo.m_ViwN; ++i)
 		{
 			back_proj_DEMO17(palloneproj, pbakLambda, ConeGeo, Vol, i, volBlk, volGid);
-			checkCudaErrors(cudaDeviceSynchronize());
+			CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 			std::cout << i << std::endl;
 		}
 		hv = dbakLambda;
@@ -4270,7 +4263,7 @@ void DEMO18(
 			for (subangIdx = 0; subangIdx != numPerSubSet; ++subangIdx)
 			{
 				angIdx = subsetIdx + subangIdx *subSetNum;
-				checkCudaErrors(cudaMemcpy(prawproj, hprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyHostToDevice));
+				CUDA_CHECK_RETURN(cudaMemcpy(prawproj, hprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyHostToDevice));
 				//cudaMemcpy(prawproj, dprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyDeviceToDevice);
 				proj_DEMO17(pvolume, pweightedproj, prawproj, ConeGeo, Vol, angIdx, prjBlk, prjGid);
 				//bakprojection
@@ -4303,7 +4296,7 @@ void DEMO18(
 void DEMO18v2()
 {
 
-	checkCudaErrors(cudaSetDevice(0));
+	CUDA_CHECK_RETURN(cudaSetDevice(0));
 	/// Statistical Iterative Reconstruction OS-SART ÖØ¹¹;
 	ConeEDGeo ConeGeo(167.80, 93.91, 400, 0.0f, 3.4906585039886591538473777777778, make_float2(50.6, 50.6), make_int2(2024, 2024));
 	ConeGeo.m_DetCntIdx.x = ConeGeo.m_DetN.x * 0.5 + 65.4 * 2;
@@ -4373,7 +4366,7 @@ void DEMO18v2()
 		for (unsigned int i = 0; i != ConeGeo.m_ViwN; ++i)
 		{
 			back_proj_DEMO17(palloneproj, pbakLambda, ConeGeo, Vol, i, volBlk, volGid);
-			checkCudaErrors(cudaDeviceSynchronize());
+			CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 			std::cout << i << std::endl;
 		}
 		hv = dbakLambda;
@@ -4487,7 +4480,7 @@ void DEMO18v2()
 			for (subangIdx = 0; subangIdx != numPerSubSet; ++subangIdx)
 			{
 				angIdx = subsetIdx + subangIdx *subSetNum;
-				checkCudaErrors(cudaMemcpy(prawproj, hprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyHostToDevice));
+				CUDA_CHECK_RETURN(cudaMemcpy(prawproj, hprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyHostToDevice));
 				//cudaMemcpy(prawproj, dprj + angIdx *projR, sizeof(float) * projR, cudaMemcpyDeviceToDevice);
 				proj_DEMO17(pvolume, pweightedproj, prawproj, ConeGeo, Vol, angIdx, prjBlk, prjGid);
 				//bakprojection

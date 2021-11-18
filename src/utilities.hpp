@@ -89,11 +89,8 @@
 // Usually, for safety, we will use checkCudaErrors or CUDA_CHECK_RETURN before "cuda" API functions
 #if DEBUG
 #define CUDA_CHECK_RETURN(value) { cudaError_t _m_cudaStat = value; if(_m_cudaStat != cudaSuccess){fprintf(stderr, "Error %s at line %d in file %s\n", cudaGetErrorString(_m_cudaStat), __LINE__, __FILE__); exit(1);}}
-#define checkCudaErrors(value) { cudaError_t _m_cudaStat = value; if(_m_cudaStat != cudaSuccess){fprintf(stderr, "Error %s at line %d in file %s\n", cudaGetErrorString(_m_cudaStat), __LINE__, __FILE__); exit(1);}}
 #else
 #define CUDA_CHECK_RETURN(value) {value;}
-#define CUDA_SAFE_CALL(value) {value;}
-#define checkCudaErrors(value) {value;}
 #endif
 
 
@@ -4048,7 +4045,15 @@ void DD3Boundaries(int nrBoundaries, T*pCenters, T *pBoundaries)
 		*pBoundaries = *pCenters - 0.5;
 		*(pBoundaries + 1) = *pCenters + 0.5;
 	}
+}
 
+template<typename T>
+std::vector<T> getDD3Boundaries(int nCenters, T* pCenters) {
+	std::vector<T> res(nCenters + 1, 0);
+	T* pBoundaries = &(res[0]);
+	int nrBoundaries = nCenters + 1;
+	DD3Boundaries(nrBoundaries, pCenters, pBoundaries);
+	return res;
 }
 
 
@@ -4064,7 +4069,26 @@ void DD3Boundaries(int nrBoundaries, thrust::host_vector<T>& Centers, thrust::ho
 	DD3Boundaries<T>(nrBoundaries, &Centers[0], &Boundaries[0]);
 }
 
-
+template<typename T>
+std::vector<T> getDD3Boundaries(const std::vector<T>& centers) {
+	typename std::vector<T>::iterator pCenters = centers.begin();
+	std::vector<T> boundaries(centers.size() + 1, 0);
+	typename std::vector<T>::iterator pBoundaries = boundaries.begin();
+	int i;
+	if (boundaries.size() >= 3) {
+		*pBoundaries++ = 1.5 * *pCenters - 0.5 * *(pCenters + 1);
+		for (i = 1; i <= (centers.size() - 1); i++) {
+			*pBoundaries++ = 0.5 * *pCenters + 0.5 * *(pCenters + 1);
+			pCenters++;
+		}
+		*pBoundaries = 1.5 * *pCenters - 0.5 * *(pCenters - 1);
+	}
+	else {
+		*pBoundaries = *pCenters - 0.5;
+		*(pBoundaries + 1) = *pCenters + 0.5;
+	}
+	return boundaries;
+}
 
 
 

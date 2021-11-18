@@ -107,8 +107,8 @@ void HouseHolder_v2(thrust::device_vector<float>& B, const int m, const int n)
 	float summ(0);	float len(0); float tempV(0); float alpha(0); float gamma(0);
 	const float ONE = 1.0;
 	const float ZERO = 0.0;
-	checkCudaErrors(cudaSetDevice(0));
-	checkCudaErrors(cudaStreamCreate(&streams[0]));
+	CUDA_CHECK_RETURN(cudaSetDevice(0));
+	CUDA_CHECK_RETURN(cudaStreamCreate(&streams[0]));
 	cublasHandle_t cublashandle;
 	cublasCreate(&cublashandle);
 	thrust::device_vector<float> hvec(m, 0);
@@ -116,8 +116,8 @@ void HouseHolder_v2(thrust::device_vector<float>& B, const int m, const int n)
 
 
 
-	checkCudaErrors(cudaSetDevice(1)); //Used to update Left part
-	checkCudaErrors(cudaStreamCreate(&streams[1]));
+	CUDA_CHECK_RETURN(cudaSetDevice(1)); //Used to update Left part
+	CUDA_CHECK_RETURN(cudaStreamCreate(&streams[1]));
 	thrust::device_vector<float> hvec1(m, 0);
 	thrust::device_vector<float> Uhvec1(m, 0);
 	thrust::device_vector<float> U(m*m, 0);
@@ -130,8 +130,8 @@ void HouseHolder_v2(thrust::device_vector<float>& B, const int m, const int n)
 
 
 
-	checkCudaErrors(cudaSetDevice(2)); //Used to update right part
-	checkCudaErrors(cudaStreamCreate(&streams[2]));
+	CUDA_CHECK_RETURN(cudaSetDevice(2)); //Used to update right part
+	CUDA_CHECK_RETURN(cudaStreamCreate(&streams[2]));
 	thrust::device_vector<float> lvec2(n, 0);
 	thrust::device_vector<float> Vlvec2(n, 0);
 	thrust::device_vector<float> V(n * n, 0);
@@ -161,7 +161,7 @@ void HouseHolder_v2(thrust::device_vector<float>& B, const int m, const int n)
 	for (size_t k = 0; k < n; k++)
 	{
 		std::cout << k << std::endl;
-		checkCudaErrors(cudaSetDevice(0));
+		CUDA_CHECK_RETURN(cudaSetDevice(0));
 		//Copy Vector;
 		summ = 0;
 		for (size_t i = 0; i < m - k; i++)
@@ -177,14 +177,14 @@ void HouseHolder_v2(thrust::device_vector<float>& B, const int m, const int n)
 		for (size_t jj = k + 1; jj < m; jj++){ hvec[jj] = B[k * m + jj] / (2.0 * gamma); }
 
 		// Update U
-		checkCudaErrors(cudaSetDevice(1));
+		CUDA_CHECK_RETURN(cudaSetDevice(1));
 		hvec1 = hvec;
 		//Calculate U
 		cublasSgemv(cublashandle1, CUBLAS_OP_N, m, m, &ONE, thrust::raw_pointer_cast(&U[0]), m, thrust::raw_pointer_cast(&hvec1[0]), 1, &ZERO, thrust::raw_pointer_cast(&Uhvec1[0]), 1);
 		updateU<float> << <mgid, mblk, 0, streams[1] >> >(thrust::raw_pointer_cast(&U[0]), thrust::raw_pointer_cast(&Uhvec1[0]), thrust::raw_pointer_cast(&hvec1[0]), m);
 
 		// Calculate A' * hvec;
-		checkCudaErrors(cudaSetDevice(0));
+		CUDA_CHECK_RETURN(cudaSetDevice(0));
 		cublasSgemv(cublashandle, CUBLAS_OP_T, m, n, &ONE, thrust::raw_pointer_cast(&B[0]), m, thrust::raw_pointer_cast(&hvec[0]), 1, &ZERO, thrust::raw_pointer_cast(&lvec[0]), 1);
 		calculateQB<float> << <gid, blk, 0, streams[0] >> >(thrust::raw_pointer_cast(&B[0]), thrust::raw_pointer_cast(&hvec[0]), thrust::raw_pointer_cast(&lvec[0]), m, n);
 
@@ -192,7 +192,7 @@ void HouseHolder_v2(thrust::device_vector<float>& B, const int m, const int n)
 		// Update U in another device
 		if (k < n - 2)
 		{
-			checkCudaErrors(cudaSetDevice(0));
+			CUDA_CHECK_RETURN(cudaSetDevice(0));
 			summ = 0;
 			for (size_t i = 0; i != (n - 1 - k); ++i){ summ += B[(k + 1 + i) * m + k] * B[(k + 1 + i) * m + k]; }
 			len = std::sqrt(summ);
@@ -204,36 +204,36 @@ void HouseHolder_v2(thrust::device_vector<float>& B, const int m, const int n)
 			lvec[k + 1] = (B[(k + 1) * m + k] - alpha) / (2.0f * gamma);
 			for (size_t jj = k + 2; jj < n; jj++){ lvec[jj] = B[jj * m + k] / (2.0f * gamma); }
 
-			checkCudaErrors(cudaSetDevice(2));
+			CUDA_CHECK_RETURN(cudaSetDevice(2));
 			lvec2 = lvec;
 			// Calculate V
 			cublasSgemv(cublashandle2, CUBLAS_OP_N, n, n, &ONE, thrust::raw_pointer_cast(&V[0]), n, thrust::raw_pointer_cast(&lvec2[0]), 1, &ZERO, thrust::raw_pointer_cast(&Vlvec2[0]), 1);
 			updateV<float> << <ngid, nblk, 0, streams[2] >> >(thrust::raw_pointer_cast(&V[0]), thrust::raw_pointer_cast(&Vlvec2[0]), thrust::raw_pointer_cast(&lvec2[0]), n);
 
 			// Calculate B * P
-			checkCudaErrors(cudaSetDevice(0));
+			CUDA_CHECK_RETURN(cudaSetDevice(0));
 			cublasSgemv(cublashandle, CUBLAS_OP_N, m, n, &ONE, thrust::raw_pointer_cast(&B[0]), m, thrust::raw_pointer_cast(&lvec[0]), 1, &ZERO, thrust::raw_pointer_cast(&hvec[0]), 1);
 			calculateBP<float> << <gid, blk, 0, streams[0] >> >(thrust::raw_pointer_cast(&B[0]), thrust::raw_pointer_cast(&lvec[0]), thrust::raw_pointer_cast(&hvec[0]), m, n);
 
 		}
-		checkCudaErrors(cudaDeviceSynchronize());
+		CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 	}
 
-	checkCudaErrors(cudaSetDevice(0)); //Used to update Left part
-	checkCudaErrors(cudaStreamDestroy(streams[0]));
+	CUDA_CHECK_RETURN(cudaSetDevice(0)); //Used to update Left part
+	CUDA_CHECK_RETURN(cudaStreamDestroy(streams[0]));
 	hvec.clear();
 	lvec.clear();
 	cublasDestroy(cublashandle);
 
-	checkCudaErrors(cudaSetDevice(1)); //Used to update U
-	checkCudaErrors(cudaStreamDestroy(streams[1]));
+	CUDA_CHECK_RETURN(cudaSetDevice(1)); //Used to update U
+	CUDA_CHECK_RETURN(cudaStreamDestroy(streams[1]));
 	hvec1.clear();
 	Uhvec1.clear();
 	U.clear();
 	cublasDestroy(cublashandle1);
 
-	checkCudaErrors(cudaSetDevice(2)); //Used to update V
-	checkCudaErrors(cudaStreamDestroy(streams[2]));
+	CUDA_CHECK_RETURN(cudaSetDevice(2)); //Used to update V
+	CUDA_CHECK_RETURN(cudaStreamDestroy(streams[2]));
 	lvec2.clear();
 	Vlvec2.clear();
 	V.clear();
@@ -246,8 +246,8 @@ void HouseHolder_v2(thrust::device_vector<double>& B, const int m, const int n)
 	double summ(0);	double len(0); double tempV(0); double alpha(0); double gamma(0);
 	const double ONE = 1.0;
 	const double ZERO = 0.0;
-	checkCudaErrors(cudaSetDevice(0));
-	checkCudaErrors(cudaStreamCreate(&streams[0]));
+	CUDA_CHECK_RETURN(cudaSetDevice(0));
+	CUDA_CHECK_RETURN(cudaStreamCreate(&streams[0]));
 	cublasHandle_t cublashandle;
 	cublasCreate(&cublashandle);
 	thrust::device_vector<double> hvec(m, 0);
@@ -255,8 +255,8 @@ void HouseHolder_v2(thrust::device_vector<double>& B, const int m, const int n)
 
 
 
-	checkCudaErrors(cudaSetDevice(1)); //Used to update Left part
-	checkCudaErrors(cudaStreamCreate(&streams[1]));
+	CUDA_CHECK_RETURN(cudaSetDevice(1)); //Used to update Left part
+	CUDA_CHECK_RETURN(cudaStreamCreate(&streams[1]));
 	thrust::device_vector<double> hvec1(m, 0);
 	thrust::device_vector<double> Uhvec1(m, 0);
 	thrust::device_vector<double> U(m*m, 0);
@@ -269,8 +269,8 @@ void HouseHolder_v2(thrust::device_vector<double>& B, const int m, const int n)
 
 
 
-	checkCudaErrors(cudaSetDevice(2)); //Used to update right part
-	checkCudaErrors(cudaStreamCreate(&streams[2]));
+	CUDA_CHECK_RETURN(cudaSetDevice(2)); //Used to update right part
+	CUDA_CHECK_RETURN(cudaStreamCreate(&streams[2]));
 	thrust::device_vector<double> lvec2(n, 0);
 	thrust::device_vector<double> Vlvec2(n, 0);
 	thrust::device_vector<double> V(n * n, 0);
@@ -300,7 +300,7 @@ void HouseHolder_v2(thrust::device_vector<double>& B, const int m, const int n)
 	for (size_t k = 0; k < n; k++)
 	{
 		std::cout << k << std::endl;
-		checkCudaErrors(cudaSetDevice(0));
+		CUDA_CHECK_RETURN(cudaSetDevice(0));
 		//Copy Vector;
 		summ = 0;
 		for (size_t i = 0; i < m - k; i++)
@@ -316,14 +316,14 @@ void HouseHolder_v2(thrust::device_vector<double>& B, const int m, const int n)
 		for (size_t jj = k + 1; jj < m; jj++){ hvec[jj] = B[k * m + jj] / (2.0 * gamma); }
 
 		// Update U
-		checkCudaErrors(cudaSetDevice(1));
+		CUDA_CHECK_RETURN(cudaSetDevice(1));
 		hvec1 = hvec;
 		//Calculate U
 		cublasDgemv(cublashandle1, CUBLAS_OP_N, m, m, &ONE, thrust::raw_pointer_cast(&U[0]), m, thrust::raw_pointer_cast(&hvec1[0]), 1, &ZERO, thrust::raw_pointer_cast(&Uhvec1[0]), 1);
 		updateU<double> << <mgid, mblk, 0, streams[1] >> >(thrust::raw_pointer_cast(&U[0]), thrust::raw_pointer_cast(&Uhvec1[0]), thrust::raw_pointer_cast(&hvec1[0]), m);
 
 		// Calculate A' * hvec;
-		checkCudaErrors(cudaSetDevice(0));
+		CUDA_CHECK_RETURN(cudaSetDevice(0));
 		cublasDgemv(cublashandle, CUBLAS_OP_T, m, n, &ONE, thrust::raw_pointer_cast(&B[0]), m, thrust::raw_pointer_cast(&hvec[0]), 1, &ZERO, thrust::raw_pointer_cast(&lvec[0]), 1);
 		calculateQB<double> << <gid, blk, 0, streams[0] >> >(thrust::raw_pointer_cast(&B[0]), thrust::raw_pointer_cast(&hvec[0]), thrust::raw_pointer_cast(&lvec[0]), m, n);
 
@@ -331,7 +331,7 @@ void HouseHolder_v2(thrust::device_vector<double>& B, const int m, const int n)
 		// Update U in another device
 		if (k < n - 2)
 		{
-			checkCudaErrors(cudaSetDevice(0));
+			CUDA_CHECK_RETURN(cudaSetDevice(0));
 			summ = 0;
 			for (size_t i = 0; i != (n - 1 - k); ++i){ summ += B[(k + 1 + i) * m + k] * B[(k + 1 + i) * m + k]; }
 			len = std::sqrt(summ);
@@ -343,36 +343,36 @@ void HouseHolder_v2(thrust::device_vector<double>& B, const int m, const int n)
 			lvec[k + 1] = (B[(k + 1) * m + k] - alpha) / (2.0f * gamma);
 			for (size_t jj = k + 2; jj < n; jj++){ lvec[jj] = B[jj * m + k] / (2.0f * gamma); }
 
-			checkCudaErrors(cudaSetDevice(2));
+			CUDA_CHECK_RETURN(cudaSetDevice(2));
 			lvec2 = lvec;
 			// Calculate V
 			cublasDgemv(cublashandle2, CUBLAS_OP_N, n, n, &ONE, thrust::raw_pointer_cast(&V[0]), n, thrust::raw_pointer_cast(&lvec2[0]), 1, &ZERO, thrust::raw_pointer_cast(&Vlvec2[0]), 1);
 			updateV<double> << <ngid, nblk, 0, streams[2] >> >(thrust::raw_pointer_cast(&V[0]), thrust::raw_pointer_cast(&Vlvec2[0]), thrust::raw_pointer_cast(&lvec2[0]), n);
 
 			// Calculate B * P
-			checkCudaErrors(cudaSetDevice(0));
+			CUDA_CHECK_RETURN(cudaSetDevice(0));
 			cublasDgemv(cublashandle, CUBLAS_OP_N, m, n, &ONE, thrust::raw_pointer_cast(&B[0]), m, thrust::raw_pointer_cast(&lvec[0]), 1, &ZERO, thrust::raw_pointer_cast(&hvec[0]), 1);
 			calculateBP<double> << <gid, blk, 0, streams[0] >> >(thrust::raw_pointer_cast(&B[0]), thrust::raw_pointer_cast(&lvec[0]), thrust::raw_pointer_cast(&hvec[0]), m, n);
 
 		}
-		checkCudaErrors(cudaDeviceSynchronize());
+		CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 	}
 
-	checkCudaErrors(cudaSetDevice(0)); //Used to update Left part
-	checkCudaErrors(cudaStreamDestroy(streams[0]));
+	CUDA_CHECK_RETURN(cudaSetDevice(0)); //Used to update Left part
+	CUDA_CHECK_RETURN(cudaStreamDestroy(streams[0]));
 	hvec.clear();
 	lvec.clear();
 	cublasDestroy(cublashandle);
 
-	checkCudaErrors(cudaSetDevice(1)); //Used to update U
-	checkCudaErrors(cudaStreamDestroy(streams[1]));
+	CUDA_CHECK_RETURN(cudaSetDevice(1)); //Used to update U
+	CUDA_CHECK_RETURN(cudaStreamDestroy(streams[1]));
 	hvec1.clear();
 	Uhvec1.clear();
 	U.clear();
 	cublasDestroy(cublashandle1);
 
-	checkCudaErrors(cudaSetDevice(2)); //Used to update V
-	checkCudaErrors(cudaStreamDestroy(streams[2]));
+	CUDA_CHECK_RETURN(cudaSetDevice(2)); //Used to update V
+	CUDA_CHECK_RETURN(cudaStreamDestroy(streams[2]));
 	lvec2.clear();
 	Vlvec2.clear();
 	V.clear();
@@ -416,13 +416,13 @@ int testHouseHolder()
 	{
 		hA[i] = rand() % (m * n);
 	}
-	checkCudaErrors(cudaDeviceReset());
-	checkCudaErrors(cudaSetDevice(0));
+	CUDA_CHECK_RETURN(cudaDeviceReset());
+	CUDA_CHECK_RETURN(cudaSetDevice(0));
 	thrust::device_vector<float> A = hA;
 	time_t start = clock();
 	HouseHolder_v2(A, m, n);
 	double duration = double((double(clock()) - double(start))) / CLOCKS_PER_SEC;
-	checkCudaErrors(cudaDeviceReset());
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 	std::cout << duration << std::endl;
 	return 0;
 

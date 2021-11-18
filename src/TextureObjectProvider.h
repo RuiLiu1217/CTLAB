@@ -13,14 +13,13 @@ void createTextureObject(
 	cudaTextureAddressMode addressMode, // how to address the texture (clamp, border ...)
 	cudaTextureFilterMode textureFilterMode, // usually linear filtering (double --> int2 use pointer not linear interpolation)
 	cudaTextureReadMode textureReadMode, // usually use element wise reading mode.
-	bool isNormalized) // usually false
-{
+	bool isNormalized) { // usually false
 	cudaExtent prjSize;
 	prjSize.width = Width;
 	prjSize.height = Height;
 	prjSize.depth = Depth;
 	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<T>();
-	cudaMalloc3DArray(&d_prjArray, &channelDesc, prjSize);
+	CUDA_CHECK_RETURN(cudaMalloc3DArray(&d_prjArray, &channelDesc, prjSize));
 	cudaMemcpy3DParms copyParams = { 0 };
 	copyParams.srcPtr = make_cudaPitchedPtr(
 		(void*)sourceData, prjSize.width * sizeof(T),
@@ -28,7 +27,7 @@ void createTextureObject(
 	copyParams.dstArray = d_prjArray;
 	copyParams.extent = prjSize;
 	copyParams.kind = memcpyKind;
-	cudaMemcpy3D(&copyParams);
+	CUDA_CHECK_RETURN(cudaMemcpy3D(&copyParams));
 	cudaResourceDesc resDesc;
 	memset(&resDesc, 0, sizeof(resDesc));
 	resDesc.resType = cudaResourceTypeArray;
@@ -42,14 +41,12 @@ void createTextureObject(
 	texDesc.readMode = textureReadMode;
 
 	texDesc.normalizedCoords = isNormalized;
-	CUDA_SAFE_CALL(cudaCreateTextureObject(&texObj, &resDesc, &texDesc, nullptr));
+	CUDA_CHECK_RETURN(cudaCreateTextureObject(&texObj, &resDesc, &texDesc, nullptr));
 }
 
 // Destroy a GPU array and corresponding TextureObject
-void destroyTextureObject(cudaTextureObject_t& texObj, cudaArray* d_array)
-{
-	cudaDestroyTextureObject(texObj);
-	cudaFreeArray(d_array);
+void destroyTextureObject(cudaTextureObject_t& texObj, cudaArray* d_array) {
+	CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj));
+	CUDA_CHECK_RETURN(cudaFreeArray(d_array));
 }
-
 #endif

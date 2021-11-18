@@ -418,7 +418,7 @@ template<typename T>
 void writeFileFromDeviceToDisk_template(const std::string& FileName, T* data, cuint bytes)
 {
 	T* hdata = new T[bytes];
-	checkCudaErrors(cudaMemcpy(hdata,data,sizeof(T) * bytes,cudaMemcpyDeviceToHost));
+	CUDA_CHECK_RETURN(cudaMemcpy(hdata,data,sizeof(T) * bytes,cudaMemcpyDeviceToHost));
 	std::ofstream fid(FileName.c_str(),std::ios::binary);
 	fid.write((char*)hdata,sizeof(T)* bytes);
 	fid.close();

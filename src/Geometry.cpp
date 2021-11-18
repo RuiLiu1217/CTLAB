@@ -6,13 +6,9 @@
 #define M_PI (3.14159265358979323846264)
 #endif
 
-Geometry::Geometry() :mDetShape(ARC)
-{
-}
+Geometry::Geometry() : mDetShape(ARC) {}
 
-Geometry::~Geometry()
-{
-}
+Geometry::~Geometry() {}
 
 Geometry::Geometry(const Geometry& rhs):
 	mSourToObj(rhs.getSourToObj()),
@@ -34,13 +30,9 @@ Geometry::Geometry(const Geometry& rhs):
 	mXds(rhs.getXds()),
 	mYds(rhs.getYds()),
 	mZds(rhs.getZds()),
-	mSour(rhs.getSour())
-{
+	mSour(rhs.getSour()) {}
 
-}
-
-void Geometry::correctObjCtrIdx()
-{
+void Geometry::correctObjCtrIdx() {
 	mObjCtrIdx.x = (static_cast<float>(mObjDim.x) - 1.0) * 0.5 - mObjCtrCoord.x / mVoxelSize.x;
 	mObjCtrIdx.y = (static_cast<float>(mObjDim.y) - 1.0) * 0.5 - mObjCtrCoord.y / mVoxelSize.y;
 	mObjCtrIdx.z = (static_cast<float>(mObjDim.z) - 1.0) * 0.5 - mObjCtrCoord.z / mVoxelSize.z;

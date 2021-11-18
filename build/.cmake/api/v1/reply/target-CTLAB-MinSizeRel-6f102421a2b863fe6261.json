@@ -12,7 +12,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "lib/Debug/CTLAB.lib"
+			"path" : "lib/MinSizeRel/CTLAB.lib"
 		}
 	],
 	"backtrace" : 2,
@@ -38,7 +38,7 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 136,
+				"line" : 138,
 				"parent" : 0
 			},
 			{
@@ -50,7 +50,7 @@
 			{
 				"command" : 2,
 				"file" : 1,
-				"line" : 128,
+				"line" : 130,
 				"parent" : 0
 			},
 			{
@@ -73,7 +73,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc  -openmp /MDd /Zi /Ob0 /Od /RTC1"
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc  -openmp /MD /O1 /Ob1 /DNDEBUG"
 				}
 			],
 			"includes" : 
@@ -90,19 +90,19 @@
 			"language" : "CXX",
 			"sourceIndexes" : 
 			[
-				17,
-				19,
+				18,
 				20,
-				22,
-				24,
-				27,
-				30,
-				32,
+				21,
+				23,
+				25,
+				28,
+				31,
 				33,
-				35,
+				34,
 				36,
 				37,
-				38
+				38,
+				39
 			]
 		}
 	],
@@ -138,14 +138,14 @@
 				9,
 				10,
 				11,
-				12
+				12,
+				13
 			]
 		},
 		{
 			"name" : "Source Files",
 			"sourceIndexes" : 
 			[
-				13,
 				14,
 				15,
 				16,
@@ -170,23 +170,23 @@
 				35,
 				36,
 				37,
-				38
+				38,
+				39,
+				40
 			]
 		},
 		{
 			"name" : "",
 			"sourceIndexes" : 
 			[
-				39,
-				60
+				41,
+				62
 			]
 		},
 		{
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
-				40,
-				41,
 				42,
 				43,
 				44,
@@ -205,12 +205,15 @@
 				57,
 				58,
 				59,
+				60,
 				61,
-				62,
 				63,
 				64,
 				65,
-				66
+				66,
+				67,
+				68,
+				69
 			]
 		}
 	],
@@ -292,6 +295,12 @@
 			"backtrace" : 2,
 			"isGenerated" : true,
 			"path" : "build/bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"isGenerated" : true,
+			"path" : "build/bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_GenerateSummedAreaTable.cu.obj",
 			"sourceGroupIndex" : 0
 		},
 		{
@@ -439,6 +448,11 @@
 		},
 		{
 			"backtrace" : 2,
+			"path" : "src/GenerateSummedAreaTable.cu",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
 			"path" : "src/utilities.cuh",
 			"sourceGroupIndex" : 2
 		},
@@ -575,6 +589,11 @@
 		{
 			"backtrace" : 2,
 			"path" : "src/TextureObjectProvider.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/GenerateSummedAreaTable.h",
 			"sourceGroupIndex" : 3
 		}
 	],

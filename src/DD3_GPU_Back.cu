@@ -4,7 +4,7 @@
 #include "Geometry.h"
 #include "BackprojectionModelMap.h"
 #include <cassert>
-
+#include "TextureObjectProvider.h"
 
 #define BACK_BLKX 64 ///< Define the block size along x dimension for backprojection
 #define BACK_BLKY 4  ///< Define the block size along y dimension for backprojection
@@ -279,55 +279,6 @@ static thrust::device_vector<float> genSAT_of_Projection_alreadyinGPU(
 	return prjSAT;
 }
 
-static void createTextureObject(
-	cudaTextureObject_t& texObj,
-	cudaArray* d_prjArray,
-	int Width, int Height, int Depth,
-	float* sourceData,
-	cudaMemcpyKind memcpyKind,
-	cudaTextureAddressMode addressMode,
-	cudaTextureFilterMode textureFilterMode,
-	cudaTextureReadMode textureReadMode,
-	bool isNormalized)
-{
-	cudaExtent prjSize;
-	prjSize.width = Width;
-	prjSize.height = Height;
-	prjSize.depth = Depth;
-	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float>();
-
-	cudaMalloc3DArray(&d_prjArray, &channelDesc, prjSize);
-	cudaMemcpy3DParms copyParams = { 0 };
-	copyParams.srcPtr = make_cudaPitchedPtr(
-		(void*) sourceData, prjSize.width * sizeof(float),
-		prjSize.width, prjSize.height);
-	copyParams.dstArray = d_prjArray;
-	copyParams.extent = prjSize;
-	copyParams.kind = memcpyKind;
-	cudaMemcpy3D(&copyParams);
-	cudaResourceDesc resDesc;
-	memset(&resDesc, 0, sizeof(resDesc));
-	resDesc.resType = cudaResourceTypeArray;
-	resDesc.res.array.array = d_prjArray;
-	cudaTextureDesc texDesc;
-	memset(&texDesc, 0, sizeof(texDesc));
-	texDesc.addressMode[0] = addressMode;
-	texDesc.addressMode[1] = addressMode;
-	texDesc.addressMode[2] = addressMode;
-	texDesc.filterMode = textureFilterMode;
-	texDesc.readMode = textureReadMode;
-	texDesc.normalizedCoords = isNormalized;
-
-	cudaCreateTextureObject(&texObj, &resDesc, &texDesc, nullptr);
-}
-
-
-static void destroyTextureObject(cudaTextureObject_t& texObj, cudaArray* d_array)
-{
-	cudaDestroyTextureObject(texObj);
-	cudaFreeArray(d_array);
-}
-
 
 template < BackProjectionMethod METHOD >
 __global__ void DD3_gpu_back_ker(
@@ -532,11 +483,6 @@ __global__ void DD3_gpu_back_ker<_BRANCHLESS>(
 		vol[__umul24((__umul24(id.y, VN.x) + id.x), VN.z) + id.z] = summ;
 	}
 }
-
-
-
-
-
 
 
 __global__ void DD3_gpu_back_branchless_ker(
@@ -2050,7 +1996,7 @@ static void createTextureObjectDouble(
 	copyParams.dstArray = d_prjArray;
 	copyParams.extent = prjSize;
 	copyParams.kind = memcpyKind;
-	cudaMemcpy3D(&copyParams);
+	CUDA_CHECK_RETURN(cudaMemcpy3D(&copyParams));
 	cudaResourceDesc resDesc;
 	memset(&resDesc, 0, sizeof(resDesc));
 	resDesc.resType = cudaResourceTypeArray;
@@ -2288,8 +2234,8 @@ void DD3Back_branch_gpu(float x0, float y0, float z0, int DNU, int DNV,
 	float* hangs, float* hzPos, int PN, int XN, int YN, int ZN, float* hvol, float* hprj,
 	float dx, float dz, byte* mask, int gpunum, int squared)
 {
-	cudaSetDevice(gpunum);
-	cudaDeviceReset();
+	CUDA_CHECK_RETURN(cudaSetDevice(gpunum));
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 	thrust::device_vector<float> proj(hprj, hprj + DNU * DNV * PN);
 	thrust::device_vector<float> vol(hvol, hvol + XN * YN * ZN);
 	thrust::device_vector<byte> dmask(mask, mask + XN * YN);
@@ -2541,9 +2487,6 @@ void DD3BackHelical_4GPU(
 }
 
 
-
-
-
 void DD3Back_branchless_sat2d_multiGPU(
 	float x0, float y0, float z0,
 	int DNU, int DNV,
@@ -2633,8 +2576,8 @@ void DD3Back_branchless_sat2d_multiGPU(
 		// Calculate the corresponding center position index of the sub volumes
 		subImgZCenter[i] = -imgZCenter / dz + ZN * 0.5 - ObjZIdx_Start[i] - 0.5f; // index position
 
-		cudaSetDevice(i);
-		cudaStreamCreate(&stream[i]);
+		CUDA_CHECK_RETURN(cudaSetDevice(i));
+		CUDA_CHECK_RETURN(cudaStreamCreate(&stream[i]));
 
 		// Generate the SAT for the projection data
 		siz[i] = DNU * DNV * SPN[i];
@@ -2673,7 +2616,7 @@ void DD3Back_branchless_sat2d_multiGPU(
 		prjSize.width = DNV + 1;
 		prjSize.height = DNU + 1;
 		prjSize.depth = SPN[i];
-		cudaMalloc3DArray(&d_prjArray[i], &channelDesc, prjSize);
+		CUDA_CHECK_RETURN(cudaMalloc3DArray(&d_prjArray[i], &channelDesc, prjSize));
 
 		cudaMemcpy3DParms copyParams = { 0 };
 			copyParams.srcPtr = make_cudaPitchedPtr(
@@ -2683,7 +2626,7 @@ void DD3Back_branchless_sat2d_multiGPU(
 			copyParams.dstArray = d_prjArray[i];
 			copyParams.extent = prjSize;
 			copyParams.kind = cudaMemcpyDeviceToDevice;
-		cudaMemcpy3DAsync(&copyParams,stream[i]);
+		CUDA_CHECK_RETURN(cudaMemcpy3DAsync(&copyParams,stream[i]));
 
 		cudaResourceDesc resDesc;
 		memset(&resDesc, 0, sizeof(resDesc));
@@ -2697,7 +2640,7 @@ void DD3Back_branchless_sat2d_multiGPU(
 		texDesc.filterMode = cudaFilterModeLinear;
 		texDesc.readMode = cudaReadModeElementType;
 		texDesc.normalizedCoords = false;
-		cudaCreateTextureObject(&texObj[i], &resDesc, &texDesc, nullptr);
+		CUDA_CHECK_RETURN(cudaCreateTextureObject(&texObj[i], &resDesc, &texDesc, nullptr));
 		prjSAT[i].clear();
 		// The part above are for branchless DD
 
@@ -2719,7 +2662,7 @@ void DD3Back_branchless_sat2d_multiGPU(
 	for(int i = 0; i < gpuNum; ++i)
 	{
 
-		cudaSetDevice(i);
+		CUDA_CHECK_RETURN(cudaSetDevice(i));
 		DD3_gpu_back_ker<_BRANCHLESS> << <gid[i], blk, 0, stream[i] >> >(texObj[i],
 				thrust::raw_pointer_cast(&vol[i][0]), thrust::raw_pointer_cast(&msk[i][0]),
 				thrust::raw_pointer_cast(&cossinZT[i][0]), make_float3(x0, y0, z0), S2D,
@@ -2731,7 +2674,7 @@ void DD3Back_branchless_sat2d_multiGPU(
 #pragma omp parallel for
 	for(int i = 0 ;i < gpuNum; ++i)
 	{
-		cudaSetDevice(i);
+		CUDA_CHECK_RETURN(cudaSetDevice(i));
 		// copy the volume back.
 		subVol[i].resize(XN * YN * SZN[i]);
 		thrust::copy(vol[i].begin(), vol[i].end(), subVol[i].begin());
@@ -2740,10 +2683,10 @@ void DD3Back_branchless_sat2d_multiGPU(
 		msk[i].clear();
 		cossinZT[i].clear();
 
-		cudaDestroyTextureObject(texObj[i]);
-		cudaFreeArray(d_prjArray[i]);
+		CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj[i]));
+		CUDA_CHECK_RETURN(cudaFreeArray(d_prjArray[i]));
 	}
-	cudaDeviceSynchronize();
+	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 
 	combineVolume<float>(hvol, XN, YN, ZN, subVol, &(SZN[0]), gpuNum);
 
@@ -2862,8 +2805,8 @@ void DD3Back_pseudo_multiGPU(
 		// Calculate the corresponding center position index of the sub volumes
 		subImgZCenter[i] = -imgZCenter / dz + ZN * 0.5 - ObjZIdx_Start[i] - 0.5f; // index position
 
-		cudaSetDevice(i);
-		cudaStreamCreate(&stream[i]);
+		CUDA_CHECK_RETURN(cudaSetDevice(i));
+		CUDA_CHECK_RETURN(cudaStreamCreate(&stream[i]));
 		////////////////////////////////////////////////////////////////////////
 		siz[i] = DNU * DNV * SPN[i];
 		prj[i].resize(siz[i]);
@@ -2876,7 +2819,7 @@ void DD3Back_pseudo_multiGPU(
 		prjSize.width = DNV;
 		prjSize.height = DNU;
 		prjSize.depth = SPN[i];
-		cudaMalloc3DArray(&d_prjArray[i], &channelDesc, prjSize);
+		CUDA_CHECK_RETURN(cudaMalloc3DArray(&d_prjArray[i], &channelDesc, prjSize));
 
 		cudaMemcpy3DParms copyParams = { 0 };
 			copyParams.srcPtr = make_cudaPitchedPtr(
@@ -2886,7 +2829,7 @@ void DD3Back_pseudo_multiGPU(
 			copyParams.dstArray = d_prjArray[i];
 			copyParams.extent = prjSize;
 			copyParams.kind = cudaMemcpyDeviceToDevice;
-		cudaMemcpy3DAsync(&copyParams,stream[i]);
+		CUDA_CHECK_RETURN(cudaMemcpy3DAsync(&copyParams,stream[i]));
 
 		cudaResourceDesc resDesc;
 		memset(&resDesc, 0, sizeof(resDesc));
@@ -2900,7 +2843,7 @@ void DD3Back_pseudo_multiGPU(
 		texDesc.filterMode = cudaFilterModeLinear;
 		texDesc.readMode = cudaReadModeElementType;
 		texDesc.normalizedCoords = false;
-		cudaCreateTextureObject(&texObj[i], &resDesc, &texDesc, nullptr);
+		CUDA_CHECK_RETURN(cudaCreateTextureObject(&texObj[i], &resDesc, &texDesc, nullptr));
 		prj[i].clear();
 		////////////////////////////////////////////////////////////////////////
 		// Generate the SAT for the projection data
@@ -2923,7 +2866,7 @@ void DD3Back_pseudo_multiGPU(
 #pragma omp parallel for
 	for(int i = 0; i < gpuNum; ++i)
 	{
-		cudaSetDevice(i);
+		CUDA_CHECK_RETURN(cudaSetDevice(i));
 		DD3_gpu_back_ker<_PSEUDODD> << <gid[i], blk, 0, stream[i] >> >(texObj[i],
 				thrust::raw_pointer_cast(&vol[i][0]), thrust::raw_pointer_cast(&msk[i][0]),
 				thrust::raw_pointer_cast(&cossinZT[i][0]), make_float3(x0, y0, z0), S2D,
@@ -2943,10 +2886,10 @@ void DD3Back_pseudo_multiGPU(
 		msk[i].clear();
 		cossinZT[i].clear();
 
-		cudaDestroyTextureObject(texObj[i]);
-		cudaFreeArray(d_prjArray[i]);
+		CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj[i]));
+		CUDA_CHECK_RETURN(cudaFreeArray(d_prjArray[i]));
 	}
-	cudaDeviceSynchronize();
+	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 
 	combineVolume<float>(hvol, XN, YN, ZN, subVol, &(SZN[0]), gpuNum);
 

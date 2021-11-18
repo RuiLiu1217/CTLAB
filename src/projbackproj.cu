@@ -1216,7 +1216,7 @@ void proj_CPU_OPENMP(float* dimg, float* ddif, float* draw, const FanEDGeo& FanG
 {
 
 	int prjIdx = 0;
-	checkCudaErrors(cudaMalloc((void**)&draw[0], sizeof(float) * FanGeo.m_DetN *FanGeo.m_ViwN));
+	CUDA_CHECK_RETURN(cudaMalloc((void**)&draw[0], sizeof(float) * FanGeo.m_DetN *FanGeo.m_ViwN));
 #pragma omp parallel for
 	for (prjIdx = 0; prjIdx < FanGeo.m_ViwN; prjIdx++)
 	{

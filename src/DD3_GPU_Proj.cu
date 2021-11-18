@@ -4,10 +4,24 @@
 #include "CTLAB.h"
 #include "Geometry.h"
 #include "TextureObjectProvider.h"
-
+#include "GenerateSummedAreaTable.h"
 #define BLKX 32
 #define BLKY 8
 #define BLKZ 1
+
+// masking the volume with provided mask. The mask size is XN * YN
+// the volume is with size [ZN, XN, YN] ZN is the primary order.
+template<typename T>
+void maskingVolume(T* vol, byte* mask, int XN, int YN, int ZN) {
+	//Pre compute mask.*vol;
+	for (int ii = 0; ii != XN * YN; ++ii) {
+		byte v = mask[ii];
+		std::for_each(vol + ii * ZN, vol + (ii + 1) * ZN, [v](T& val) { val *= v; });
+		/*for (int jj = 0; jj != ZN; ++jj) {
+			vol[ii * ZN + jj] *= v;
+		}*/
+	}
+}
 
 template<typename Ta, typename Tb>
 __global__ void naive_copyToTwoVolumes(Ta* in_ZXY,
@@ -87,155 +101,6 @@ __global__ void horizontalIntegral(T* prj, int DNU, int DNV, int PN) {
 			prj[headPtr + ii * DNV] += prj[headPtr + (ii - 1) * DNV];
 		}
 	}
-}
-
-
-void genSAT_fof_Volume(float* hvol,
-	thrust::device_vector<float>&ZXY,
-	thrust::device_vector<float>&ZYX,
-	int XN, int YN, int ZN)
-{
-	const int siz = XN * YN * ZN;
-	const int nsiz_ZXY = (ZN + 1) * (XN + 1) * YN;
-	const int nsiz_ZYX = (ZN + 1) * (YN + 1) * XN;
-	ZXY.resize(nsiz_ZXY);
-	ZYX.resize(nsiz_ZYX);
-
-	thrust::device_vector<float> vol(hvol, hvol + siz);
-
-	dim3 blk(64, 16, 1);
-	dim3 gid(
-		(ZN + blk.x - 1) / blk.x,
-		(XN + blk.y - 1) / blk.y,
-		(YN + blk.z - 1) / blk.z);
-
-	naive_copyToTwoVolumes << <gid, blk >> >(
-		thrust::raw_pointer_cast(&vol[0]),
-		thrust::raw_pointer_cast(&ZXY[0]),
-		thrust::raw_pointer_cast(&ZYX[0]),
-		XN, YN, ZN);
-
-	vol.clear();
-	const int nZN = ZN + 1;
-	const int nXN = XN + 1;
-	const int nYN = YN + 1;
-
-	blk.x = 32;
-	blk.y = 1;
-	blk.z = 1;
-	gid.x = (nXN * YN + blk.x - 1) / blk.x;
-	gid.y = 1;
-	gid.z = 1;
-	verticalIntegral << <gid, blk >> >(
-		thrust::raw_pointer_cast(&ZXY[0]),
-		nZN, nXN * YN);
-
-	blk.x = 64;
-	blk.y = 16;
-	blk.z = 1;
-	gid.x = (nZN + blk.x - 1) / blk.x;
-	gid.y = (YN + blk.y - 1) / blk.y;
-	gid.z = 1;
-
-	horizontalIntegral << <gid, blk >> >(
-		thrust::raw_pointer_cast(&ZXY[0]),
-		nXN, nZN, YN);
-
-	blk.x = 32;
-	blk.y = 1;
-	blk.z = 1;
-	gid.x = (nYN * XN + blk.x - 1) / blk.x;
-	gid.y = 1;
-	gid.z = 1;
-	verticalIntegral << <gid, blk >> >(
-		thrust::raw_pointer_cast(&ZYX[0]),
-		nZN, nXN * YN);
-
-	blk.x = 64;
-	blk.y = 16;
-	blk.z = 1;
-	gid.x = (nZN + blk.x - 1) / blk.x;
-	gid.y = (XN + blk.y - 1) / blk.y;
-	gid.z = 1;
-
-	horizontalIntegral << <gid, blk >> >(
-		thrust::raw_pointer_cast(&ZYX[0]),
-		nYN, nZN, XN);
-}
-
-
-void genSAT_fof_Volume_alreadyinGPU(
-	const thrust::device_vector<float>& vol,
-	thrust::device_vector<float>&ZXY,
-	thrust::device_vector<float>&ZYX,
-	int XN, int YN, int ZN)
-{
-	//const int siz = XN * YN * ZN;
-	const int nsiz_ZXY = (ZN + 1) * (XN + 1) * YN;
-	const int nsiz_ZYX = (ZN + 1) * (YN + 1) * XN;
-	ZXY.resize(nsiz_ZXY);
-	ZYX.resize(nsiz_ZYX);
-
-	//thrust::device_vector<float> vol(hvol, hvol + siz);
-
-	dim3 blk(64, 16, 1);
-	dim3 gid(
-		(ZN + blk.x - 1) / blk.x,
-		(XN + blk.y - 1) / blk.y,
-		(YN + blk.z - 1) / blk.z);
-
-	naive_copyToTwoVolumes << <gid, blk >> >(
-		thrust::raw_pointer_cast(&vol[0]),
-		thrust::raw_pointer_cast(&ZXY[0]),
-		thrust::raw_pointer_cast(&ZYX[0]),
-		XN, YN, ZN);
-
-	//vol.clear();
-	const int nZN = ZN + 1;
-	const int nXN = XN + 1;
-	const int nYN = YN + 1;
-
-	blk.x = 32;
-	blk.y = 1;
-	blk.z = 1;
-	gid.x = (nXN * YN + blk.x - 1) / blk.x;
-	gid.y = 1;
-	gid.z = 1;
-	verticalIntegral << <gid, blk >> >(
-		thrust::raw_pointer_cast(&ZXY[0]),
-		nZN, nXN * YN);
-
-	blk.x = 64;
-	blk.y = 16;
-	blk.z = 1;
-	gid.x = (nZN + blk.x - 1) / blk.x;
-	gid.y = (YN + blk.y - 1) / blk.y;
-	gid.z = 1;
-
-	horizontalIntegral << <gid, blk >> >(
-		thrust::raw_pointer_cast(&ZXY[0]),
-		nXN, nZN, YN);
-
-	blk.x = 32;
-	blk.y = 1;
-	blk.z = 1;
-	gid.x = (nYN * XN + blk.x - 1) / blk.x;
-	gid.y = 1;
-	gid.z = 1;
-	verticalIntegral << <gid, blk >> >(
-		thrust::raw_pointer_cast(&ZYX[0]),
-		nZN, nXN * YN);
-
-	blk.x = 64;
-	blk.y = 16;
-	blk.z = 1;
-	gid.x = (nZN + blk.x - 1) / blk.x;
-	gid.y = (XN + blk.y - 1) / blk.y;
-	gid.z = 1;
-
-	horizontalIntegral << <gid, blk >> >(
-		thrust::raw_pointer_cast(&ZYX[0]),
-		nYN, nZN, XN);
 }
 
 __global__  void DD3_gpu_proj_branchless_sat2d_ker(
@@ -404,31 +269,23 @@ void DD3_gpu_proj_branchless_sat2d(
 	int XN, int YN, int ZN,
 	float* vol, float* hprj, float dx, float dz, byte* mask, int gpunum)
 {
-	for (int i = 0; i != XN * YN; ++i)
-	{
-		byte v = mask[i];
-		for (int z = 0; z != ZN; ++z)
-		{
-			vol[i * ZN + z] = vol[i * ZN + z] * v;
-		}
-	}
+	maskingVolume(vol, mask, XN, YN, ZN);
+	std::cout << "I am called\n";
+	CUDA_CHECK_RETURN(cudaSetDevice(gpunum));
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 
-	CUDA_SAFE_CALL(cudaSetDevice(gpunum));
-	cudaDeviceReset();
+	
+	std::vector<float> bxdsVec = getDD3Boundaries(DNU, xds);
+	std::vector<float> bydsVec = getDD3Boundaries(DNU, yds);
+	std::vector<float> bzdsVec = getDD3Boundaries(DNV, zds);
 
-	float* bxds = new float[DNU + 1];
-	float* byds = new float[DNU + 1];
-	float* bzds = new float[DNV + 1];
+	float* bxds = &(bxdsVec[0]);
+	float* byds = &(bydsVec[0]);
+	float* bzds = &(bzdsVec[0]);
 
-	DD3Boundaries(DNU + 1, xds, bxds);
-	DD3Boundaries(DNU + 1, yds, byds);
-	DD3Boundaries(DNV + 1, zds, bzds);
-
-//	cudaStream_t streams[4];
-//	cudaStreamCreate(&streams[0]);
-//	cudaStreamCreate(&streams[1]);
-//	cudaStreamCreate(&streams[2]);
-//	cudaStreamCreate(&streams[3]);
+	//DD3Boundaries(DNU + 1, xds, bxds);
+	//DD3Boundaries(DNU + 1, yds, byds);
+	//DD3Boundaries(DNV + 1, zds, bzds);
 
 	float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter / dx;
 	float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter / dx;
@@ -454,8 +311,8 @@ void DD3_gpu_proj_branchless_sat2d(
 	cudaArray* d_volumeArray1;
 	cudaArray* d_volumeArray2;
 
-	cudaMalloc3DArray(&d_volumeArray1, &channelDesc1, volumeSize1);
-	cudaMalloc3DArray(&d_volumeArray2, &channelDesc2, volumeSize2);
+	CUDA_CHECK_RETURN(cudaMalloc3DArray(&d_volumeArray1, &channelDesc1, volumeSize1));
+	CUDA_CHECK_RETURN(cudaMalloc3DArray(&d_volumeArray2, &channelDesc2, volumeSize2));
 
 	cudaMemcpy3DParms copyParams1 = { 0 };
 	copyParams1.srcPtr = make_cudaPitchedPtr((void*)
@@ -475,8 +332,8 @@ void DD3_gpu_proj_branchless_sat2d(
 	copyParams2.extent = volumeSize2;
 	copyParams2.kind = cudaMemcpyDeviceToDevice;
 
-	cudaMemcpy3D(&copyParams1);
-	cudaMemcpy3D(&copyParams2);
+	CUDA_CHECK_RETURN(cudaMemcpy3D(&copyParams1));
+	CUDA_CHECK_RETURN(cudaMemcpy3D(&copyParams2));
 
 	SATZXY.clear();
 	SATZYX.clear();
@@ -518,8 +375,8 @@ void DD3_gpu_proj_branchless_sat2d(
 	cudaTextureObject_t texObj1 = 0;
 	cudaTextureObject_t texObj2 = 0;
 
-	cudaCreateTextureObject(&texObj1, &resDesc1, &texDesc1, nullptr);
-	cudaCreateTextureObject(&texObj2, &resDesc2, &texDesc2, nullptr);
+	CUDA_CHECK_RETURN(cudaCreateTextureObject(&texObj1, &resDesc1, &texDesc1, nullptr));
+	CUDA_CHECK_RETURN(cudaCreateTextureObject(&texObj2, &resDesc2, &texDesc2, nullptr));
 
 	thrust::device_vector<float> prj(DNU * DNV * PN, 0);
 	thrust::device_vector<float> d_xds(xds, xds + DNU);
@@ -559,11 +416,11 @@ void DD3_gpu_proj_branchless_sat2d(
 		dx, dz, XN, YN, ZN, DNU, DNV, PN);
 
 	thrust::copy(prj.begin(), prj.end(), hprj);
-	cudaDestroyTextureObject(texObj1);
-	cudaDestroyTextureObject(texObj2);
+	CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj1));
+	CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj2));
 
-	cudaFreeArray(d_volumeArray1);
-	cudaFreeArray(d_volumeArray2);
+	CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray1));
+	CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray2));
 
 	prj.clear();
 	angs.clear();
@@ -577,9 +434,9 @@ void DD3_gpu_proj_branchless_sat2d(
 	d_bzds.clear();
 	cossinZT.clear();
 
-	delete[] bxds;
-	delete[] byds;
-	delete[] bzds;
+	//delete[] bxds;
+	//delete[] byds;
+	//delete[] bzds;
 
 }
 
@@ -655,8 +512,8 @@ byte* mask, int gpunum)
 		}
 	}
 
-	CUDA_SAFE_CALL(cudaSetDevice(gpunum));
-	cudaDeviceReset();
+	CUDA_CHECK_RETURN(cudaSetDevice(gpunum));
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 
 	float objCntIdxX = (XN - 1.0f) * 0.5f - imgXCenter / dx;
 	float objCntIdxY = (YN - 1.0f) * 0.5f - imgYCenter / dx;
@@ -669,7 +526,7 @@ byte* mask, int gpunum)
 
 	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float>();
 	cudaArray* d_volumeArray;
-	cudaMalloc3DArray(&d_volumeArray, &channelDesc, volumeSize);
+	CUDA_CHECK_RETURN(cudaMalloc3DArray(&d_volumeArray, &channelDesc, volumeSize));
 
 	cudaMemcpy3DParms copyParams = { 0 };
 	copyParams.srcPtr = make_cudaPitchedPtr((void*)vol, // Changed here
@@ -704,7 +561,7 @@ byte* mask, int gpunum)
 
 	cudaTextureObject_t texObj = 0;
 
-	cudaCreateTextureObject(&texObj, &resDesc, &texDesc, nullptr);
+	CUDA_CHECK_RETURN(cudaCreateTextureObject(&texObj, &resDesc, &texDesc, nullptr));
 
 	thrust::device_vector<float> prj(DNU * DNV * PN, 0);
 	thrust::device_vector<float> d_xds(xds, xds + DNU);
@@ -738,9 +595,9 @@ byte* mask, int gpunum)
 
 
 	thrust::copy(prj.begin(), prj.end(), hprj);
-	cudaDestroyTextureObject(texObj);
+	CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj));
 
-	cudaFreeArray(d_volumeArray);
+	CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray));
 
 
 	prj.clear();
@@ -751,13 +608,7 @@ byte* mask, int gpunum)
 	d_yds.clear();
 	d_zds.clear();
 	cossinZT.clear();
-
 }
-
-
-
-
-
 
 void DD3_gpu_proj_branchless_sat2d_alreadyinGPU(
 	float x0, float y0, float z0,
@@ -926,7 +777,6 @@ void DD3_gpu_proj_branchless_sat2d_alreadyinGPU(
 	bxds.clear();
 	byds.clear();
 	bzds.clear();
-
 }
 
 //
@@ -1244,8 +1094,8 @@ void DD3_gpu_proj_volumerendering(float x0, float y0, float z0, int DNU, int DNV
 			hvol[i * ZN + z] = hvol[i * ZN + z] * v;
 		}
 	}
-	CUDA_SAFE_CALL(cudaSetDevice(gpunum)); // choose the 2nd GPU for now (1st GPU used to be occupied on torb
-	CUDA_SAFE_CALL(cudaDeviceReset());
+	CUDA_CHECK_RETURN(cudaSetDevice(gpunum)); // choose the 2nd GPU for now (1st GPU used to be occupied on torb
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 
 	thrust::device_vector<float> prj(DNU * DNV * PN, 0); // projection data
 	thrust::device_vector<float> d_xds(xds, xds + DNU);
@@ -2024,14 +1874,7 @@ void DD3_gpu_proj_doubleprecisionbranchless(
 	byte* mask, int gpunum)
 {
 	//Pre compute mask.*vol;
-	for (int ii = 0; ii != XN * YN; ++ii)
-	{
-		byte v = mask[ii];
-		for (int jj = 0; jj != ZN; ++jj)
-		{
-			vol[ii * ZN + jj] = vol[ii * ZN + jj] * v;
-		}
-	}
+	maskingVolume(vol, mask, XN, YN, ZN);
 
 	float* bxds = new float[DNU + 1];
 	float* byds = new float[DNU + 1];
@@ -2040,14 +1883,14 @@ void DD3_gpu_proj_doubleprecisionbranchless(
 	DD3Boundaries(DNU + 1, yds, byds);
 	DD3Boundaries(DNV + 1, zds, bzds);
 
-	CUDA_SAFE_CALL(cudaSetDevice(gpunum));
-	CUDA_SAFE_CALL(cudaDeviceReset());
+	CUDA_CHECK_RETURN(cudaSetDevice(gpunum));
+	CUDA_CHECK_RETURN(cudaDeviceReset());
 
 	cudaStream_t streams[4];
-	CUDA_SAFE_CALL(cudaStreamCreate(&streams[0]));
-	CUDA_SAFE_CALL(cudaStreamCreate(&streams[1]));
-	CUDA_SAFE_CALL(cudaStreamCreate(&streams[2]));
-	CUDA_SAFE_CALL(cudaStreamCreate(&streams[3]));
+	CUDA_CHECK_RETURN(cudaStreamCreate(&streams[0]));
+	CUDA_CHECK_RETURN(cudaStreamCreate(&streams[1]));
+	CUDA_CHECK_RETURN(cudaStreamCreate(&streams[2]));
+	CUDA_CHECK_RETURN(cudaStreamCreate(&streams[3]));
 
 	int TOTVN = XN * YN * ZN;
 	double objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter / dx;
@@ -2179,8 +2022,8 @@ void DD3_gpu_proj_doubleprecisionbranchless(
 		dx, dz, XN, YN, DNU, DNV, PN);
 	thrust::copy(prj.begin(), prj.end(), hprj);
 
-	CUDA_SAFE_CALL(cudaDestroyTextureObject(texObj1));
-	CUDA_SAFE_CALL(cudaDestroyTextureObject(texObj2));
+	CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj1));
+	CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj2));
 
 	destroyTextureObject(texObj1, d_volumeArray1);
 	destroyTextureObject(texObj2, d_volumeArray2);
@@ -2727,9 +2570,9 @@ void DD3_gpu_proj_pseudodistancedriven_multiGPU(
 		// NOTE: The explanation will be later:
 		subImgZCenter[i] = -imgZCenter / dz + ZN * 0.5 - ObjIdx_Start[i] - 0.5f;
 
-		CUDA_SAFE_CALL(cudaSetDevice(i));
+		CUDA_CHECK_RETURN(cudaSetDevice(i));
 		// For each GPU generate two streams
-		CUDA_SAFE_CALL(cudaStreamCreate(&stream[i]));
+		CUDA_CHECK_RETURN(cudaStreamCreate(&stream[i]));
 		siz[i] = XN * YN * SZN[i];
 
 		d_vol[i].resize(siz[i]);
@@ -2739,7 +2582,7 @@ void DD3_gpu_proj_pseudodistancedriven_multiGPU(
 		volumeSize[i].width = SZN[i];
 		volumeSize[i].height = XN;
 		volumeSize[i].depth = YN;
-		CUDA_SAFE_CALL(cudaMalloc3DArray(&d_volumeArray[i], &channelDesc, volumeSize[i]));
+		CUDA_CHECK_RETURN(cudaMalloc3DArray(&d_volumeArray[i], &channelDesc, volumeSize[i]));
 
 		cudaMemcpy3DParms copyParams = { 0 };
 		copyParams.srcPtr = make_cudaPitchedPtr((void*)
@@ -2750,7 +2593,7 @@ void DD3_gpu_proj_pseudodistancedriven_multiGPU(
 		copyParams.extent = volumeSize[i];
 		copyParams.kind = cudaMemcpyDeviceToDevice;
 
-		CUDA_SAFE_CALL(cudaMemcpy3DAsync(&copyParams,stream[i]));
+		CUDA_CHECK_RETURN(cudaMemcpy3DAsync(&copyParams,stream[i]));
 		d_vol[i].clear();
 
 
@@ -2768,7 +2611,7 @@ void DD3_gpu_proj_pseudodistancedriven_multiGPU(
 		texDesc.readMode = cudaReadModeElementType;
 		texDesc.normalizedCoords = false;
 		texObj[i] = 0;
-		CUDA_SAFE_CALL(cudaCreateTextureObject(&texObj[i], &resDesc, &texDesc, nullptr));
+		CUDA_CHECK_RETURN(cudaCreateTextureObject(&texObj[i], &resDesc, &texDesc, nullptr));
 
 
 		prj[i].resize(DNU * DNV * SPN[i]); // Change here
@@ -2819,7 +2662,7 @@ void DD3_gpu_proj_pseudodistancedriven_multiGPU(
 	for(int i = 0; i < gpuNum; ++i)
 	{
 		cudaSetDevice(i);
-		CUDA_SAFE_CALL(cudaMemcpyAsync(hprj + DNU * DNV * prefixSPN[i],
+		CUDA_CHECK_RETURN(cudaMemcpyAsync(hprj + DNU * DNV * prefixSPN[i],
 				thrust::raw_pointer_cast(&prj[i][0]), sizeof(float) * DNU * DNV * SPN[i],
 				cudaMemcpyDeviceToHost,stream[i]));
 		d_xds[i].clear();
@@ -2828,10 +2671,8 @@ void DD3_gpu_proj_pseudodistancedriven_multiGPU(
 		cossinZT[i].clear();
 		prj[i].clear();
 
-		CUDA_SAFE_CALL(cudaDestroyTextureObject(texObj[i]));
-		CUDA_SAFE_CALL(cudaFreeArray(d_volumeArray[i]));
-		//CUDA_SAFE_CALL(cudaStreamDestroy(stream[i*2]));
-		//CUDA_SAFE_CALL(cudaStreamDestroy(stream[i*2 + 1]));
+		CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj[i]));
+		CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray[i]));
 	}
 
 	// Delete the vectors;
@@ -2995,10 +2836,10 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 		subImgZCenter[i] = -imgZCenter / dz + ZN * 0.5 - ObjIdx_Start[i] - 0.5f;
 
 
-		CUDA_SAFE_CALL(cudaSetDevice(i));
+		CUDA_CHECK_RETURN(cudaSetDevice(i));
 		// For each GPU generate two streams
-		CUDA_SAFE_CALL(cudaStreamCreate(&stream[i * 2]));
-		CUDA_SAFE_CALL(cudaStreamCreate(&stream[i * 2 + 1]));
+		CUDA_CHECK_RETURN(cudaStreamCreate(&stream[i * 2]));
+		CUDA_CHECK_RETURN(cudaStreamCreate(&stream[i * 2 + 1]));
 		siz[i] = XN * YN * SZN[i];
 		nZN[i] = SZN[i] + 1;
 		nsiz_ZXY[i] = nZN[i] * nXN * YN;
@@ -3018,8 +2859,8 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 				thrust::raw_pointer_cast(&d_ZXY[i][0]),
 				thrust::raw_pointer_cast(&d_ZYX[i][0]),
 				XN,YN,SZN[i]);
-		CUDA_SAFE_CALL(cudaStreamSynchronize(stream[2 * i]));
-		CUDA_SAFE_CALL(cudaStreamSynchronize(stream[2 * i + 1]));
+		CUDA_CHECK_RETURN(cudaStreamSynchronize(stream[2 * i]));
+		CUDA_CHECK_RETURN(cudaStreamSynchronize(stream[2 * i + 1]));
 
 		d_vol[i].clear();
 		// Generate the SAT for two volumes
@@ -3049,8 +2890,8 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 		volumeSize2[i].height = nYN;
 		volumeSize2[i].depth = XN;
 
-		CUDA_SAFE_CALL(cudaMalloc3DArray(&d_volumeArray1[i], &channelDesc, volumeSize1[i]));
-		CUDA_SAFE_CALL(cudaMalloc3DArray(&d_volumeArray2[i], &channelDesc, volumeSize2[i]));
+		CUDA_CHECK_RETURN(cudaMalloc3DArray(&d_volumeArray1[i], &channelDesc, volumeSize1[i]));
+		CUDA_CHECK_RETURN(cudaMalloc3DArray(&d_volumeArray2[i], &channelDesc, volumeSize2[i]));
 
 		cudaMemcpy3DParms copyParams1 = { 0 };
 		copyParams1.srcPtr = make_cudaPitchedPtr((void*)
@@ -3070,8 +2911,8 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 		copyParams2.extent = volumeSize2[i];
 		copyParams2.kind = cudaMemcpyDeviceToDevice;
 
-		CUDA_SAFE_CALL(cudaMemcpy3DAsync(&copyParams1,stream[2 * i]));
-		CUDA_SAFE_CALL(cudaMemcpy3DAsync(&copyParams2,stream[2 * i + 1]));
+		CUDA_CHECK_RETURN(cudaMemcpy3DAsync(&copyParams1,stream[2 * i]));
+		CUDA_CHECK_RETURN(cudaMemcpy3DAsync(&copyParams2,stream[2 * i + 1]));
 
 		d_ZXY[i].clear();
 		d_ZYX[i].clear();
@@ -3102,8 +2943,8 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 		texDesc2.normalizedCoords = false;
 		texObj1[i] = 0;
 		texObj2[i] = 0;
-		CUDA_SAFE_CALL(cudaCreateTextureObject(&texObj1[i], &resDesc1, &texDesc1, nullptr));
-		CUDA_SAFE_CALL(cudaCreateTextureObject(&texObj2[i], &resDesc2, &texDesc2, nullptr));
+		CUDA_CHECK_RETURN(cudaCreateTextureObject(&texObj1[i], &resDesc1, &texDesc1, nullptr));
+		CUDA_CHECK_RETURN(cudaCreateTextureObject(&texObj2[i], &resDesc2, &texDesc2, nullptr));
 
 
 		prj[i].resize(DNU * DNV * SPN[i]); // Change here
@@ -3165,7 +3006,7 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 	for(int i = 0; i < gpuNum; ++i)
 	{
 		cudaSetDevice(i);
-		CUDA_SAFE_CALL(cudaMemcpyAsync(hprj + DNU * DNV * prefixSPN[i],
+		CUDA_CHECK_RETURN(cudaMemcpyAsync(hprj + DNU * DNV * prefixSPN[i],
 				thrust::raw_pointer_cast(&prj[i][0]), sizeof(float) * DNU * DNV * SPN[i],
 				cudaMemcpyDeviceToHost,stream[2*i]));
 		d_xds[i].clear();
@@ -3177,10 +3018,10 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 		cossinZT[i].clear();
 		prj[i].clear();
 
-		CUDA_SAFE_CALL(cudaDestroyTextureObject(texObj1[i]));
-		CUDA_SAFE_CALL(cudaDestroyTextureObject(texObj2[i]));
-		CUDA_SAFE_CALL(cudaFreeArray(d_volumeArray1[i]));
-		CUDA_SAFE_CALL(cudaFreeArray(d_volumeArray2[i]));
+		CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj1[i]));
+		CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj2[i]));
+		CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray1[i]));
+		CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray2[i]));
 	}
 
 	// Clear the vectors
