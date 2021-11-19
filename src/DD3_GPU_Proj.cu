@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "utilities.hpp"
 #include "utilities.cuh"
 #include "DD3_GPU_Proj.h"
@@ -5,6 +6,8 @@
 #include "Geometry.h"
 #include "TextureObjectProvider.h"
 #include "GenerateSummedAreaTable.h"
+#include "cudaCheckReturner.h"
+#include "VolumeToTextures.h"
 #define BLKX 32
 #define BLKY 8
 #define BLKZ 1
@@ -17,9 +20,6 @@ void maskingVolume(T* vol, byte* mask, int XN, int YN, int ZN) {
 	for (int ii = 0; ii != XN * YN; ++ii) {
 		byte v = mask[ii];
 		std::for_each(vol + ii * ZN, vol + (ii + 1) * ZN, [v](T& val) { val *= v; });
-		/*for (int jj = 0; jj != ZN; ++jj) {
-			vol[ii * ZN + jj] *= v;
-		}*/
 	}
 }
 
@@ -259,134 +259,7 @@ __global__  void DD3_gpu_proj_branchless_sat2d_ker(
 	}
 }
 
-
-void DD3_gpu_proj_branchless_sat2d(
-	float x0, float y0, float z0,
-	int DNU, int DNV,
-	float* xds, float* yds, float* zds,
-	float imgXCenter, float imgYCenter, float imgZCenter,
-	float* hangs, float* hzPos, int PN,
-	int XN, int YN, int ZN,
-	float* vol, float* hprj, float dx, float dz, byte* mask, int gpunum)
-{
-	maskingVolume(vol, mask, XN, YN, ZN);
-	std::cout << "I am called\n";
-	CUDA_CHECK_RETURN(cudaSetDevice(gpunum));
-	CUDA_CHECK_RETURN(cudaDeviceReset());
-
-	
-	std::vector<float> bxdsVec = getDD3Boundaries(DNU, xds);
-	std::vector<float> bydsVec = getDD3Boundaries(DNU, yds);
-	std::vector<float> bzdsVec = getDD3Boundaries(DNV, zds);
-
-	float* bxds = &(bxdsVec[0]);
-	float* byds = &(bydsVec[0]);
-	float* bzds = &(bzdsVec[0]);
-
-	//DD3Boundaries(DNU + 1, xds, bxds);
-	//DD3Boundaries(DNU + 1, yds, byds);
-	//DD3Boundaries(DNV + 1, zds, bzds);
-
-	float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter / dx;
-	float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter / dx;
-	float objCntIdxZ = (ZN - 1.0) * 0.5 - imgZCenter / dz;
-
-	thrust::device_vector<float> SATZXY;
-	thrust::device_vector<float> SATZYX;
-	genSAT_fof_Volume(vol, SATZXY, SATZYX, XN, YN, ZN);
-
-	cudaExtent volumeSize1;
-	cudaExtent volumeSize2;
-	volumeSize1.width = ZN + 1;
-	volumeSize1.height = XN + 1;
-	volumeSize1.depth = YN;
-
-	volumeSize2.width = ZN + 1;
-	volumeSize2.height = YN + 1;
-	volumeSize2.depth = XN;
-
-	cudaChannelFormatDesc channelDesc1 = cudaCreateChannelDesc<float>();
-	cudaChannelFormatDesc channelDesc2 = cudaCreateChannelDesc<float>();
-
-	cudaArray* d_volumeArray1;
-	cudaArray* d_volumeArray2;
-
-	CUDA_CHECK_RETURN(cudaMalloc3DArray(&d_volumeArray1, &channelDesc1, volumeSize1));
-	CUDA_CHECK_RETURN(cudaMalloc3DArray(&d_volumeArray2, &channelDesc2, volumeSize2));
-
-	cudaMemcpy3DParms copyParams1 = { 0 };
-	copyParams1.srcPtr = make_cudaPitchedPtr((void*)
-		thrust::raw_pointer_cast(&SATZXY[0]),
-		volumeSize1.width * sizeof(float),
-		volumeSize1.width, volumeSize1.height);
-	copyParams1.dstArray = d_volumeArray1;
-	copyParams1.extent = volumeSize1;
-	copyParams1.kind = cudaMemcpyDeviceToDevice;
-
-	cudaMemcpy3DParms copyParams2 = { 0 };
-	copyParams2.srcPtr = make_cudaPitchedPtr((void*)
-		thrust::raw_pointer_cast(&SATZYX[0]),
-		volumeSize2.width * sizeof(float),
-		volumeSize2.width, volumeSize2.height);
-	copyParams2.dstArray = d_volumeArray2;
-	copyParams2.extent = volumeSize2;
-	copyParams2.kind = cudaMemcpyDeviceToDevice;
-
-	CUDA_CHECK_RETURN(cudaMemcpy3D(&copyParams1));
-	CUDA_CHECK_RETURN(cudaMemcpy3D(&copyParams2));
-
-	SATZXY.clear();
-	SATZYX.clear();
-
-	cudaResourceDesc resDesc1;
-	cudaResourceDesc resDesc2;
-	memset(&resDesc1, 0, sizeof(resDesc1));
-	memset(&resDesc2, 0, sizeof(resDesc2));
-
-	resDesc1.resType = cudaResourceTypeArray;
-	resDesc2.resType = cudaResourceTypeArray;
-
-	resDesc1.res.array.array = d_volumeArray1;
-	resDesc2.res.array.array = d_volumeArray2;
-
-	cudaTextureDesc texDesc1;
-	cudaTextureDesc texDesc2;
-
-	memset(&texDesc1, 0, sizeof(texDesc1));
-	memset(&texDesc2, 0, sizeof(texDesc2));
-
-	texDesc1.addressMode[0] = cudaAddressModeClamp;
-	texDesc1.addressMode[1] = cudaAddressModeClamp;
-	texDesc1.addressMode[2] = cudaAddressModeClamp;
-
-	texDesc2.addressMode[0] = cudaAddressModeClamp;
-	texDesc2.addressMode[1] = cudaAddressModeClamp;
-	texDesc2.addressMode[2] = cudaAddressModeClamp;
-
-	texDesc1.filterMode = cudaFilterModeLinear;
-	texDesc2.filterMode = cudaFilterModeLinear;
-
-	texDesc1.readMode = cudaReadModeElementType;
-	texDesc2.readMode = cudaReadModeElementType;
-
-	texDesc1.normalizedCoords = false;
-	texDesc2.normalizedCoords = false;
-
-	cudaTextureObject_t texObj1 = 0;
-	cudaTextureObject_t texObj2 = 0;
-
-	CUDA_CHECK_RETURN(cudaCreateTextureObject(&texObj1, &resDesc1, &texDesc1, nullptr));
-	CUDA_CHECK_RETURN(cudaCreateTextureObject(&texObj2, &resDesc2, &texDesc2, nullptr));
-
-	thrust::device_vector<float> prj(DNU * DNV * PN, 0);
-	thrust::device_vector<float> d_xds(xds, xds + DNU);
-	thrust::device_vector<float> d_yds(yds, yds + DNU);
-	thrust::device_vector<float> d_zds(zds, zds + DNV);
-
-	thrust::device_vector<float> d_bxds(bxds, bxds + DNU + 1);
-	thrust::device_vector<float> d_byds(byds, byds + DNU + 1);
-	thrust::device_vector<float> d_bzds(bzds, bzds + DNV + 1);
-
+thrust::device_vector<float3> getCosSinZPosFromAngleAndZPos(float* hangs, float* hzPos, int PN, const float x0, const float y0, const float z0) {
 	thrust::device_vector<float> angs(hangs, hangs + PN);
 	thrust::device_vector<float> zPos(hzPos, hzPos + PN);
 
@@ -395,14 +268,46 @@ void DD3_gpu_proj_branchless_sat2d(
 		thrust::make_zip_iterator(thrust::make_tuple(angs.begin(), zPos.begin())),
 		thrust::make_zip_iterator(thrust::make_tuple(angs.end(), zPos.end())),
 		cossinZT.begin(), CTMBIR::ConstantForBackProjection4(x0, y0, z0));
+	return cossinZT;
+}
 
+void DD3_gpu_proj_branchless_sat2d(
+	float x0, float y0, float z0,
+	int DNU, int DNV,
+	float* xds, float* yds, float* zds,
+	float imgXCenter, float imgYCenter, float imgZCenter,
+	float* hangs, float* hzPos, int PN,
+	int XN, int YN, int ZN,
+	float* vol, float* hprj, float dx, float dz, byte* mask, int gpunum) {
+
+	maskingVolume(vol, mask, XN, YN, ZN);
+	CUDA_CHECK_RETURN(cudaSetDevice(gpunum));
+	CUDA_CHECK_RETURN(cudaDeviceReset());
+	
+	thrust::device_vector<float> d_bxds = getDD3Boundaries(xds, DNU);
+	thrust::device_vector<float> d_byds = getDD3Boundaries(yds, DNU);
+	thrust::device_vector<float> d_bzds = getDD3Boundaries(zds, DNV);
+
+	float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter / dx;
+	float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter / dx;
+	float objCntIdxZ = (ZN - 1.0) * 0.5 - imgZCenter / dz;
+
+	VolumeToTextures volumeToTexture(vol, XN, YN, ZN, cudaAddressModeClamp);
+
+	thrust::device_vector<float> prj(DNU * DNV * PN, 0);
+	thrust::device_vector<float> d_xds(xds, xds + DNU);
+	thrust::device_vector<float> d_yds(yds, yds + DNU);
+	thrust::device_vector<float> d_zds(zds, zds + DNV);
+
+	thrust::device_vector<float3> cossinZT = getCosSinZPosFromAngleAndZPos(hangs, hzPos, PN, x0, y0, z0);
+	
 	dim3 blk(BLKX, BLKY, BLKZ);
 	dim3 gid(
 		(DNV + blk.x - 1) / blk.x,
 		(DNU + blk.y - 1) / blk.y,
 		(PN + blk.z - 1) / blk.z);
 
-	DD3_gpu_proj_branchless_sat2d_ker << <gid, blk >> >(texObj1, texObj2,
+	DD3_gpu_proj_branchless_sat2d_ker << <gid, blk >> >(volumeToTexture.getTextureZXY(), volumeToTexture.getTextureZYX(),
 		thrust::raw_pointer_cast(&prj[0]),
 		make_float3(x0, y0, z0),
 		thrust::raw_pointer_cast(&cossinZT[0]),
@@ -416,28 +321,6 @@ void DD3_gpu_proj_branchless_sat2d(
 		dx, dz, XN, YN, ZN, DNU, DNV, PN);
 
 	thrust::copy(prj.begin(), prj.end(), hprj);
-	CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj1));
-	CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj2));
-
-	CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray1));
-	CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray2));
-
-	prj.clear();
-	angs.clear();
-	zPos.clear();
-
-	d_xds.clear();
-	d_yds.clear();
-	d_zds.clear();
-	d_bxds.clear();
-	d_byds.clear();
-	d_bzds.clear();
-	cossinZT.clear();
-
-	//delete[] bxds;
-	//delete[] byds;
-	//delete[] bzds;
-
 }
 
 
@@ -487,7 +370,6 @@ __global__ void DD3ProjSiddon_gpu_kernel(
 
 		proj[(angIdx * DNU + detIdU) * DNV + detIdV] = prj;
 	}
-
 }
 
 
@@ -503,14 +385,7 @@ float* vol, float* hprj,
 float dx, float dz,
 byte* mask, int gpunum)
 {
-	for (int i = 0; i != XN * YN; ++i)
-	{
-		byte v = mask[i];
-		for (int z = 0; z != ZN; ++z)
-		{
-			vol[i * ZN + z] = vol[i * ZN + z] * v;
-		}
-	}
+	maskingVolume(vol, mask, XN, YN, ZN);
 
 	CUDA_CHECK_RETURN(cudaSetDevice(gpunum));
 	CUDA_CHECK_RETURN(cudaDeviceReset());
@@ -598,16 +473,6 @@ byte* mask, int gpunum)
 	CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj));
 
 	CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray));
-
-
-	prj.clear();
-	angs.clear();
-	zPos.clear();
-
-	d_xds.clear();
-	d_yds.clear();
-	d_zds.clear();
-	cossinZT.clear();
 }
 
 void DD3_gpu_proj_branchless_sat2d_alreadyinGPU(
@@ -623,8 +488,8 @@ void DD3_gpu_proj_branchless_sat2d_alreadyinGPU(
 	thrust::device_vector<float>& hprj, float dx, float dz,
 	const thrust::device_vector<byte>& mask, int gpunum)
 {
-	//cudaSetDevice(gpunum);
-	//cudaDeviceReset();
+	cudaSetDevice(gpunum);
+	cudaDeviceReset();
 
 	thrust::host_vector<float> hxds = xds;
 	thrust::host_vector<float> hyds = yds;
@@ -764,19 +629,6 @@ void DD3_gpu_proj_branchless_sat2d_alreadyinGPU(
 
 	cudaFreeArray(d_volumeArray1);
 	cudaFreeArray(d_volumeArray2);
-
-
-	d_bxds.clear();
-	d_byds.clear();
-	d_bzds.clear();
-	cossinZT.clear();
-
-	hxds.clear();
-	hyds.clear();
-	hzds.clear();
-	bxds.clear();
-	byds.clear();
-	bzds.clear();
 }
 
 //
@@ -1066,8 +918,7 @@ __global__ void DD3_gpu_proj_volumerendering_ker(cudaTextureObject_t texObj,
 		float3 curIdx;
 		float summ = 0;
 
-		for (int i = 0; i != stpNum; ++i)
-		{
+		for (int i = 0; i != stpNum; ++i) {
 			cursour = cursour + dir * 0.25;
 			curIdx.x = cursour.x / dx + objCtrIdx.x + 0.5; // 0.5 is used for texture object offset
 			curIdx.y = cursour.y / dx + objCtrIdx.y + 0.5;
@@ -1079,21 +930,14 @@ __global__ void DD3_gpu_proj_volumerendering_ker(cudaTextureObject_t texObj,
 	}
 }
 
+// Todo: Incorrect
 void DD3_gpu_proj_volumerendering(float x0, float y0, float z0, int DNU, int DNV,
 	float* xds, float* yds, float* zds,
 	float imgXCenter, float imgYCenter, float imgZCenter,
 	float* hangs, float* hzPos, int PN, int XN, int YN, int ZN,
 	float* hvol, float* hprj, float dx, float dz, byte* mask, int gpunum)
 {
-
-	for (int i = 0; i != XN * YN; ++i)
-	{
-		byte v = mask[i];
-		for (int z = 0; z != ZN; ++z)
-		{
-			hvol[i * ZN + z] = hvol[i * ZN + z] * v;
-		}
-	}
+	maskingVolume(hvol, mask, XN, YN, ZN);
 	CUDA_CHECK_RETURN(cudaSetDevice(gpunum)); // choose the 2nd GPU for now (1st GPU used to be occupied on torb
 	CUDA_CHECK_RETURN(cudaDeviceReset());
 
@@ -1224,70 +1068,22 @@ void DD3_gpu_proj_pseudodistancedriven(
 	float imgXCenter, float imgYCenter, float imgZCenter,
 	float* hangs, float* hzPos, int PN,
 	int XN, int YN, int ZN, float* hvol, float* hprj,
-	float dx, float dz, byte* mask, int gpunum)
-{
-	for (int ii = 0; ii != XN * YN; ++ii)
-	{
-		byte v = mask[ii];
-		for (int jj = 0; jj != ZN; ++jj)
-		{
-			hvol[ii * ZN + jj] = hvol[ii * ZN + jj] * v;
-		}
-	}
+	float dx, float dz, byte* mask, int gpunum) {
+	maskingVolume(hvol, mask, XN, YN, ZN);
 
-
-	float* bxds = new float[DNU + 1];
-	float* byds = new float[DNU + 1];
-	float* bzds = new float[DNV + 1];
-	DD3Boundaries(DNU + 1, xds, bxds);
-	DD3Boundaries(DNU + 1, yds, byds);
-	DD3Boundaries(DNV + 1, zds, bzds);
-
-	cudaSetDevice(gpunum);
-	cudaDeviceReset();
+	CUDA_CHECK_RETURN(cudaSetDevice(gpunum));
+	CUDA_CHECK_RETURN(cudaDeviceReset());
+	
+	thrust::device_vector<float> d_bxds = getDD3Boundaries(xds, DNU);
+	thrust::device_vector<float> d_byds = getDD3Boundaries(yds, DNU);
+	thrust::device_vector<float> d_bzds = getDD3Boundaries(zds, DNV);
 
 	const int TOTVN = XN * YN * ZN;
 	float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter / dx;
 	float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter / dx;
 	float objCntIdxZ = (ZN - 1.0) * 0.5 - imgZCenter / dz;
 
-	thrust::device_vector<float> vol(hvol, hvol + TOTVN);
-
-
-	cudaExtent volumeSize;
-	volumeSize.width = ZN;
-	volumeSize.height = XN;
-	volumeSize.depth = YN;
-
-	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float>();
-
-	cudaArray* d_volumeArray;
-	cudaMalloc3DArray(&d_volumeArray, &channelDesc, volumeSize);
-	cudaMemcpy3DParms copyParams = { 0 };
-	copyParams.srcPtr = make_cudaPitchedPtr((void*)thrust::raw_pointer_cast(&vol[0]),
-		volumeSize.width * sizeof(float),
-		volumeSize.width, volumeSize.height);
-	copyParams.dstArray = d_volumeArray;
-	copyParams.extent = volumeSize;
-	copyParams.kind = cudaMemcpyDeviceToDevice;
-	cudaMemcpy3D(&copyParams);
-	vol.clear();
-
-	cudaResourceDesc resDesc;
-	memset(&resDesc, 0, sizeof(resDesc));
-	resDesc.resType = cudaResourceTypeArray;
-	resDesc.res.array.array = d_volumeArray;
-	cudaTextureDesc texDesc;
-	memset(&texDesc, 0, sizeof(texDesc));
-	texDesc.addressMode[0] = cudaAddressModeBorder;
-	texDesc.addressMode[1] = cudaAddressModeBorder;
-	texDesc.addressMode[2] = cudaAddressModeBorder;
-	texDesc.filterMode = cudaFilterModeLinear;
-	texDesc.readMode = cudaReadModeElementType;
-	texDesc.normalizedCoords = false;
-
-	cudaTextureObject_t texObj = 0;
-	cudaCreateTextureObject(&texObj, &resDesc, &texDesc, nullptr);
+	VolumeToOneTexture volumeToOneTexture(hvol, XN, YN, ZN, cudaAddressModeBorder);
 
 	thrust::device_vector<float> prj(DNU * DNV * PN, 0);
 	thrust::device_vector<float> angs(hangs, hangs + PN);
@@ -1310,7 +1106,8 @@ void DD3_gpu_proj_pseudodistancedriven(
 		(PN + blk.z - 1) / blk.z);
 
 	DD3_gpu_proj_pseudodistancedriven_ker << <gid, blk >> >(
-		texObj, thrust::raw_pointer_cast(&prj[0]),
+		volumeToOneTexture.getTexture(), 
+		thrust::raw_pointer_cast(&prj[0]),
 		make_float3(x0, y0, z0),
 		thrust::raw_pointer_cast(&d_xds[0]),
 		thrust::raw_pointer_cast(&d_yds[0]),
@@ -1319,12 +1116,6 @@ void DD3_gpu_proj_pseudodistancedriven(
 		make_float3(objCntIdxX, objCntIdxY, objCntIdxZ),
 		dx, dz, XN, YN, DNU, DNV, PN);
 	thrust::copy(prj.begin(), prj.end(), hprj);
-
-	delete[] bxds;
-	delete[] byds;
-	delete[] bzds;
-
-
 }
 
 
@@ -2231,19 +2022,9 @@ void DD3Proj_branches(float x0, float y0, float z0, int DNU, int DNV,
 	int XN, int YN, int ZN, float* hvol, float* hprj, float dx, float dz, byte* mask,
 	int gpunum)
 {
-	cudaSetDevice(gpunum);
-	//Pre set the projection
-	for (int jj = 0; jj != YN; ++jj)
-	{
-		for (int ii = 0; ii != XN; ++ii)
-		{
-			byte tempV = mask[jj * XN + ii];
-			for (int kk = 0; kk != ZN; ++kk)
-			{
-				hvol[(jj * XN + ii) * ZN + kk] *= static_cast<float>(tempV);
-			}
-		}
-	}
+	CUDA_CHECK_RETURN(cudaSetDevice(gpunum));
+	maskingVolume(hvol, mask, XN, YN, ZN);
+
 	thrust::host_vector<float3> hcossinZT(PN);
 	for (int i = 0; i != PN; ++i)
 	{
@@ -2253,36 +2034,22 @@ void DD3Proj_branches(float x0, float y0, float z0, int DNU, int DNV,
 	}
 	thrust::device_vector<float3> cossinZT = hcossinZT;
 
-	thrust::host_vector<float> hxds(xds, xds + DNU);
-	thrust::host_vector<float> hyds(yds, yds + DNU);
-	thrust::host_vector<float> hzds(zds, zds + DNV);
+	thrust::device_vector<float> dxds(xds, xds + DNU);
+	thrust::device_vector<float> dyds(yds, yds + DNU);
+	thrust::device_vector<float> dzds(zds, zds + DNU);
 
+	thrust::device_vector<float> dbxds = getDD3Boundaries(xds, DNU);
+	thrust::device_vector<float> dbyds = getDD3Boundaries(yds, DNU);
+	thrust::device_vector<float> dbzds = getDD3Boundaries(zds, DNV);
 
-	thrust::host_vector<float> bxds(DNU + 1, 0);
-	thrust::host_vector<float> byds(DNU + 1, 0);
-	thrust::host_vector<float> bzds(DNV + 1, 0);
-
-	DD3Boundaries<float>(DNU + 1, hxds, bxds);
-	DD3Boundaries<float>(DNU + 1, hyds, byds);
-	DD3Boundaries<float>(DNV + 1, hzds, bzds);
-
-	thrust::device_vector<float> dxds = hxds;
-	thrust::device_vector<float> dyds = hyds;
-	thrust::device_vector<float> dzds = hzds;
-
-	thrust::device_vector<float> dbxds = bxds;
-	thrust::device_vector<float> dbyds = byds;
-	thrust::device_vector<float> dbzds = bzds;
-
-	thrust::device_vector<float> dprj(hprj, hprj + DNU*DNV*PN);
-	thrust::device_vector<float> dvol(hvol, hvol + XN*YN*ZN);
+	thrust::device_vector<float> dprj(hprj, hprj + DNU * DNV * PN);
+	thrust::device_vector<float> dvol(hvol, hvol + XN * YN * ZN);
 
 	dim3 blk(64, 4, 1);
 	dim3 gid(
 		(DNV + blk.x - 1) / blk.x,
 		(DNU + blk.y - 1) / blk.y,
 		(PN + blk.z - 1) / blk.z);
-
 	float objCntIdxX = (static_cast<float>(XN) - 1.0f) * 0.5f - imgXCenter / dx;
 	float objCntIdxY = (static_cast<float>(YN) - 1.0f) * 0.5f - imgYCenter / dx;
 	float objCntIdxZ = (static_cast<float>(ZN) - 1.0f) * 0.5f - imgZCenter / dz;
@@ -2298,23 +2065,6 @@ void DD3Proj_branches(float x0, float y0, float z0, int DNU, int DNV,
 		XN, YN, ZN, DNU, DNV, PN,
 		dx, dz);
 	thrust::copy(dprj.begin(), dprj.end(), hprj);
-	hcossinZT.clear();
-	cossinZT.clear();
-	hxds.clear();
-	hyds.clear();
-	hzds.clear();
-	bxds.clear();
-	byds.clear();
-	bzds.clear();
-	dxds.clear();
-	dyds.clear();
-	dzds.clear();
-
-	dbxds.clear();
-	dbyds.clear();
-	dbzds.clear();
-	dprj.clear();
-	dvol.clear();
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // END BRANCHES PROJECTION
@@ -2338,22 +2088,22 @@ void DD3Proj_gpu(
 		DD3_gpu_proj_branchless_sat2d(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
 			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
 		break;
-	case 1:
+	case 1: // Todo: incorrect
 		DD3_gpu_proj_volumerendering(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
 			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
 		break;
-	case 2:
+	case 2: // Todo: incorrect
 		DD3_gpu_proj_doubleprecisionbranchless(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
 			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
 	case 3:
 		DD3_gpu_proj_pseudodistancedriven(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
 			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
 		break;
-	case 4: //Siddon's algorithm exactly which is slow because of the L2 cache in device function
+	case 4: // Todo: incorrect
 		DD3ProjSiddon_gpu(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
 				hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
 		break;
-	case 5: //Brute Force projection (Not finished)
+	case 5:
 		DD3Proj_branches(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
 			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
 		break;
@@ -2674,33 +2424,6 @@ void DD3_gpu_proj_pseudodistancedriven_multiGPU(
 		CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj[i]));
 		CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray[i]));
 	}
-
-	// Delete the vectors;
-	hangs.clear();
-	hzPos.clear();
-	ObjIdx_Start.clear();
-	ObjIdx_End.clear();
-	PrjIdx_Start.clear();
-	PrjIdx_End.clear();
-	SPN.clear();
-	prefixSPN.clear();
-	SZN.clear();
-	subVol.clear();
-	subImgZCenter.clear();
-	stream.clear();
-	siz.clear();
-	volumeSize.clear();
-	d_volumeArray.clear();
-	d_vol.clear();
-	prj.clear();
-	d_xds.clear();
-	d_yds.clear();
-	d_zds.clear();
-	angs.clear();
-	zPos.clear();
-	cossinZT.clear();
-	gid.clear();
-
 }
 
 
@@ -2718,14 +2441,7 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 	thrust::host_vector<float> hangs(h_angs, h_angs+PN);
 	thrust::host_vector<float> hzPos(h_zPos, h_zPos+PN);
 
-	for (int i = 0; i != XN * YN; ++i)
-	{
-		byte v = mask[i];
-		for (int z = 0; z != ZN; ++z)
-		{
-			hvol[i * ZN + z] = hvol[i * ZN + z] * v;
-		}
-	}
+	maskingVolume(hvol, mask, XN, YN, ZN);
 	// Calculate the boundary positions
 	std::vector<float> bxds(DNU + 1, 0.0f);
 	std::vector<float> byds(DNU + 1, 0.0f);
@@ -2762,7 +2478,6 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 
 	// Generate multiple streams;
 	std::vector<cudaStream_t> stream(gpuNum * 2);
-
 
 	std::vector<int> siz(gpuNum, 0);
 	std::vector<int> nsiz_ZXY(gpuNum, 0);
@@ -3023,49 +2738,6 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 		CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray1[i]));
 		CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray2[i]));
 	}
-
-	// Clear the vectors
-	hangs.clear();
-	hzPos.clear();
-	bxds.clear();
-	byds.clear();
-	bzds.clear();
-	ObjIdx_Start.clear();
-	ObjIdx_End.clear();
-	PrjIdx_Start.clear();
-	PrjIdx_End.clear();
-	SPN.clear();
-	prefixSPN.clear();
-	SZN.clear();
-	subVol.clear();
-	subImgZCenter.clear();
-	stream.clear();
-	siz.clear();
-	nsiz_ZXY.clear();
-	nsiz_ZYX.clear();
-	nZN.clear();
-	d_vol.clear();
-	d_ZXY.clear();
-	d_ZYX.clear();
-	prj.clear();
-	d_xds.clear();
-	d_yds.clear();
-	d_zds.clear();
-	d_bxds.clear();
-	d_byds.clear();
-	d_bzds.clear();
-	angs.clear();
-	zPos.clear();
-	cossinZT.clear();
-	copygid.clear();
-	satgid2_1.clear();
-	satgid2_2.clear();
-	gid.clear();
-	volumeSize1.clear();
-	volumeSize2.clear();
-	d_volumeArray1.clear();
-	d_volumeArray2.clear();
-
 }
 
 
@@ -3111,8 +2783,6 @@ void DD3Proj_multiGPU(
 	}
 }
 
-#include "ProjectionModelMap.h"
-
 void CT::Proj(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, const std::string& projModel)
 {
 	std::vector<unsigned char> mask(geo.getObjDimX() * geo.getObjDimY(), 1);
@@ -3121,7 +2791,7 @@ void CT::Proj(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, 
 	std::vector<float> zds = geo.getZds();
 	std::vector<float> hangs = geo.getAllAngles();
 	std::vector<float> hzPos = geo.getAllZPoses();
-	ProjectionModelMap m;
+
 	DD3Proj_gpu(0, geo.getSourToObj(), 0,
 		geo.getDetNumWidth(), geo.getDetNumHeight(),
 		&xds[0], &yds[0], &zds[0],
@@ -3131,5 +2801,5 @@ void CT::Proj(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, 
 		geo.getObjDimX(), geo.getObjDimY(), geo.getObjDimZ(),
 		&hvol[0], &hprj[0],
 		geo.getVoxelSizeX(), geo.getVoxelSizeZ(),
-		&mask[0], 0, m.get()[projModel]);
+		&mask[0], 0, 0);
 }

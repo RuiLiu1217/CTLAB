@@ -28,16 +28,13 @@
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSysMatrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ProjectionModelMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\BackprojectionModelMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Geometry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\CTLAB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\TextureObjectProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -102,12 +99,6 @@
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSysMatrix.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ProjectionModelMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\BackprojectionModelMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Geometry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -121,6 +112,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\GenerateSummedAreaTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\cudaCheckReturner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\VolumeToTextures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -165,6 +162,9 @@
       <Filter>Source Files</Filter>
     </CustomBuild>
     <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\GenerateSummedAreaTable.cu">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\VolumeToTextures.cu">
       <Filter>Source Files</Filter>
     </CustomBuild>
     <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\CMakeLists.txt" />
@@ -214,6 +214,9 @@
       <Filter>Object Files</Filter>
     </Object>
     <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_GenerateSummedAreaTable.cu.obj">
+      <Filter>Object Files</Filter>
+    </Object>
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_VolumeToTextures.cu.obj">
       <Filter>Object Files</Filter>
     </Object>
   </ItemGroup>

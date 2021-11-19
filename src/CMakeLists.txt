@@ -51,13 +51,13 @@ SET(CTLAB_HEADERS
 	genSheppLoganProjection.h # Generate Shepp Logan phantom based projection
 	genSysMatrix.hpp        # Generate system matrix with SIDDON/AIM model
 	multiSlices_ker.cuh     # multi slices based projection and backprojection
-	ProjectionModelMap.h
-	BackprojectionModelMap.h
 	Geometry.h
 	OldCodes.h
 	CTLAB.h
 	TextureObjectProvider.h
 	GenerateSummedAreaTable.h
+	cudaCheckReturner.h
+	VolumeToTextures.h
 	
 )
 
@@ -85,11 +85,11 @@ SET(CTLAB_SRC
 	genSheppLoganProjection.cpp # Generate Shepp Logan phantom based projection
 	genSysMatrix.cpp        # Generate system matrix with SIDDON/AIM model
 	multiSlices_ker.cu      # multi slices based projection and backprojection
-	ProjectionModelMap.cpp
-	BackprojectionModelMap.cpp
 	Geometry.cpp
 	CTLAB.cpp
 	GenerateSummedAreaTable.cu
+	TextureObjectProvider.cpp
+	VolumeToTextures.cu
 )
 
 

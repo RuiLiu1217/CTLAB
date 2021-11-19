@@ -86,14 +86,6 @@
 #define INLINE inline
 #endif
 
-// Usually, for safety, we will use checkCudaErrors or CUDA_CHECK_RETURN before "cuda" API functions
-#if DEBUG
-#define CUDA_CHECK_RETURN(value) { cudaError_t _m_cudaStat = value; if(_m_cudaStat != cudaSuccess){fprintf(stderr, "Error %s at line %d in file %s\n", cudaGetErrorString(_m_cudaStat), __LINE__, __FILE__); exit(1);}}
-#else
-#define CUDA_CHECK_RETURN(value) {value;}
-#endif
-
-
 typedef unsigned char byte;
 typedef unsigned int uint;
 typedef const unsigned int cuint;
@@ -4056,6 +4048,11 @@ std::vector<T> getDD3Boundaries(int nCenters, T* pCenters) {
 	return res;
 }
 
+template<typename T>
+thrust::device_vector<T> getDD3Boundaries(T* pCenters, int nCenters) {
+	thrust::device_vector<T> res{ getDD3Boundaries(nCenters, pCenters) };
+	return res;
+}
 
 template<typename T>
 void DD3Boundaries(int nrBoundaries, std::vector<T>& Centers, std::vector<T>& Boundaries)

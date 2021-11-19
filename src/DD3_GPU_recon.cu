@@ -5,8 +5,6 @@
 #include "DD3_GPU_Back.h"
 #include "FastIterativeShrinkageAlgorithm.h"
 #include "SARTWeighting.h"
-#include "ProjectionModelMap.h"
-#include "BackprojectionModelMap.h"
 
 #include "CTLAB.h"
 
@@ -143,8 +141,6 @@ void OS_SART_v4(std::vector<float>& reconImg, // The image volume to be reconstr
 	const int osNum, // # of OS
 	const int iterNum)
 {
-	ProjectionModelMap pm;
-	BackprojectionModelMap bm;
 	const float sid = geo.getSourToObj();
 	const float sdd = geo.getSourToDet();
 	const int DNU = geo.getDetNumWidth();
@@ -226,11 +222,11 @@ void OS_SART_v4(std::vector<float>& reconImg, // The image volume to be reconstr
 		DD3Proj_gpu(x0, y0, z0, DNU, DNV,
 			&xds[0], &yds[0], &zds[0],
 			imgXCenter, imgYCenter, imgZCenter, shangs[i], shzPos[i], SPN[i],
-			XN, YN, ZN, &oneVol[0], srowSum[i], dx, dz, &mask[0], 0, pm.get()[projModel]);
+			XN, YN, ZN, &oneVol[0], srowSum[i], dx, dz, &mask[0], 0, 0);
 		DD3Back_gpu(x0, y0, z0, DNU, DNV,
 			&xds[0], &yds[0], &zds[0],
 			imgXCenter, imgYCenter, imgZCenter, shangs[i], shzPos[i], SPN[i],
-			XN, YN, ZN, colSum[i], &allOneproj[0], dx, dz, &mask[0], 0, 0, bm.get()[backModel]);
+			XN, YN, ZN, colSum[i], &allOneproj[0], dx, dz, &mask[0], 0, 0, 0);
 	}
 	allOneproj.clear();
 
@@ -247,13 +243,13 @@ void OS_SART_v4(std::vector<float>& reconImg, // The image volume to be reconstr
 			DD3Proj_gpu(x0, y0, z0, DNU, DNV,
 				&xds[0], &yds[0], &zds[0],
 				imgXCenter, imgYCenter, imgZCenter, shangs[subIdx], shzPos[subIdx], SPN[subIdx],
-				XN, YN, ZN, &hvol[0], onePrj[subIdx], dx, dz, &mask[0], 0, pm.get()[projModel]);
+				XN, YN, ZN, &hvol[0], onePrj[subIdx], dx, dz, &mask[0], 0, 0);
 			SART_Weighting<float>::Proj_ptr(onePrj[subIdx], shprj[subIdx], srowSum[subIdx], DNU*DNV*SPN[subIdx]);
 
 			DD3Back_gpu(x0, y0, z0, DNU, DNV,
 				&xds[0], &yds[0], &zds[0],
 				imgXCenter, imgYCenter, imgZCenter, shangs[subIdx], shzPos[subIdx], SPN[subIdx],
-				XN, YN, ZN, &oneVol[0], onePrj[subIdx], dx, dz, &mask[0], 0, 0, bm.get()[backModel]);
+				XN, YN, ZN, &oneVol[0], onePrj[subIdx], dx, dz, &mask[0], 0, 0, 0);
 			SART_Weighting<float>::Back_ptr(&oneVol[0], &hvol[0], colSum[subIdx], totN);
 
 		}
@@ -507,8 +503,8 @@ void OS_SART_v3(std::vector<float>& reconImg, // The image volume to be reconstr
 	const std::string& backprojectionModel,
 	Geometry& geometry)
 {
-	ProjectionModelMap pm;
-	BackprojectionModelMap bm;
+	/*ProjectionModelMap pm;
+	BackprojectionModelMap bm;*/
 	int DNU = geometry.getDetNumWidth();
 	int DNV = geometry.getDetNumHeight();
 	float imgXCenter = geometry.getObjCtrCoordX();
@@ -585,11 +581,11 @@ void OS_SART_v3(std::vector<float>& reconImg, // The image volume to be reconstr
 		DD3Proj_gpu(x0, y0, z0, DNU, DNV,
 			&xds[0], &yds[0], &zds[0],
 			imgXCenter, imgYCenter, imgZCenter, &shangs[i][0], &shzPos[i][0], SPN[i],
-			XN, YN, ZN, &oneVol[0], &srowSum[i][0], dx, dz, &mask[0], 0, pm.get()[projectionModel]);
+			XN, YN, ZN, &oneVol[0], &srowSum[i][0], dx, dz, &mask[0], 0, 0);
 		DD3Back_gpu(x0, y0, z0, DNU, DNV,
 			&xds[0], &yds[0], &zds[0],
 			imgXCenter, imgYCenter, imgZCenter, &shangs[i][0], &shzPos[i][0], SPN[i],
-			XN, YN, ZN, &colSum[i][0], &allOneproj[0], dx, dz, &mask[0], 0, 0, bm.get()[backprojectionModel]);
+			XN, YN, ZN, &colSum[i][0], &allOneproj[0], dx, dz, &mask[0], 0, 0, 0);
 	}
 	allOneproj.clear();
 
@@ -606,13 +602,13 @@ void OS_SART_v3(std::vector<float>& reconImg, // The image volume to be reconstr
 			DD3Proj_gpu(x0, y0, z0, DNU, DNV,
 				&xds[0], &yds[0], &zds[0],
 				imgXCenter, imgYCenter, imgZCenter, &shangs[subIdx][0], &shzPos[subIdx][0], SPN[subIdx],
-				XN, YN, ZN, &hvol[0], &onePrj[subIdx][0], dx, dz, &mask[0], 0, pm.get()[projectionModel]);
+				XN, YN, ZN, &hvol[0], &onePrj[subIdx][0], dx, dz, &mask[0], 0, 0);
 			SART_Weighting<float>::Proj_ptr(&onePrj[subIdx][0], &shprj[subIdx][0], &srowSum[subIdx][0], DNU*DNV*SPN[subIdx]);
 
 			DD3Back_gpu(x0, y0, z0, DNU, DNV,
 				&xds[0], &yds[0], &zds[0],
 				imgXCenter, imgYCenter, imgZCenter, &shangs[subIdx][0], &shzPos[subIdx][0], SPN[subIdx],
-				XN, YN, ZN, &oneVol[0], &onePrj[subIdx][0], dx, dz, &mask[0], 0, 0, bm.get()[backprojectionModel]);
+				XN, YN, ZN, &oneVol[0], &onePrj[subIdx][0], dx, dz, &mask[0], 0, 0, 0);
 			SART_Weighting<float>::Back_ptr(&oneVol[0], &hvol[0], &colSum[subIdx][0], totN);
 
 		}
@@ -1013,10 +1009,6 @@ void CG(thrust::host_vector<float>& reconImg, // The image volume to be reconstr
 	double alpha(1.0);
 	double beta(1.0);
 
-//	double beta1(1.0);
-//	double beta2(1.0);
-	//thrust::host_vector<float> betaTempVar(nextR.size(), 0);
-
 	for(int i = 0; i != iterNum; ++i)
 	{
 		// Calculate the scalar alpha
@@ -1036,50 +1028,6 @@ void CG(thrust::host_vector<float>& reconImg, // The image volume to be reconstr
 
 		// (3) Calculate beta
 		beta = calculateBeta<float>(X, R, nextR, Delta, cgm);
-//
-//		// (3) Calculate beta
-//		switch(cgm)
-//		{
-//		case CG_FR:
-//			// TODO: USE ONE TRANSORM TO UPDATE IT (NOTE: This will not reduce the complexity of the calculation)
-//			beta1 = thrust::inner_product(nextR.begin(),nextR.end(),nextR.begin(),0.0);
-//			beta2 = thrust::inner_product(R.begin(),R.end(),R.begin(),0.0);
-//			beta = beta1 / beta2;
-//			break;
-//		case CG_PRP:
-//			// TODO: USE ONLY ONE TRANSFORM TO UPDATE IT (NOTE: This will not reduce the complexity of the calculation)
-//			thrust::transform(nextR.begin(),nextR.end(),R.begin(),betaTempVar.begin(),thrust::minus<float>());
-//			beta1 = thrust::inner_product(nextR.begin(),nextR.end(),betaTempVar.begin(),0.0);
-//			beta2 = thrust::inner_product(R.begin(),R.end(),R.begin(),0.0);
-//			beta = beta1 / beta2;
-//			break;
-//		case CG_CW:
-//			// TODO: USE ONLY ONE TRANSFORM TO UPDATE IT (NOTE: This will not reduce the complexity of the calculation)
-//			thrust::transform(nextR.begin(),nextR.end(),R.begin(),betaTempVar.begin(),thrust::minus<float>());\
-//			beta1 = thrust::inner_product(nextR.begin(), nextR.end(),betaTempVar.begin(),0.0);
-//			beta2 = thrust::inner_product(Delta.begin(), Delta.end(),betaTempVar.begin(),0.0);
-//			beta = beta1 / beta2;
-//			break;
-//		case CG_DI:
-//			// TODO: USE ONLY ONE TRANSFORM TO UPDATE IT (NOTE: This will not reduce the complexity of the calculation)
-//			beta1 = thrust::inner_product(nextR.begin(),nextR.end(),nextR.begin(),0.0);
-//			beta2 = thrust::inner_product(Delta.begin(),Delta.end(),R.begin(),0.0);
-//			beta = -beta1 / beta2;
-//			break;
-//		case CG_DY:
-//			// TODO: USE ONLY ONE TRANSFORM TO UPDATE IT (NOTE: This will not reduce the complexity of the calculation)
-//			beta1 = thrust::inner_product(nextR.begin(),nextR.end(),nextR.begin(),0.0);
-//			thrust::transform(nextR.begin(),nextR.end(),R.begin(),betaTempVar.begin(),thrust::minus<float>());
-//			beta2 = thrust::inner_product(Delta.begin(), Delta.end(),betaTempVar.begin(),0.0);
-//			beta = beta1 / beta2;
-//			break;
-//		default:
-//			// TODO: USE ONLY ONE TRANSFORM TO UPDATE IT (NOTE: This will not reduce the complexity of the calculation)
-//			beta1 = thrust::inner_product(nextR.begin(),nextR.end(),nextR.begin(),0.0);
-//			beta2 = thrust::inner_product(R.begin(),R.end(),R.begin(),0.0);
-//			beta = beta1 / beta2;
-//			break;
-//		}
 
 		// Update current Delta with nextR;
 		thrust::transform(nextR.begin(),nextR.end(),Delta.begin(),Delta.begin(),CGop<float>(beta));

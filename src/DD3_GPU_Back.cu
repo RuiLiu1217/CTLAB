@@ -2,7 +2,6 @@
 #include "DD3_GPU_Back.h"
 #include "CTLAB.h"
 #include "Geometry.h"
-#include "BackprojectionModelMap.h"
 #include <cassert>
 #include "TextureObjectProvider.h"
 
@@ -2971,7 +2970,7 @@ void CT::Back(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, 
 	std::vector<float> zds = geo.getZds();
 	std::vector<float> hangs = geo.getAllAngles();
 	std::vector<float> hzPos = geo.getAllZPoses();
-	BackprojectionModelMap m;
+	
 	std::vector<unsigned char> mask(geo.getObjDimX() * geo.getObjDimY(), 1);
 	DD3Back_gpu(0, geo.getSourToObj(), 0,
 		geo.getDetNumWidth(), geo.getDetNumHeight(),
@@ -2981,5 +2980,5 @@ void CT::Back(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, 
 		geo.getObjDimX(), geo.getObjDimY(), geo.getObjDimZ(),
 		&hvol[0], &hprj[0],
 		geo.getVoxelSizeX(), geo.getVoxelSizeZ(),
-		&mask[0], 0, 0, m.get()[backModel]);
+		&mask[0], 0, 0, 0);
 }

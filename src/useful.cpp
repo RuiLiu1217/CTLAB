@@ -1,6 +1,6 @@
 #include "useful.hpp"
 #include "utilities.hpp"
-
+#include "cudaCheckReturner.h"
 FanEAGeo::FanEAGeo(void)
 {
 	m_DetArc = 0.95928517242269f;

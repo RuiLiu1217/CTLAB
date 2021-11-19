@@ -1,8 +1,6 @@
 #include "utilities.hpp"
-
-
 #include "threeGPUHouseholder.hpp"
-
+#include "cudaCheckReturner.h"
 
 namespace SVD{
 template<typename T>

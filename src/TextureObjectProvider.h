@@ -2,6 +2,7 @@
 #define TEXTURE_OBJECT_PROVIDER_H_
 #include <cuda_runtime.h>
 #include <cuda.h>
+#include "cudaCheckReturner.h"
 //Create texture object and corresponding cudaArray function
 template<typename T>
 void createTextureObject(
@@ -45,8 +46,5 @@ void createTextureObject(
 }
 
 // Destroy a GPU array and corresponding TextureObject
-void destroyTextureObject(cudaTextureObject_t& texObj, cudaArray* d_array) {
-	CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj));
-	CUDA_CHECK_RETURN(cudaFreeArray(d_array));
-}
+void destroyTextureObject(cudaTextureObject_t& texObj, cudaArray* d_array);
 #endif
