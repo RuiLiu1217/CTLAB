@@ -1987,7 +1987,7 @@ __global__ void _proj_AIM_Ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
@@ -2113,7 +2113,7 @@ __global__ void _proj_AIM_Ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
 					weight += coef;
@@ -2237,7 +2237,7 @@ __global__ void _proj_AIM_Ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
 					weight += coef;
@@ -2349,7 +2349,7 @@ __global__ void _proj_AIM_Ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist * FanGeo.m_DetStp);
@@ -2482,7 +2482,7 @@ __global__ void _proj_AIMslow_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const
 				grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 				//Sort grid
-				SortProj<T>(grid);
+				SortProjection<T>(grid);
 
 				pdist = hypot((imgLIdx - cntImgX)*Img.m_Step.x - sour[0], (imgWIdx - cntImgY)*Img.m_Step.y - sour[1]);
 				coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
@@ -2647,8 +2647,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Ima
 					initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
@@ -2749,8 +2748,8 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Ima
 					initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					//����;
-					SortProj<T>(grid);
+
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
 					summ += coef * dimg[curIdx * Img.m_Reso.x + sliceIdx];
@@ -2851,8 +2850,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Ima
 					initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
 					summ += coef * dimg[sliceIdx* Img.m_Reso.x + curIdx];
@@ -2954,7 +2952,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Ima
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist * FanGeo.m_DetStp);
@@ -3126,8 +3124,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEAGeo FanGeo, 
 					initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
@@ -3237,8 +3234,8 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEAGeo FanGeo, 
 					initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					//����;
-					SortProj<T>(grid);
+
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
 					weight += coef;
@@ -3348,8 +3345,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEAGeo FanGeo, 
 					initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
 					weight += coef;
@@ -3459,8 +3455,8 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEAGeo FanGeo, 
 					initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					//����;
-					SortProj<T>(grid);
+
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist * FanGeo.m_DetStp);
@@ -3636,8 +3632,8 @@ __global__ void _proj_AIM_ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 					initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					//����;
-					SortProj<T>(grid);
+
+					SortProjection<T>(grid);
 
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
@@ -3746,8 +3742,8 @@ __global__ void _proj_AIM_ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 					initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					//����;
-					SortProj<T>(grid);
+
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
 					weight += coef;
@@ -3857,8 +3853,8 @@ __global__ void _proj_AIM_ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 					initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					//����;
-					SortProj<T>(grid);
+
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
 					weight += coef;
@@ -3968,8 +3964,8 @@ __global__ void _proj_AIM_ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 					initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					//����;
-					SortProj<T>(grid);
+
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist * FanGeo.m_DetStp);
@@ -4171,8 +4167,7 @@ __global__ void _proj_AIM2_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Im
 				initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 				grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-				//����;
-				SortProj<T>(grid);
+				SortProjection<T>(grid);
 
 				len = hypot((curIdx - cntImgX)*Img.m_Step.x - sour[0], (sliceIdx - cntImgY)*Img.m_Step.y - sour[1]);
 				coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
@@ -4270,8 +4265,8 @@ __global__ void _proj_AIM2_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Im
 				initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 				grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-				//����;
-				SortProj<T>(grid);
+
+				SortProjection<T>(grid);
 				len = hypot((sliceIdx - cntImgX)*Img.m_Step.x - sour[0], (curIdx - cntImgY)*Img.m_Step.y - sour[1]);
 				coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 				coef = coef / (len * FanGeo.m_DetStp);
@@ -4369,8 +4364,8 @@ __global__ void _proj_AIM2_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Im
 				initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 				grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-				//����;
-				SortProj<T>(grid);
+
+				SortProjection<T>(grid);
 				len = hypot((curIdx - cntImgX)*Img.m_Step.x - sour[0], (sliceIdx - cntImgY)*Img.m_Step.y - sour[1]);
 				coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 				coef = coef / (len * FanGeo.m_DetStp);
@@ -4467,8 +4462,8 @@ __global__ void _proj_AIM2_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Im
 				initDir[1] = dir[0] * (-sinT) + dir[1] * cosT;
 				grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-				//����;
-				SortProj<T>(grid);
+
+				SortProjection<T>(grid);
 				len = hypot((sliceIdx - cntImgX)*Img.m_Step.x - sour[0], (curIdx - cntImgY)*Img.m_Step.y - sour[1]);
 				coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 				coef = coef / (len * FanGeo.m_DetStp);
@@ -4603,8 +4598,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEDGeo FanGeo, const Ima
 					grid[3][2] = xPos / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 
-					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
@@ -4682,8 +4676,8 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEDGeo FanGeo, const Ima
 					grid[3][2] = xPos / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 
-					//����;
-					SortProj<T>(grid);
+
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist* vv);
@@ -4761,8 +4755,8 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEDGeo FanGeo, const Ima
 					grid[3][2] = xPos / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 
-					//����;
-					SortProj<T>(grid);
+
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist* vv);
@@ -4837,7 +4831,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEDGeo FanGeo, const Ima
 					xPos = -initP[0] * FanGeo.m_S2D / initP[1];
 					grid[3][2] = xPos / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist* vv);
@@ -4987,7 +4981,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 
 
 					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
@@ -5075,7 +5069,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 
 
 					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist* vv);
@@ -5163,7 +5157,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 
 
 					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist* vv);
@@ -5247,7 +5241,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 					xPos = -initP[0] * FanGeo.m_S2D / initP[1];
 					grid[3][2] = xPos / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist* vv);
@@ -5389,7 +5383,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 
 
 					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
@@ -5477,7 +5471,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 
 
 					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist* vv);
@@ -5565,7 +5559,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 
 
 					//����;
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(curIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(sliceIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist* vv);
@@ -5649,7 +5643,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 					xPos = -initP[0] * FanGeo.m_S2D / initP[1];
 					grid[3][2] = xPos / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 					pdist = hypot((static_cast<T>(sliceIdx)-cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx)-cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 					coef = coef / (pdist* vv);
@@ -8181,7 +8175,7 @@ __global__ void _bakproj_AIM_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const 
 			grid[2][2] = beta[2] / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 			grid[3][2] = beta[3] / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-			SortProj<T>(grid);
+			SortProjection<T>(grid);
 			minDetIdx = static_cast<int>(grid[0][2]);
 			maxDetIdx = (int(ceil(grid[3][2])));
 			minDetIdx = (minDetIdx < 0) ? 0 : minDetIdx;
@@ -9113,7 +9107,7 @@ __global__ void _bakproj_AIM_ker(T* dimg, T* dprj, const FanEAGeo FanGeo, const 
 			grid[2][2] = beta[2] / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 			grid[3][2] = beta[3] / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-			SortProj<T>(grid);
+			SortProjection<T>(grid);
 			minDetIdx = static_cast<int>(grid[0][2]);
 			maxDetIdx = (int(ceil(grid[3][2])));
 			minDetIdx = (minDetIdx < 0) ? 0 : minDetIdx;
@@ -9291,7 +9285,7 @@ __global__ void bakproj_AIM_ker(T*dimg, T* dprj, const unsigned int angIdx, cons
 		grid[2][2] = beta[2] / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 		grid[3][2] = beta[3] / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-		SortProj<T>(grid);
+		SortProjection<T>(grid);
 
 		int minDetIdx = static_cast<int>(grid[0][2]);
 		int maxDetIdx(int(ceil(grid[3][2])));
@@ -9470,7 +9464,7 @@ __global__ void _bakproj_AIM_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const 
 			grid[2][2] = beta[2] / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 			grid[3][2] = beta[3] / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-			SortProj<T>(grid);
+			SortProjection<T>(grid);
 			minDetIdx = static_cast<int>(grid[0][2]);
 			maxDetIdx = (int(ceil(grid[3][2])));
 			minDetIdx = (minDetIdx < 0) ? 0 : minDetIdx;
@@ -9602,7 +9596,7 @@ __global__ void _bakproj_AIM_ker(T* dprj, T* dimg, const FanEDGeo FanGeo, const 
 			vv = -grid[3][0] * sinT + grid[3][1] * cosT - FanGeo.m_S2O;
 			grid[3][2] = (-(pdist * FanGeo.m_S2D) / vv) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 			//����
-			SortProj<T>(grid);
+			SortProjection<T>(grid);
 
 			minDetIdx = static_cast<int>(grid[0][2]);
 			maxDetIdx = (int(ceil(grid[3][2])));
@@ -9697,7 +9691,7 @@ __global__ void _bakproj_AIM_ker(T* dprj, T* dimg, cuint angidx, const FanEDGeo 
 		vv = -grid[3][0] * sinT + grid[3][1] * cosT - FanGeo.m_S2O;
 		grid[3][2] = (-(pdist * FanGeo.m_S2D) / vv) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 		//����
-		SortProj<T>(grid);
+		SortProjection<T>(grid);
 
 		minDetIdx = static_cast<int>(grid[0][2]);
 		maxDetIdx = (int(ceil(grid[3][2])));
@@ -9790,7 +9784,7 @@ __global__ void _bakproj_AIM_ker(T* dprj, T* dimg, const FanEDGeo FanGeo, const 
 			vv = -grid[3][0] * sinT + grid[3][1] * cosT - FanGeo.m_S2O;
 			grid[3][2] = (-(pdist * FanGeo.m_S2D) / vv) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 			//����
-			SortProj<T>(grid);
+			SortProjection<T>(grid);
 
 			minDetIdx = static_cast<int>(grid[0][2]);
 			maxDetIdx = (int(ceil(grid[3][2])));

@@ -924,7 +924,7 @@ void GenerateProjectionMatrix_AIM_temp(const FanEAGeo& FanGeo, const Image& Img,
 					grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 					//Sort grid
-					SortProj<T>(grid);
+					SortProjection<T>(grid);
 
 					pdist = hypot((imgLIdx - cntImgX)*Img.m_Step.x - sour[0], (imgWIdx - cntImgY)*Img.m_Step.y - sour[1]);
 					coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
@@ -1096,7 +1096,7 @@ void GenerateMatrix_OpenMP_AIM_temp(FanEAGeo FanGeo, Image Img, const std::strin
 						grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 						//Sort grid
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 
 						pdist = hypot((imgLIdx - cntImgX)*Img.m_Step.x - sour[0], (imgWIdx - cntImgY)*Img.m_Step.y - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);

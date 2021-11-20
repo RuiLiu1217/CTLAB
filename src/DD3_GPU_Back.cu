@@ -63,48 +63,6 @@ static float4 calDetParas(float* xds, float* yds, float* zds, float x0, float y0
 	delete [] bzds;
 	return make_float4(detCtrIdxU, detCtrIdxV, dbeta, ddv);
 }
-
-
-/// \brief Calculate the size of the detector fan angle, detector cell height and the center of the index according to the x,y coordinates of the detector cells at initial position
-/// \param dxds x coordinate
-/// \param dyds y coordinate
-/// \param dzds z coordinate
-/// \param x0 source position x
-/// \param y0 source position y
-/// \param z0 source position z
-/// \param DNU detector cell number along channel direction
-/// \param DNV detector cell number along bench moving direction
-static float4 calDetParas_alreadyinGPU(const thrust::device_vector<float>& dxds, const thrust::device_vector<float>& dyds,
-		const thrust::device_vector<float>& dzds, float x0, float y0, float z0, int DNU, int DNV)
-{
-	float* bxds = new float[DNU + 1];
-	float* byds = new float[DNU + 1];
-	float* bzds = new float[DNV + 1];
-	thrust::host_vector<float> xds = dxds;
-	thrust::host_vector<float> yds = dyds;
-	thrust::host_vector<float> zds = dzds;
-	DD3Boundaries(DNU + 1, &xds[0], bxds);
-	DD3Boundaries(DNU + 1, &yds[0], byds);
-	DD3Boundaries(DNV + 1, &zds[0], bzds);
-
-	float ddv = (bzds[DNV] - bzds[0]) / DNV;
-	float detCtrIdxV = (-(bzds[0] - z0) / ddv) - 0.5;
-	float2 dir = normalize(make_float2(-x0, -y0));
-	float2 dirL = normalize(make_float2(bxds[0] - x0, byds[0] - y0));
-	float2 dirR = normalize(make_float2(bxds[DNU] - x0, byds[DNU] - y0));
-	float dbeta = asin(dirL.x * dirR.y - dirL.y * dirR.x) / DNU;
-	assert(dbeta != 0);
-	float minBeta = asin(dir.x * dirL.y - dir.y * dirL.x);
-	float detCtrIdxU = -minBeta / dbeta - 0.5;
-	delete [] bxds;
-	delete [] byds;
-	delete [] bzds;
-	xds.clear();
-	yds.clear();
-	zds.clear();
-
-	return make_float4(detCtrIdxU, detCtrIdxV, dbeta, ddv);
-}
 #endif
 
 
@@ -134,7 +92,8 @@ __global__ void addTwoSidedZeroBoarder(float* prjIn, float* prjOut,
 /// \param DNU detector cell number along channel direction
 /// \param DNV detector cell number along bench moving direction
 /// \param PN number of views
-__global__ void addOneSidedZeroBoarder(const float* prj_in, float* prj_out, int DNU, int DNV, int PN)
+template<typename T>
+__global__ void addOneSidedZeroBoarder(const T* prj_in, T* prj_out, int DNU, int DNV, int PN)
 {
 	int idv = threadIdx.x + blockIdx.x * blockDim.x;
 	int idu = threadIdx.y + blockIdx.y * blockDim.y;
@@ -147,23 +106,21 @@ __global__ void addOneSidedZeroBoarder(const float* prj_in, float* prj_out, int 
 	}
 }
 
+
 /// \brief Integral image along vertical direction
 /// \param prj Input/Output of the projection data
 /// \param ZN image dimension along bench moving direction
 /// \param N usually equals (XN x YN)
-__global__ void verticalIntegral2(float* prj, int ZN, int N)
-{
+template<typename T>
+__global__ void verticalIntegral2(T* prj, int ZN, int N) {
 	int idx = threadIdx.x + blockIdx.x * blockDim.x;
-	if (idx < N)
-	{
+	if (idx < N) {
 		int currentHead = idx * ZN;
-		for (int ii = 1; ii < ZN; ++ii)
-		{
-			prj[currentHead + ii] = prj[currentHead + ii] + prj[currentHead + ii - 1];
+		for (int ii = 1; ii < ZN; ++ii)	{
+			prj[currentHead + ii] += prj[currentHead + ii - 1];
 		}
 	}
 }
-
 
 /// \brief Integral image along horizontal direction
 /// \param prj Input/Output of the projection data
@@ -197,50 +154,6 @@ static thrust::device_vector<float> genSAT_of_Projection(
 	const int nsiz = (DNU + 1) * (DNV + 1) * PN;
 	thrust::device_vector<float> prjSAT(nsiz, 0);
 	thrust::device_vector<float> prj(hprj, hprj + siz);
-	dim3 copyBlk(64, 16, 1);
-	dim3 copyGid(
-		(DNV + copyBlk.x - 1) / copyBlk.x,
-		(DNU + copyBlk.y - 1) / copyBlk.y,
-		(PN + copyBlk.z - 1) / copyBlk.z);
-
-	addOneSidedZeroBoarder << <copyGid, copyBlk >> >(
-		thrust::raw_pointer_cast(&prj[0]),
-		thrust::raw_pointer_cast(&prjSAT[0]),
-		DNU, DNV, PN);
-	const int nDNU = DNU + 1;
-	const int nDNV = DNV + 1;
-
-	copyBlk.x = 512;
-	copyBlk.y = 1;
-	copyBlk.z = 1;
-	copyGid.x = (nDNU * PN + copyBlk.x - 1) / copyBlk.x;
-	copyGid.y = 1;
-	copyGid.z = 1;
-	verticalIntegral2 << <copyGid, copyBlk >> >(
-		thrust::raw_pointer_cast(&prjSAT[0]),
-		nDNV, nDNU * PN);
-	copyBlk.x = 64;
-	copyBlk.y = 16;
-	copyBlk.z = 1;
-	copyGid.x = (nDNV + copyBlk.x - 1) / copyBlk.x;
-	copyGid.y = (PN + copyBlk.y - 1) / copyBlk.y;
-	copyGid.z = 1;
-
-
-	heorizontalIntegral2 << <copyGid, copyBlk >> >(
-		thrust::raw_pointer_cast(&prjSAT[0]),
-		nDNU, nDNV, PN);
-
-	return prjSAT;
-}
-
-static thrust::device_vector<float> genSAT_of_Projection_alreadyinGPU(
-	const thrust::device_vector<float>& prj,
-	int DNU, int DNV, int PN)
-{
-	const int nsiz = (DNU + 1) * (DNV + 1) * PN;
-	thrust::device_vector<float> prjSAT(nsiz, 0);
-	//thrust::device_vector<float> prj(hprj, hprj + siz);
 	dim3 copyBlk(64, 16, 1);
 	dim3 copyGid(
 		(DNV + copyBlk.x - 1) / copyBlk.x,
@@ -562,242 +475,6 @@ __global__ void DD3_gpu_back_branchless_ker(
 		vol[__umul24((__umul24(id.y, VN.x) + id.x), VN.z) + id.z] = summ;
 	}
 }
-
-static
-void DD3_gpu_back_branchless_sat2d(
-	float x0, float y0, float z0,
-	int DNU, int DNV,
-	float* xds, float* yds, float* zds,
-	float imgXCenter, float imgYCenter, float imgZCenter,
-	float* hangs, float* hzPos, int PN,
-	int XN, int YN, int ZN,
-	float* hvol, float* hprj,
-	float dx, float dz,
-	byte* mask, int squared, int gpunum)
-{
-	cudaSetDevice(gpunum);
-	cudaDeviceReset();
-
-	const int TOTVON = XN * YN * ZN;
-	const float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter;
-	const float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter;
-	const float objCntIdxZ = (ZN - 1.0) * 0.5 - imgZCenter;
-
-	thrust::device_vector<float> prjSAT = genSAT_of_Projection(hprj, DNU, DNV, PN);
-
-	cudaExtent prjSize;
-	prjSize.width = DNV + 1;
-	prjSize.height = DNU + 1;
-	prjSize.depth = PN;
-
-	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float>();
-	cudaArray *d_prjSATarray;
-	cudaMalloc3DArray(&d_prjSATarray, &channelDesc, prjSize);
-
-	cudaMemcpy3DParms copyParams = { 0 };
-	copyParams.srcPtr = make_cudaPitchedPtr(
-		(void*) thrust::raw_pointer_cast(&prjSAT[0]),
-		prjSize.width * sizeof(float),
-		prjSize.width,
-		prjSize.height);
-
-	copyParams.dstArray = d_prjSATarray;
-	copyParams.extent = prjSize;
-	copyParams.kind = cudaMemcpyDeviceToDevice;
-	cudaMemcpy3D(&copyParams);
-
-	cudaResourceDesc resDesc;
-	memset(&resDesc, 0, sizeof(resDesc));
-	resDesc.resType = cudaResourceTypeArray;
-	resDesc.res.array.array = d_prjSATarray;
-	cudaTextureDesc texDesc;
-	memset(&texDesc, 0, sizeof(texDesc));
-	texDesc.addressMode[0] = cudaAddressModeClamp;
-	texDesc.addressMode[1] = cudaAddressModeClamp;
-	texDesc.addressMode[2] = cudaAddressModeClamp;
-	texDesc.filterMode = cudaFilterModeLinear;
-	texDesc.readMode = cudaReadModeElementType;
-	cudaTextureObject_t texObj;
-	texDesc.normalizedCoords = false;
-	cudaCreateTextureObject(&texObj, &resDesc, &texDesc, nullptr);
-	prjSAT.clear();
-
-	thrust::device_vector<float> angs(hangs, hangs + PN);
-	thrust::device_vector<float> zPos(hzPos, hzPos + PN);
-
-	thrust::device_vector<float3> cursour(PN);
-	thrust::device_vector<float2> dirsour(PN);
-	thrust::device_vector<float3> cossinT(PN);
-
-	thrust::transform(
-		thrust::make_zip_iterator(thrust::make_tuple(angs.begin(), zPos.begin())),
-		thrust::make_zip_iterator(thrust::make_tuple(angs.end(), zPos.end())),
-		thrust::make_zip_iterator(thrust::make_tuple(cossinT.begin(), cursour.begin(), dirsour.begin())),
-		CTMBIR::ConstantForBackProjection3(x0, y0, z0));
-
-	thrust::device_vector<float> vol(TOTVON, 0);
-	thrust::device_vector<byte> msk(mask, mask + XN * YN);
-	const float S2D = hypotf(xds[0] - x0, yds[0] - y0);
-
-	float* bxds = new float[DNU + 1];
-	float* byds = new float[DNU + 1];
-	float* bzds = new float[DNV + 1];
-
-	DD3Boundaries<float>(DNU + 1, xds, bxds);
-	DD3Boundaries<float>(DNU + 1, yds, byds);
-	DD3Boundaries<float>(DNV + 1, zds, bzds);
-
-	float ddv = (bzds[DNV] - bzds[0]) / DNV;
-	float detCtrIdV = (-(bzds[0] - z0) / ddv) - 0.5;
-	float2 dir = normalize(make_float2(-x0, -y0));
-	float2 dirL = normalize(make_float2(bxds[0] - x0, byds[0] - y0));
-	float2 dirR = normalize(make_float2(bxds[DNU] - x0, byds[DNU] - y0));
-	float dbeta = asinf(dirL.x * dirR.y - dirL.y * dirR.x) / DNU;
-	assert(dbeta != 0);
-	float minBeta = asinf(dir.x * dirL.y - dir.y * dirL.x);
-	float detCtrIdU = -minBeta / dbeta - 0.5;
-
-	dim3 blk(BACK_BLKX, BACK_BLKY, BACK_BLKZ);
-	dim3 gid(
-		(ZN + blk.x - 1) / blk.x,
-		(XN + blk.y - 1) / blk.y,
-		(YN + blk.z - 1) / blk.z);
-
-	DD3_gpu_back_branchless_ker << <gid, blk >> >(texObj,
-		thrust::raw_pointer_cast(&vol[0]),
-		thrust::raw_pointer_cast(&msk[0]),
-		thrust::raw_pointer_cast(&cossinT[0]),
-		make_float3(x0, y0, z0),
-		S2D, make_float3(objCntIdxX, objCntIdxY, objCntIdxZ),
-		dx, dz, dbeta, ddv, make_float2(detCtrIdU, detCtrIdV),
-		make_int3(XN, YN, ZN), PN, static_cast<int>(squared != 0));
-	thrust::copy(vol.begin(), vol.end(), hvol);
-	delete [] bxds;
-	delete [] byds;
-	delete [] bzds;
-}
-
-
-
-
-static
-void DD3_panel_gpu_back_branchless_sat2d(
-	float x0, float y0, float z0,
-	int DNU, int DNV,
-	float* xds, float* yds, float* zds,
-	float imgXCenter, float imgYCenter, float imgZCenter,
-	float* hangs, float* hzPos, int PN,
-	int XN, int YN, int ZN,
-	float* hvol, float* hprj,
-	float dx, float dz,
-	byte* mask, int squared, int gpunum)
-{
-	cudaSetDevice(gpunum);
-	cudaDeviceReset();
-
-	const int TOTVON = XN * YN * ZN;
-	const float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter;
-	const float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter;
-	const float objCntIdxZ = (ZN - 1.0) * 0.5 - imgZCenter;
-
-	thrust::device_vector<float> prjSAT = genSAT_of_Projection(hprj, DNU, DNV, PN);
-
-	cudaExtent prjSize;
-	prjSize.width = DNV + 1;
-	prjSize.height = DNU + 1;
-	prjSize.depth = PN;
-
-	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float>();
-	cudaArray *d_prjSATarray;
-	cudaMalloc3DArray(&d_prjSATarray, &channelDesc, prjSize);
-
-	cudaMemcpy3DParms copyParams = { 0 };
-	copyParams.srcPtr = make_cudaPitchedPtr(
-		(void*)thrust::raw_pointer_cast(&prjSAT[0]),
-		prjSize.width * sizeof(float),
-		prjSize.width,
-		prjSize.height);
-
-	copyParams.dstArray = d_prjSATarray;
-	copyParams.extent = prjSize;
-	copyParams.kind = cudaMemcpyDeviceToDevice;
-	cudaMemcpy3D(&copyParams);
-
-	cudaResourceDesc resDesc;
-	memset(&resDesc, 0, sizeof(resDesc));
-	resDesc.resType = cudaResourceTypeArray;
-	resDesc.res.array.array = d_prjSATarray;
-	cudaTextureDesc texDesc;
-	memset(&texDesc, 0, sizeof(texDesc));
-	texDesc.addressMode[0] = cudaAddressModeClamp;
-	texDesc.addressMode[1] = cudaAddressModeClamp;
-	texDesc.addressMode[2] = cudaAddressModeClamp;
-	texDesc.filterMode = cudaFilterModeLinear;
-	texDesc.readMode = cudaReadModeElementType;
-	cudaTextureObject_t texObj;
-	texDesc.normalizedCoords = false;
-	cudaCreateTextureObject(&texObj, &resDesc, &texDesc, nullptr);
-	prjSAT.clear();
-
-	thrust::device_vector<float> angs(hangs, hangs + PN);
-	thrust::device_vector<float> zPos(hzPos, hzPos + PN);
-
-	thrust::device_vector<float3> cursour(PN);
-	thrust::device_vector<float2> dirsour(PN);
-	thrust::device_vector<float3> cossinT(PN);
-
-	thrust::transform(
-		thrust::make_zip_iterator(thrust::make_tuple(angs.begin(), zPos.begin())),
-		thrust::make_zip_iterator(thrust::make_tuple(angs.end(), zPos.end())),
-		thrust::make_zip_iterator(thrust::make_tuple(cossinT.begin(), cursour.begin(), dirsour.begin())),
-		CTMBIR::ConstantForBackProjection3(x0, y0, z0));
-
-	thrust::device_vector<float> vol(TOTVON, 0);
-	thrust::device_vector<byte> msk(mask, mask + XN * YN);
-	const float S2D = hypotf(xds[0] - x0, yds[0] - y0);
-
-	float* bxds = new float[DNU + 1];
-	float* byds = new float[DNU + 1];
-	float* bzds = new float[DNV + 1];
-
-	DD3Boundaries<float>(DNU + 1, xds, bxds);
-	DD3Boundaries<float>(DNU + 1, yds, byds);
-	DD3Boundaries<float>(DNV + 1, zds, bzds);
-
-	float ddv = (bzds[DNV] - bzds[0]) / DNV;
-	float detCtrIdV = (-(bzds[0] - z0) / ddv) - 0.5;
-
-	//Assume all the detector are with the same size;
-	float dbeta = sqrtf(powf(bxds[0] - bxds[DNU], 2.0) + powf(byds[0] - byds[DNU], 2.0)) / DNU;
-	/*float2 dir = normalize(make_float2(-x0, -y0));
-	float2 dirL = normalize(make_float2(bxds[0] - x0, byds[0] - y0));
-	float2 dirR = normalize(make_float2(bxds[DNU] - x0, byds[DNU] - y0));*/
-	//We assume that initiall the detector is parallel to X axis
-	assert(dbeta != 0);
-	float detCtrIdU = -bxds[0] / dbeta - 0.5;
-
-	dim3 blk(BACK_BLKX, BACK_BLKY, BACK_BLKZ);
-	dim3 gid(
-		(ZN + blk.x - 1) / blk.x,
-		(XN + blk.y - 1) / blk.y,
-		(YN + blk.z - 1) / blk.z);
-
-	DD3_panel_gpu_back_ker<_BRANCHLESS> << <gid, blk >> >(texObj,
-		thrust::raw_pointer_cast(&vol[0]),
-		thrust::raw_pointer_cast(&msk[0]),
-		thrust::raw_pointer_cast(&cossinT[0]),
-		make_float3(x0, y0, z0),
-		S2D, make_float3(objCntIdxX, objCntIdxY, objCntIdxZ),
-		dx, dz, dbeta, ddv, make_float2(detCtrIdU, detCtrIdV),
-		make_int3(XN, YN, ZN), PN, static_cast<int>(squared != 0));
-	thrust::copy(vol.begin(), vol.end(), hvol);
-	delete[] bxds;
-	delete[] byds;
-	delete[] bzds;
-}
-
-
-
 
 __global__ void DD3_gpu_back_volumerendering_ker(
 	cudaTextureObject_t texObj,
@@ -1766,35 +1443,6 @@ double4 calDetParasDouble(float* xds, float* yds, float* zds, float x0, float y0
 
 
 
-__global__ void addOneSidedZeroBoarder
-(double* prj_in, double* prj_out, int DNU, int DNV, int PN)
-{
-	int idv = threadIdx.x + blockIdx.x * blockDim.x;
-	int idu = threadIdx.y + blockIdx.y * blockDim.y;
-	int ang = threadIdx.z + blockIdx.z * blockDim.z;
-	if (idu < DNU && idv < DNV && ang < PN)
-	{
-		int i = (ang * DNU + idu) * DNV + idv;
-		int ni = (ang * (DNU + 1) + (idu + 1)) * (DNV + 1) + (idv + 1);
-		prj_out[ni] = prj_in[i];
-	}
-}
-
-
-__global__ void verticalIntegral2(double* prj, int ZN, int N)
-{
-	int idx = threadIdx.x + blockIdx.x * blockDim.x;
-	if (idx < N)
-	{
-		int currentHead = idx * ZN;
-		for (int ii = 1; ii < ZN; ++ii)
-		{
-			prj[currentHead + ii] = prj[currentHead + ii] + prj[currentHead + ii - 1];
-		}
-	}
-}
-
-
 __global__ void horizontalIntegral2(double* prj, int DNU, int DNV, int PN)
 {
 	int idv = threadIdx.x + blockIdx.x * blockDim.x;
@@ -1809,10 +1457,8 @@ __global__ void horizontalIntegral2(double* prj, int DNU, int DNV, int PN)
 	}
 }
 
-struct TransFromDoubleToInt2
-{
-	__device__ int2 operator()(double a) const
-	{
+struct TransFromDoubleToInt2 {
+	__device__ int2 operator()(double a) const {
 		return make_int2(__double2loint(a), __double2hiint(a));
 	}
 };
@@ -1857,6 +1503,7 @@ thrust::device_vector<int2> genSAT_of_Projection_Double(
 	horizontalIntegral2 << <copyGid, copyBlk >> >(thrust::raw_pointer_cast(&prjSAT[0]), nDNU, nDNV, PN);
 	prj.clear();
 	thrust::device_vector<int2> prjSATInt(nsiz);
+
 	thrust::transform(prjSAT.begin(), prjSAT.end(), prjSATInt.begin(), TransFromDoubleToInt2());
 	prjSAT.clear();
 	return prjSATInt; // It has the device to device memory copy (TODO: avoid this by using reference parameters)
@@ -2688,32 +2335,6 @@ void DD3Back_branchless_sat2d_multiGPU(
 	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 
 	combineVolume<float>(hvol, XN, YN, ZN, subVol, &(SZN[0]), gpuNum);
-
-	hangs.clear();
-	hzPos.clear();
-	ObjZIdx_Start.clear();
-	ObjZIdx_End.clear();
-	prjIdx_Start.clear();
-	prjIdx_End.clear();
-	SZN.clear();
-	subImgZCenter.clear();
-	SPN.clear();
-	sour.clear();
-	msk.clear();
-	vol.clear();
-	cossinZT.clear();
-	d_prjArray.clear();
-	texObj.clear();
-	prjSAT.clear();
-	prj.clear();
-	stream.clear();
-	COSSINZT.clear();
-	ANGS.clear();
-	ZPOS.clear();
-	copyGid.clear();
-	gid.clear();
-	vertGenGid.clear();
-	horzGenGid.clear();
 }
 
 
@@ -2891,31 +2512,6 @@ void DD3Back_pseudo_multiGPU(
 	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 
 	combineVolume<float>(hvol, XN, YN, ZN, subVol, &(SZN[0]), gpuNum);
-
-	hangs.clear();
-	hzPos.clear();
-	ObjZIdx_Start.clear();
-	ObjZIdx_End.clear();
-	prjIdx_Start.clear();
-	prjIdx_End.clear();
-	SZN.clear();
-	subImgZCenter.clear();
-	SPN.clear();
-	sour.clear();
-	msk.clear();
-	vol.clear();
-	cossinZT.clear();
-	d_prjArray.clear();
-	texObj.clear();
-	prj.clear();
-	stream.clear();
-	COSSINZT.clear();
-	ANGS.clear();
-	ZPOS.clear();
-	copyGid.clear();
-	gid.clear();
-	vertGenGid.clear();
-	horzGenGid.clear();
 }
 
 
@@ -2956,7 +2552,6 @@ void DD3Back_multiGPU(
 			dx, dz, mask, startVOL, gpuNum);
 		break;
 	}
-
 }
 
 

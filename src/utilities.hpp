@@ -817,89 +817,6 @@ namespace CTMBIR
 	};
 }
 
-
-/// (x,y) template
-template<typename T>
-class T2
-{
-public:
-	T x;
-	T y;
-public:
-	T2() :x(0), y(0){}
-	T2(const T& t) :x(t), y(t){}
-	T2(const T& xx, const T& yy) :x(xx), y(yy){}
-	T2(const float2& o) :x(o.x), y(o.y){}
-	T2(const double2& o) :x(o.x), y(o.y){}
-	T2& operator=(const T2& o) const { x = o.x; y = o.y; return *this; }
-	T2& operator=(const float2& o) const { x = o.x; y = o.y; return *this; }
-	T2& operator=(const double2& o) const { x = o.x; y = o.y; return *this; }
-	friend std::ostream& operator<<(std::ostream& os, const T2& t)
-	{
-		os << "(" << t.x << "," << t.y << ")" << std::endl;
-		return os;
-	}
-};
-
-
-/// (x,y,z) template
-template<typename T>
-class T3
-{
-public:
-	T x;
-	T y;
-	T z;
-public:
-	T3() :x(0), y(0), z(0){}
-	T3(const T& t) :x(t), y(t), z(t){}
-	T3(const T& xx, const T& yy, const T& zz) :x(xx), y(yy), z(zz){}
-	T3(const float3& o) :x(o.x), y(o.y), z(o.z){}
-	T3(const double3& o) :x(o.x), y(o.y), z(o.z){}
-	T3& operator=(const T3& o) const { x = o.x; y = o.y; z = o.z; return *this; }
-	T3& operator=(const float3& o) const { x = o.x; y = o.y; z = o.z; return *this; }
-	T3& operator=(const double3& o) const { x = o.x; y = o.y; z = o.z; return *this; }
-	friend std::ostream& operator<<(std::ostream& os, const T3& t)
-	{
-		os << "(" << t.x << "," << t.y << "," << t.z << ")" << std::endl;
-		return os;
-	}
-};
-
-
-/// (x,y,z,w) template
-template<typename T>
-class T4
-{
-public:
-	T x;
-	T y;
-	T z;
-	T w;
-public:
-	T4() :x(0), y(0), z(0), w(0){}
-	T4(const T& t) :x(t), y(t), z(t), w(t){}
-	T4(const T& xx, const T& yy, const T& zz, const T& ww) :x(xx), y(yy), z(zz), w(ww){}
-	T4(const float4& o) :x(o.x), y(o.y), z(o.z), w(o.z){}
-	T4(const double4& o) :x(o.x), y(o.y), z(o.z), w(o.w){}
-	T4(const float3& o) :x(o.x), y(o.y), z(o.z), w(1.0){}
-	T4(const double3& o) :x(o.x), y(o.y), z(o.z), w(1.0){}
-	T4& operator=(const T4& o) const { x = o.x; y = o.y; z = o.z; w = o.w; return *this; }
-	T4& operator=(const float4& o) const { x = o.x; y = o.y; z = o.z; w = o.w; return *this; }
-	T4& operator=(const double4& o) const { x = o.x; y = o.y; z = o.z; w = o.w; return *this; }
-	T4& operator=(const float3& o) const { x = o.x; y = o.y; z = o.z; w = 1.0; return *this; }
-	T4& operator=(const double3& o) const { x = o.x; y = o.y; z = o.z; w = 1.0; return *this; }
-	friend std::ostream& operator<<(std::ostream& os, const T4& t)
-	{
-		os << "(" << t.x << "," << t.y << "," << t.z << "," << t.w << ")" << std::endl;
-		return os;
-	}
-};
-
-
-
-
-
 /// \brief Fan Beam Equal Angle Detector based CT system
 class FanEAGeo
 {
@@ -1108,113 +1025,6 @@ public:
 		);
 };
 
-
-
-/// \brief Calculate the scalar transform of a vector, called by the thrust::transform or std::transform
-template<typename T>
-struct _scale_functor
-{
-	T _s;
-	_scale_functor(const T& s) :_s(s){}
-	__host__ __device__ T operator()(const T&a) const
-	{
-		return _s * a;
-	}
-};
-/// \brief The functor called by std::transform or thrust::transform, given the parameter scale, that output the x + scale * y, where x, y are two vectors, the result is also a vector
-template<typename T>
-struct _saxpy_functor
-{
-	T _scal;
-	_saxpy_functor(const T& s) :_scal(s){}
-	__host__ __device__ T operator()(const T& x, const T& y) const
-	{
-		return x + _scal * y;
-	}
-};
-
-
-/// \brief The self defined functor called by thrust::transform or std::transform which prevent the denominator is 0;
-template<typename T>
-struct _divide_functor
-{
-	__host__ __device__ T operator()(const T& a, const T& b)
-	{
-		if (IS_ZERO(b))
-		{
-			return 0;
-		}
-		else
-		{
-			return a / b;
-		}
-	}
-};
-
-
-
-/// \brief The function helps to get the lp norm of a device or host vector
-template<typename T>
-struct _lp_functor
-{
-private:
-	T _p;
-public:
-	_lp_functor(const T& p) :_p(p){}
-	__host__ __device__ T operator()(const T& x)
-	{
-		return pow(MY_ABS<T>(x), _p);
-	}
-};
-
-/// \brief the functor helps to get |a-b| for two input value a and b, it is the first step to calculate the distance of two vectors
-template<typename T>
-struct _abs_minus_functor
-{
-
-public:
-	__host__ __device__ T operator()(const T& a, const T& b)
-	{
-		return MY_ABS<T>(a - b);
-	}
-};
-
-
-
-template<typename T>
-struct _Update
-{
-	typedef thrust::tuple<T, T, T, T> TU;
-	T _lamb;
-	T _keepRange;
-	T _minV;
-	T _maxV;
-	_Update(const T& lambda, bool keepInRange, const T& minV, const T& maxV) :
-		_lamb(lambda), _minV(minV), _maxV(maxV), _keepRange(keepInRange){}
-	__host__ __device__ T operator()(TU t)
-	{
-		T img = thrust::get<0>(t);
-		T cor = thrust::get<1>(t);
-		T weg = thrust::get<2>(t);
-		T msk = thrust::get<3>(t);
-		img = (img + _lamb * cor / weg) * msk;
-		if (_keepRange)
-		{
-			if (img < _minV)
-			{
-				return _minV;
-			}
-			if (img > _maxV)
-			{
-				return _maxV;
-			}
-			return img;
-		}
-		return img;
-	}
-};
-
-
 /// \brief Inverse transform for the soft thresholding filtering called by OptimumMU function
 template<typename T>
 struct _softThreshold_functor
@@ -1239,62 +1049,6 @@ struct _softThreshold_functor
 };
 
 
-/// \brief updating the data in CG algorithm with functor 1
-template<typename T>
-struct CG_update1_functor
-{
-public:
-	T _alpha;
-	CG_update1_functor(const T& alpha) :_alpha(alpha){}
-	__host__ __device__ T operator()(const T& X, const T& D){
-		return X + _alpha * D;
-	}
-};
-
-/// \brief updating the data in CG algorithm with functor 2
-template<typename T>
-struct CG_update2_functor
-{
-public:
-	T _alpha;
-	CG_update2_functor(const T& alpha) :_alpha(alpha){}
-	__host__ __device__ T operator()(const T& R, const T& tem2)
-	{
-		return R - _alpha * tem2;
-	}
-};
-
-/// \brief updating the data in CG algorithm with functor 3
-template<typename T>
-struct CG_update3_functor
-{
-public:
-	T _beta;
-	CG_update3_functor(const T& beta) :_beta(beta){}
-	__host__ __device__ T operator()(const T& R, const T& D)
-	{
-		return R + _beta * D;
-	}
-};
-
-
-
-/// \brief FISTA accelerate the convergence.
-template<typename T>
-struct _FISTA_demo11
-{
-public:
-	T t1;
-	T t2;
-	_FISTA_demo11(const T& _t1, const T& _t2) :t1(_t1), t2(_t2){}
-	__host__ __device__ T operator()(const T& x1, const T& x0)
-	{
-		return x1 + (t1 - 1) / t2 * (x1 - x0);
-	}
-};
-
-
-
 template<typename T>
 struct _ValueLimit_functor
 {
@@ -1316,35 +1070,6 @@ struct _ValueLimit_functor
 
 	}
 };
-
-
-
-
-
-template<typename T>
-struct ossart_update_functor
-{
-	typedef thrust::tuple<T, T, T, T> TU;
-	T _lamb;
-	ossart_update_functor(const T& lambda) :_lamb(lambda){}
-	__device__ T operator()(TU t)
-	{
-		T img = thrust::get<0>(t);
-		T cor = thrust::get<1>(t);
-		T weg = thrust::get<2>(t);
-		T msk = thrust::get<3>(t);
-		if (!IS_ZERO<T>(weg))
-		{
-			return (img + _lamb * cor / weg) * msk;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-};
-
-
 
 
 template<typename T>
@@ -1390,125 +1115,6 @@ struct _betaupdate_functor
 };
 
 
-
-/// Update the image with functor
-template<typename T>
-struct _DEMO17_update_functor
-{
-	typedef thrust::tuple<T, T, T> TP;
-	T coef;
-	T minV;
-	T maxV;
-	_DEMO17_update_functor(const T& c, const T& miv, const T& mav) :coef(c), minV(miv), maxV(mav){}
-	_DEMO17_update_functor(const T& c, const T& miv) :coef(c), minV(miv), maxV(10000.0){}
-	_DEMO17_update_functor(const T& c) :coef(c), minV(0), maxV(10000.0){}
-	__host__ __device__ T operator()(const TP& fdw)
-	{
-		T f = thrust::get < 0 >(fdw);
-		T d = thrust::get < 1 >(fdw);
-		T w = thrust::get < 2 >(fdw);
-		T res = 0;
-		if (!IS_ZERO(w))
-		{
-			res = f + coef * d / w;
-		}
-		else
-		{
-			res = minV;
-		}
-		if (res > maxV)
-		{
-			res = maxV;
-		}
-		if (res < minV)
-		{
-			res = minV;
-		}
-		return res;
-	}
-};
-
-
-
-
-/// Update the image with functor
-template<typename T>
-struct _DEMO18_update_functor
-{
-	typedef thrust::tuple<T, T, T> TP;
-	T coef;
-	T minV;
-	T maxV;
-	_DEMO18_update_functor(const T& c, const T& miv, const T& mav) :coef(c), minV(miv), maxV(mav){}
-	__host__ __device__ T operator()(const TP& fdw)
-	{
-		T f = thrust::get < 0 >(fdw);
-		T d = thrust::get < 1 >(fdw);
-		T w = thrust::get < 2 >(fdw);
-		T res = 0;
-		if (!IS_ZERO(w))
-		{
-			res = f + coef * d / w;
-		}
-		else
-		{
-			res = minV;
-		}
-		if (res > maxV)
-		{
-			res = maxV;
-		}
-		if (res < minV)
-		{
-			res = minV;
-		}
-		return res;
-	}
-};
-
-
-
-template<typename T>
-struct _DEMO18v4_GenProjLambda_functor
-{
-	T _maxY;
-	_DEMO18v4_GenProjLambda_functor(const T& maxy) :_maxY(maxy){}
-	__host__ __device__ T operator()(const T& yi, const T& weight)
-	{
-		if (IS_ZERO(weight))
-		{
-			return 0;
-		}
-		return yi / (_maxY * weight);
-	}
-};
-template<typename T>
-struct _DEMO18v4_GenBackLambda_functor
-{
-	T _val;
-	_DEMO18v4_GenBackLambda_functor(const T& vl) :_val(vl){}
-	__host__ __device__ T operator()(const T& v)
-	{
-		if (IS_ZERO(v))
-		{
-			return 0;
-		}
-		return _val / v;
-	}
-};
-
-template<typename T>
-struct _DEMO18v4_updateImgSIR_functor
-{
-	T _lambda;
-	_DEMO18v4_updateImgSIR_functor(const T& lamb) :_lambda(lamb){}
-	__host__ __device__ T operator()(const T& f, const T& upf)
-	{
-		return f - _lambda * upf;
-	}
-};
-
-
 template<typename T>
 class Comparer_functor
 {
@@ -1541,194 +1147,6 @@ public:
 		return res;
 	}
 };
-
-
-
-
-
-//function nu = WindowMeyer(xi,deg)
-//	% WindowMeyer -- auxiliary window function for Meyer wavelets.
-//	%  Usage
-//	%    nu = WindowMeyer(xi,deg)
-//	%  Inputs
-//	%    xi     abscissa values for window evaluation
-//	%    deg    degree of the polynomial defining Nu on [0,1]
-//	%           1 <= deg <= 3
-//	%  Outputs
-//	%    nu     polynomial of degree 'deg' if x in [0,1]
-//	%           1 if x > 1 and 0 if x < 0.
-//	%  See Also
-//	%    MeyerPartition
-template<typename T>
-struct _windowMeyer_functor1
-{
-	T __host__ __device__ operator()(const T& xi)
-	{
-		T res = xi * xi * (3.0 - 2.0 * xi); //The coefficients are gotten from the Wikipedia with Filter Window in signal processing
-		if (xi <= 0)
-		{
-			res = 0;
-		}
-		else if (xi >= 1)
-		{
-			res = 1;
-		}
-
-		return res;
-	}
-};
-
-template<typename T>
-struct _windowMeyer_functor2
-{
-	T __host__ __device__ operator()(const T& xi)
-	{
-		T res = xi * xi * xi * (10.0 - 15.0 * xi + 6.0 * xi * xi);//The coefficients are gotten from the Wikipedia with Filter Window in signal processing
-		if (xi <= 0)
-		{
-			res = 0;
-		}
-		else if (xi >= 1)
-		{
-			res = 1;
-		}
-		return res;
-	}
-};
-template<typename T>
-struct _windowMeyer_functor3
-{
-	T __host__ __device__ operator()(const T& xi)
-	{
-		T res = xi * xi * xi * xi * (35.0 - 84.0 * xi + 70.0 * xi * xi - 20.0 * xi * xi * xi);//The coefficients are gotten from the Wikipedia with Filter Window in signal processing
-		if (xi <= 0)
-		{
-			res = 0;
-		}
-		else if (xi >= 1)
-		{
-			res = 1;
-		}
-		return res;
-	}
-};
-
-template<typename T, int deg>
-struct _windowMeyer_functor
-{
-	T __host__ __device__ operator()(const T& xi)
-	{
-		T res(0);
-		switch (deg)
-		{
-		case 0:
-			res = xi;
-			break;
-		case 1:
-			res = xi * xi * (3.0 - 2.0 * xi);//The coefficients are gotten from the Wikipedia with Filter Window in signal processing
-			break;
-		case 2:
-			res = xi * xi * xi * (10.0 - 15.0 * xi + 6.0 * xi * xi);//The coefficients are gotten from the Wikipedia with Filter Window in signal processing
-			break;
-		case 3:
-			res = xi * xi * xi * xi * (35.0 - 84.0 * xi + 70.0 * xi * xi - 20.0 * xi * xi * xi);//The coefficients are gotten from the Wikipedia with Filter Window in signal processing
-			break;
-		}
-
-		if (xi <= 0)
-		{
-			res = 0;
-		}
-		else if (xi >= 1)
-		{
-			res = 1;
-		}
-		return res;
-
-	}
-};
-
-template<typename T, int deg>
-struct _windowMeyerCos_functor
-{
-	T __host__ __device__ operator()(const T& xi)
-	{
-		T res(0);
-		switch (deg)
-		{
-		case 0:
-			res = xi;
-			break;
-		case 1:
-			res = xi * xi * (3.0 - 2.0 * xi);//The coefficients are gotten from the Wikipedia with Filter Window in signal processing
-			break;
-		case 2:
-			res = xi * xi * xi * (10.0 - 15.0 * xi + 6.0 * xi * xi);//The coefficients are gotten from the Wikipedia with Filter Window in signal processing
-			break;
-		case 3:
-			res = xi * xi * xi * xi * (35.0 - 84.0 * xi + 70.0 * xi * xi - 20.0 * xi * xi * xi);//The coefficients are gotten from the Wikipedia with Filter Window in signal processing
-			break;
-		}
-
-		if (xi <= 0)
-		{
-			res = 0;
-		}
-		else if (xi >= 1)
-		{
-			res = 1;
-		}
-		return cos(res * _PI_2);
-
-	}
-};
-
-
-
-template<typename T>
-void WindowMeyer(thrust::host_vector<T>& nu, // output
-	thrust::host_vector<T>& xi, // input
-	const int deg)
-{
-	switch (deg)
-	{
-	case 0:
-		nu = xi;
-		break;
-	case 1:
-		thrust::transform(xi.begin(), xi.end(), nu.begin(), _windowMeyer_functor<T, 1>());
-		break;
-	case 2:
-		thrust::transform(xi.begin(), xi.end(), nu.begin(), _windowMeyer_functor<T, 2>());
-		break;
-	case 3:
-		thrust::transform(xi.begin(), xi.end(), nu.begin(), _windowMeyer_functor<T, 3>());
-		break;
-	}
-}
-
-
-template<typename T>
-void WindowMeyer(thrust::device_vector<T>& nu, thrust::device_vector<T>& xi, const int deg)
-{
-	switch (deg)
-	{
-	case 0:
-		nu = xi;
-		break;
-	case 1:
-		thrust::transform(xi.begin(), xi.end(), nu.begin(), _windowMeyer_functor<T, 1>());
-		break;
-	case 2:
-		thrust::transform(xi.begin(), xi.end(), nu.begin(), _windowMeyer_functor<T, 2>());
-		break;
-	case 3:
-		thrust::transform(xi.begin(), xi.end(), nu.begin(), _windowMeyer_functor<T, 3>());
-		break;
-	}
-}
-
-
 
 /// \brief The beta update formula for Conjugate Gradient method. Please DO NOT modify this function unless you exactly know what you are doing.
 template<typename T, int cases = 0>
@@ -1906,27 +1324,12 @@ __host__ __device__ inline T _trilinearInterpolation(
 }
 
 
-///// \brief SIDDON kernel function 1
-//inline __host__	__device__ float dev_pFun(const float& alpha, const float& pstart, const float&pend)
-//{
-//	return pstart + alpha * (pend - pstart);
-//}
 /// \brief SIDDON kernel function 1
 inline __host__	__device__ double dev_pFun(const double& alpha, const double& pstart, const double&pend)
 {
 	return pstart + alpha * (pend - pstart);
 }
 
-//
-///// \brief SIDDON kernel function 2
-//inline __host__	__device__ float dev_alpha_IFun(const float& b, const float& d, const float& pstart, const float& pend, const unsigned int& i)
-//{
-//	if (!IS_ZERO<float>(pend - pstart))
-//	{
-//		return ((b + (float) i*d) - pstart) / (pend - pstart);
-//	}
-//	else return 1000;//((b + i*d)-pstart)/(1e-6);
-//}
 /// \brief SIDDON kernel function 2
 inline __host__	__device__ double dev_alpha_IFun(const double& b, const double& d, const double& pstart, const double& pend, const unsigned int& i)
 {
@@ -1937,68 +1340,12 @@ inline __host__	__device__ double dev_alpha_IFun(const double& b, const double& 
 	else return 1000;//((b + i*d)-pstart)/(1e-6);
 }
 
-//
-//
-///// \brief SIDDON kernel function 3
-//inline __host__	__device__ float dev_varphiFun(const float& alpha, const float& b, const float& d, const float& pstart, const float& pend)
-//{
-//	return (dev_pFun(alpha, pstart, pend) - b) / d;
-//}
 /// \brief SIDDON kernel function 3
 inline __host__	__device__ double dev_varphiFun(const double& alpha, const double& b, const double& d, const double& pstart, const double& pend)
 {
 	return (dev_pFun(alpha, pstart, pend) - b) / d;
 }
 
-//
-//
-///// \brief SIDDON kernel function 4
-//inline	__host__ __device__ void dev_minmaxIdxFun(
-//	const float& pstart, const float& pend,
-//	const float& b, const float& d,
-//	const float& alphaMIN, const float& alphaMAX,
-//	const float& alphaPmin, const float& alphaPmax,
-//	const unsigned int& Nplane, int* imin, int* imax)
-//{
-//	if (pstart < pend)
-//	{
-//		if (IS_ZERO<float>(alphaMIN - alphaPmin))
-//		{
-//			*imin = 1;
-//		}
-//		else
-//		{
-//			*imin = static_cast<int>(ceil(dev_varphiFun(alphaMIN, b, d, pstart, pend)));
-//		}
-//		if (IS_ZERO<float>(alphaMAX - alphaPmax))
-//		{
-//			*imax = Nplane - 1;
-//		}
-//		else
-//		{
-//			*imax = static_cast<int>(floor(dev_varphiFun(alphaMAX, b, d, pstart, pend)));
-//		}
-//	}
-//	else
-//	{
-//		if (IS_ZERO<float>(alphaMIN - alphaPmin))
-//		{
-//			*imax = Nplane - 2;
-//		}
-//		else
-//		{
-//			*imax = static_cast<int>(floor(dev_varphiFun(alphaMIN, b, d, pstart, pend)));
-//		}
-//		if (IS_ZERO<float>(alphaMAX - alphaPmax))
-//		{
-//			*imin = 0;
-//		}
-//		else
-//		{
-//			*imin = static_cast<int>(ceil(dev_varphiFun(alphaMAX, b, d, pstart, pend)));
-//		}
-//	}
-//}
 
 
 /// \brief SIDDON kernel function 4
@@ -2048,17 +1395,6 @@ inline	__host__ __device__ void dev_minmaxIdxFun(
 		}
 	}
 }
-
-//
-///// \brief SIDDON kernel function 5
-//inline __host__ __device__  float dev_alphaU_Fun(const float& d, const float& startx, const float& endx)
-//{
-//	if (IS_ZERO<float>(startx - endx))
-//	{
-//		return 1000.0f;//(d/1e-6);
-//	}
-//	return d / fabsf(startx - endx);
-//}
 
 /// \brief SIDDON kernel function 5
 inline __host__ __device__  double dev_alphaU_Fun(const double& d, const double& startx, const double& endx)
@@ -2940,26 +2276,26 @@ inline void stripnl(char *str) {
 	}
 }
 
-inline int countNumLines1(char *filename) //from http://ubuntuforums.org/archive/index.php/t-1057474.html
-{
-	FILE *f;
-	char c;
-	int lines = 0;
-
-	f = fopen(filename, "r");
-	if (f == nullptr)
-		return 0;
-
-	while ((c = fgetc(f)) != EOF)
-		if (c == '\n')
-			lines++;
-
-	fclose(f);
-	if (c != '\n')
-		lines++;
-
-	return lines;
-}
+//inline int countNumLines1(char *filename) //from http://ubuntuforums.org/archive/index.php/t-1057474.html
+//{
+//	FILE *f;
+//	char c;
+//	int lines = 0;
+//
+//	f = fopen(filename, "r");
+//	if (f == nullptr)
+//		return 0;
+//
+//	while ((c = fgetc(f)) != EOF)
+//		if (c == '\n')
+//			lines++;
+//
+//	fclose(f);
+//	if (c != '\n')
+//		lines++;
+//
+//	return lines;
+//}
 inline int countNumLines2(char *s) //from: http://www.cplusplus.com/doc/tutorial/files/
 {
 	std::string line;
@@ -3178,7 +2514,18 @@ inline void pushMatrix(
 	}
 }
 
-
+// Calculate the intersection point coordinates
+template<typename T>
+inline __host__ __device__ void calSV(T initX, T initY,const T& cosT,const T& sinT, T* sour, T* SVA, const unsigned int detIdx, T plusOne) {
+	T curX = initX * cosT - initY * sinT;
+	T curY = initX * sinT + initY * cosT;
+	T dx = curX - sour[0];
+	T dy = curY - sour[1];
+	T legth = sqrt(dx * dx + dy * dy);
+	SVA[0] = dx / legth;
+	SVA[1] = dy / legth;
+	SVA[2] = static_cast<T>(detIdx) + plusOne;
+}
 
 
 template <typename T>
@@ -3187,26 +2534,14 @@ inline __host__ __device__ void calSVASVB(T* SVA, T* SVB, T* sour, const T& cosT
 	T pangle = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp;
 	T initY = -cos(pangle) * FanGeo.m_S2D + FanGeo.m_S2O;
 	T initX = sin(pangle) * FanGeo.m_S2D;
-	T curX = initX * cosT - initY * sinT;
-	T curY = initX * sinT + initY * cosT;
-	initX = curX - sour[0];
-	initY = curY - sour[1];
-	T legth = sqrt(initX * initX + initY * initY);
-	SVA[0] = initX / legth;
-	SVA[1] = initY / legth;
-	SVA[2] = static_cast<T>(detIdx);
+
+	calSV<T>(initX, initY, cosT, sinT, sour, SVA, detIdx, 0.0);
 
 	pangle = pangle + FanGeo.m_DetStp;
 	initY = -cos(pangle) * FanGeo.m_S2D + FanGeo.m_S2O;
 	initX = sin(pangle) * FanGeo.m_S2D;
-	curX = initX * cosT - initY * sinT;
-	curY = initX * sinT + initY * cosT;
-	initX = curX - sour[0];
-	initY = curY - sour[1];
-	legth = sqrt(initX * initX + initY * initY);
-	SVB[0] = initX / legth;
-	SVB[1] = initY / legth;
-	SVB[2] = static_cast<T>(detIdx) +1;
+
+	calSV<T>(initX, initY, cosT, sinT, sour, SVB, detIdx, 1.0);
 }
 
 
@@ -3215,82 +2550,33 @@ __host__ __device__ void calSVASVB(T* SVA, T* SVB, T* sour, const T& cosT, const
 {
 	T initX = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp;
 	T initY = -FanGeo.m_O2D;
-	T curX = initX * cosT - initY * sinT;
-	T curY = initX * sinT + initY * cosT;
-	initX = curX - sour[0];
-	initY = curY - sour[1];
-	T legth = sqrt(initX * initX + initY * initY);
-	SVA[0] = initX / legth;
-	SVA[1] = initY / legth;
-	SVA[2] = static_cast<T>(detIdx);
 
+	calSV<T>(initX, initY, cosT, sinT, sour, SVA, detIdx, 0.0);
 
 	initX = (detIdx - FanGeo.m_DetCntIdx + 1) * FanGeo.m_DetStp;
 	initY = -FanGeo.m_O2D;
-	curX = initX * cosT - initY * sinT;
-	curY = initX * sinT + initY * cosT;
-	initX = curX - sour[0];
-	initY = curY - sour[1];
-	legth = sqrt(initX * initX + initY * initY);
-	SVB[0] = initX / legth;
-	SVB[1] = initY / legth;
-	SVB[2] = static_cast<T>(detIdx + 1.0);
+
+	calSV<T>(initX, initY, cosT, sinT, sour, SVB, detIdx, 1.0);
 }
-
-
-
 
 template<typename T>
-inline __host__ __device__ void SortProj(T(&grid)[4][3])
-{
-	int i(0), j(0);
-	T td(0.0);
-	for (i = 0; i != 3; ++i)
-	{
-		for (j = i + 1; j != 4; ++j)
-		{
-			if (grid[j][2] < grid[i][2])
-			{
-				td = grid[i][0];
-				grid[i][0] = grid[j][0];
-				grid[j][0] = td;
-
-				td = grid[i][1];
-				grid[i][1] = grid[j][1];
-				grid[j][1] = td;
-
-				td = grid[i][2];
-				grid[i][2] = grid[j][2];
-				grid[j][2] = td;
-			}
-		}
-	}
+__host__ __device__ void dev_swap(T& a, T& b) {
+	T c = a;
+	a = b;
+	b = c;
 }
-
 
 template<typename T>
 __host__ __device__ inline void SortProjection(T(&Grid)[4][3])
 {
 	int i, j;
 	T td;
-	//mexPrintf("S0=%d,S1=%d,S2=%d,S3=%d\n",SSort[0],SSort[1],SSort[2],SSort[3]);
-	for (i = 0; i < 3; i++)
-	{
-		for (j = i + 1; j < 4; j++)
-		{
-			if (Grid[j][2] < Grid[i][2])
-			{
-				td = Grid[i][0];
-				Grid[i][0] = Grid[j][0];
-				Grid[j][0] = td;
-
-				td = Grid[i][1];
-				Grid[i][1] = Grid[j][1];
-				Grid[j][1] = td;
-
-				td = Grid[i][2];
-				Grid[i][2] = Grid[j][2];
-				Grid[j][2] = td;
+	for (i = 0; i < 3; i++) {
+		for (j = i + 1; j < 4; j++) {
+			if (Grid[j][2] < Grid[i][2]) {
+				dev_swap(Grid[i][0], Grid[j][0]);
+				dev_swap(Grid[i][1], Grid[j][1]);
+				dev_swap(Grid[i][2], Grid[j][2]);
 			}
 		}
 	}
@@ -3678,23 +2964,25 @@ void genProj_AIM(
 	T pangle(0);
 	int di(0);
 	T coef(0);
-	for (yi = 0; yi < YN; ++yi)
-	{
-		for (xi = 0; xi < XN; ++xi)
-		{
+	for (yi = 0; yi < YN; ++yi) {
+		for (xi = 0; xi < XN; ++xi)	{
 			//Fetch the four points of the pixel and their projection positions
 			Grid[0][0] = (xi - xctr)*dx;
 			Grid[0][1] = (yi - yctr)*dy;
 			Grid[0][2] = PosAry[yi*(XN + 1) + xi];
+
 			Grid[1][0] = (xi - xctr + 1)*dx;
 			Grid[1][1] = (yi - yctr)*dy;
 			Grid[1][2] = PosAry[yi*(XN + 1) + xi + 1];
+
 			Grid[2][0] = (xi - xctr + 1)*dx;
 			Grid[2][1] = (yi - yctr + 1)*dy;
 			Grid[2][2] = PosAry[(yi + 1)*(XN + 1) + xi + 1];
+
 			Grid[3][0] = (xi - xctr)*dx;
 			Grid[3][1] = (yi - yctr + 1)*dy;
 			Grid[3][2] = PosAry[(yi + 1)*(XN + 1) + xi];
+
 			SortProjection<T>(Grid);//Sort the projection psotion
 
 			posim = yi*XN + xi;
@@ -3855,8 +3143,8 @@ void genProj_AIM(std::vector<int>& rowIdx, std::vector<int>& colIdx, std::vector
 }
 
 
-template<typename T>
-void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img)
+template<typename T, typename FanGeometry>
+void genProjectionMatrix_AIM_template_Impl(const FanGeometry FanGeo, const Image Img)
 {
 	unsigned int angIdx = 0;
 	std::vector < int> rowIdx;
@@ -3866,7 +3154,7 @@ void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img)
 	for (angIdx = 0; angIdx < FanGeo.m_ViwN; ++angIdx)
 	{
 		ang = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		genProj_AIM<T>(rowIdx, colIdx, coeffs, angIdx, ang, FanGeo, Img);
+		genProj_AIM(rowIdx, colIdx, coeffs, angIdx, ang, FanGeo, Img);
 		std::cout << angIdx << std::endl;
 	}
 	int nonZ = rowIdx.size();
@@ -3891,11 +3179,11 @@ void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img)
 	std::ofstream rowFile(f1.c_str(), std::ios::binary);
 	std::ofstream colFile(f2.c_str(), std::ios::binary);
 	std::ofstream coeFile(f3.c_str(), std::ios::binary);
-	rowFile.write((char*) &(rowIdx[0]), sizeof(int) * rowIdx.size());
+	rowFile.write((char*)&(rowIdx[0]), sizeof(int) * rowIdx.size());
 	rowFile.close();
-	colFile.write((char*) &(colIdx[0]), sizeof(int) * colIdx.size());
+	colFile.write((char*)&(colIdx[0]), sizeof(int) * colIdx.size());
 	colFile.close();
-	coeFile.write((char*) &(coeffs[0]), sizeof(T) * coeffs.size());
+	coeFile.write((char*)&(coeffs[0]), sizeof(T) * coeffs.size());
 	coeFile.close();
 
 	rowFile.close();
@@ -3905,83 +3193,14 @@ void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img)
 }
 
 template<typename T>
-void genProjectionMatrix_AIM_template(const FanEAGeo FanGeo, const Image Img)
-{
-	int angIdx = 0;
-	std::vector < int> rowIdx;
-	std::vector < int > colIdx;
-	std::vector < T > coeffs;
-	T ang(0);
-	for (angIdx = 0; angIdx < FanGeo.m_ViwN; ++angIdx)
-	{
-		ang = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		genProj_AIM<T>(rowIdx, colIdx, coeffs, angIdx, ang, FanGeo, Img);
-		std::cout << angIdx << std::endl;
-	}
-	int nonZ = rowIdx.size();
-	std::stringstream ss;
-	ss << nonZ;
-	std::string f1;
-	std::string f2;
-	std::string f3;
-	if (sizeof(T) == 4)
-	{
-		f1 = "prjAIM" + ss.str() + "f.row";
-		f2 = "prjAIM" + ss.str() + "f.col";
-		f3 = "prjAIM" + ss.str() + "f.cof";
-	}
-	else if (sizeof(T) == 8)
-	{
-		f1 = "prjAIM" + ss.str() + "d.row";
-		f2 = "prjAIM" + ss.str() + "d.col";
-		f3 = "prjAIM" + ss.str() + "d.cof";
-	}
-
-	std::ofstream rowFile(f1.c_str(), std::ios::binary);
-	std::ofstream colFile(f2.c_str(), std::ios::binary);
-	std::ofstream coeFile(f3.c_str(), std::ios::binary);
-	rowFile.write((char*) &(rowIdx[0]), sizeof(int) * rowIdx.size());
-	rowFile.close();
-	colFile.write((char*) &(colIdx[0]), sizeof(int) * colIdx.size());
-	colFile.close();
-	coeFile.write((char*) &(coeffs[0]), sizeof(T) * coeffs.size());
-	coeFile.close();
-
-	rowFile.close();
-	colFile.close();
-	coeFile.close();
+void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img) {
+	genProjectionMatrix_AIM_template_Impl<T, FanEDGeo>(FanGeo, Img);
 }
 
-
-
-
-/// \brief Generate the Hilbert Filter used by analytical reconstruction algorithm
-/// \version 1.0
-/// \date 2014-02-18
-/// \param filt Filter
-/// \param sigLeng Signal Length
 template<typename T>
-void hilbertFilter(
-	std::vector<T>& filt,
-	const unsigned int& sigLeng)
-{
-	filt.clear();
-	filt.resize(2 * sigLeng - 1);
-	filt[0] = 0;
-	for (unsigned int i(1); i != sigLeng + 1; ++i)
-	{
-		filt[i] = (1 - std::pow(-1.0, i)) / (3.14159265358979323846264 * i);
-	}
-	for (unsigned int i(sigLeng); i != 2 * sigLeng - 1; ++i)
-	{
-		filt[i] = (1 - std::pow(-1.0, static_cast<T>(i) -2.0 *
-			static_cast<T>(sigLeng) +1.0)) /
-			(3.14159265358979323846264 * (static_cast<T>(i) -2.0 * static_cast<T>(sigLeng) +1.0));
-	}
+void genProjectionMatrix_AIM_template(const FanEAGeo FanGeo, const Image Img) {
+	genProjectionMatrix_AIM_template_Impl<T, FanEAGeo>(FanGeo, Img);
 }
-
-
-
 
 //Calculate the l0 norm of a device thrust vector in GPU. And points out where are these non-zeros are.
 template<typename T>
@@ -4119,19 +3338,6 @@ std::vector<T>& operator-(std::vector<T>& v, const T& ms)
 	std::transform(v.begin(), v.end(), v.begin(), [=](const T& vv){ return vv - ms; });
 	return v;
 }
-
-
-template<typename T>
-std::ostream& operator<<(std::ostream& os, std::vector<T>& dt)
-{
-	for (unsigned int i = 0; i != dt.size(); ++i)
-	{
-		os << dt[i] << " ";
-	}
-	os << std::endl;
-	return os;
-}
-
 
 template<typename T>
 const T mean(std::vector<T>& v)
@@ -4298,45 +3504,27 @@ void bakWeight(std::vector<T>& vol, std::vector<T>& reconImg, std::vector<T>& co
 }
 
 
-
-template<typename T>
-void FISTA(T* lasImg, T* currentImg, T t1, T t2, int N)
-{
-	struct FISTA_functor
-	{
-		T t1;
-		T t2;
-		FISTA_functor(const T& _t1, const T& _t2) :t1(_t1), t2(_t2){}
-		__host__ __device__ T operator()(T curImg, T lasImg)
-		{
-			return curImg + (t1 - 1.0) / t2 * (curImg - lasImg);
-		}
-
-	};
-	thrust::transform(currentImg, currentImg + N, lasImg, currentImg, FISTA_functor(t1, t2));
-}
-
-
-
-
-template<typename T>
-void FISTA(std::vector<T>& lasImg, std::vector<T>&  currentImg, T t1, T t2, int N)
-{
-	struct FISTA_functor
-	{
-		T t1;
-		T t2;
-		FISTA_functor(const T& _t1, const T& _t2) :t1(_t1), t2(_t2){}
-		__host__ __device__ T operator()(T curImg, T lasImg)
-		{
-			return curImg + (t1 - 1.0) / t2 * (curImg - lasImg);
-		}
-
-	};
-	thrust::transform(currentImg.begin(), currentImg.end(), lasImg.begin(), currentImg, FISTA_functor(t1, t2));
-}
-
-
+//template<typename T>
+//struct FISTA_functor {
+//	T t1;
+//	T t2;
+//	FISTA_functor(const T& _t1, const T& _t2) :t1(_t1), t2(_t2) {}
+//	__host__ __device__ T operator()(T curImg, T lasImg)
+//	{
+//		return curImg + (t1 - 1.0) / t2 * (curImg - lasImg);
+//	}
+//};
+//template<typename T>
+//void FISTA(T* lasImg, T* currentImg, T t1, T t2, int N) {
+//	thrust::transform(currentImg, currentImg + N, lasImg, currentImg, FISTA_functor<T>(t1, t2));
+//}
+//
+//template<typename T>
+//void FISTA(std::vector<T>& lasImg, std::vector<T>&  currentImg, T t1, T t2, int N) {
+//	thrust::transform(currentImg.begin(), currentImg.end(), lasImg.begin(), currentImg, FISTA_functor<T>(t1, t2));
+//}
+//
+//
 
 
 

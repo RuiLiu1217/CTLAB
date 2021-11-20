@@ -15,6 +15,20 @@
 #include "utilities.hpp"
 #include "projbackproj.hpp"
 #include "cudaCheckReturner.h"
+
+
+ /// \brief The functor called by std::transform or thrust::transform, given the parameter scale, that output the x + scale * y, where x, y are two vectors, the result is also a vector
+template<typename T>
+struct _saxpy_functor
+{
+	T _scal;
+	_saxpy_functor(const T& s) :_scal(s) {}
+	__host__ __device__ T operator()(const T& x, const T& y) const
+	{
+		return x + _scal * y;
+	}
+};
+
 #ifndef MYEPSILON
 #define MYEPSILON 1.0E-9
 #endif
@@ -321,7 +335,19 @@ void generateModiPhantom_d(const std::string& FileName, const unsigned int& lenR
 }
 
 
-
+/// \brief The function helps to get the lp norm of a device or host vector
+template<typename T>
+struct _lp_functor
+{
+private:
+	T _p;
+public:
+	_lp_functor(const T& p) :_p(p){}
+	__host__ __device__ T operator()(const T& x)
+	{
+		return pow(MY_ABS<T>(x), _p);
+	}
+};
 float norm(float* v, cuint len, const float p)
 {
 	thrust::device_ptr<float> pv(v);
@@ -817,6 +843,38 @@ double OptimizedW0(thrust::device_vector<double>& TVImg, const double& ObjTV)
 
 
 
+template<typename T>
+struct _Update
+{
+	typedef thrust::tuple<T, T, T, T> TU;
+	T _lamb;
+	T _keepRange;
+	T _minV;
+	T _maxV;
+	_Update(const T& lambda, bool keepInRange, const T& minV, const T& maxV) :
+		_lamb(lambda), _minV(minV), _maxV(maxV), _keepRange(keepInRange) {}
+	__host__ __device__ T operator()(TU t)
+	{
+		T img = thrust::get<0>(t);
+		T cor = thrust::get<1>(t);
+		T weg = thrust::get<2>(t);
+		T msk = thrust::get<3>(t);
+		img = (img + _lamb * cor / weg) * msk;
+		if (_keepRange) {
+			if (img < _minV) {
+				return _minV;
+			}
+
+			if (img > _maxV) {
+				return _maxV;
+			}
+
+			return img;
+		}
+		return img;
+	}
+};
+
 
 
 void SART(thrust::host_vector<float>& himg,
@@ -1059,8 +1117,6 @@ void OS_SART(float* himg, float* hprj, float* himgWeg, float* hmask, const FanEA
 }
 
 
-
-
 void OS_SART_SD(thrust::host_vector<float>& himg,
 	thrust::host_vector<float>& hprj,
 	thrust::host_vector<float>& hweg,
@@ -1145,6 +1201,7 @@ void OS_SART_SD(thrust::host_vector<float>& himg,
 	dcorImg.clear();
 	dcorPrj.clear();
 }
+
 
 
 void OS_SART_SD(float* himg, float* hprj, float* himgWeg, float* hmask, const FanEAGeo& FanGeo, const Image& Img,
@@ -2486,6 +2543,43 @@ void DEMO8()
 
 
 
+/// \brief updating the data in CG algorithm with functor 1
+template<typename T>
+struct CG_update1_functor
+{
+public:
+	T _alpha;
+	CG_update1_functor(const T& alpha) :_alpha(alpha) {}
+	__host__ __device__ T operator()(const T& X, const T& D) {
+		return X + _alpha * D;
+	}
+};
+
+/// \brief updating the data in CG algorithm with functor 2
+template<typename T>
+struct CG_update2_functor
+{
+public:
+	T _alpha;
+	CG_update2_functor(const T& alpha) :_alpha(alpha) {}
+	__host__ __device__ T operator()(const T& R, const T& tem2)
+	{
+		return R - _alpha * tem2;
+	}
+};
+
+/// \brief updating the data in CG algorithm with functor 3
+template<typename T>
+struct CG_update3_functor
+{
+public:
+	T _beta;
+	CG_update3_functor(const T& beta) :_beta(beta) {}
+	__host__ __device__ T operator()(const T& R, const T& D)
+	{
+		return R + _beta * D;
+	}
+};
 void CG_recon(float* himg, float* hprj, const FanEAGeo& FanGeo, const Image& Img, cuint IterNum)
 {
 	float* X = nullptr;
@@ -2706,6 +2800,20 @@ void DEMO10()
 
 
 
+
+/// \brief FISTA accelerate the convergence.
+template<typename T>
+struct _FISTA_demo11
+{
+public:
+	T t1;
+	T t2;
+	_FISTA_demo11(const T& _t1, const T& _t2) :t1(_t1), t2(_t2) {}
+	__host__ __device__ T operator()(const T& x1, const T& x0)
+	{
+		return x1 + (t1 - 1) / t2 * (x1 - x0);
+	}
+};
 
 __global__ void updateImg_demo11(float* dimg, float* dcorImg, float* dwegImg, float* dmask, float lambda, cuint ImgLR, cuint ImgWR, cuint sliceNum)
 {
@@ -2967,7 +3075,22 @@ void DEMO12()
 }
 
 
-
+/// \brief The self defined functor called by thrust::transform or std::transform which prevent the denominator is 0;
+template<typename T>
+struct _divide_functor
+{
+	__host__ __device__ T operator()(const T& a, const T& b)
+	{
+		if (IS_ZERO(b))
+		{
+			return 0;
+		}
+		else
+		{
+			return a / b;
+		}
+	}
+};
 
 void EM(float* hprj, float* himg, const FanEAGeo& FanGeo, const Image& Img, cuint iterNum)
 {
@@ -3522,7 +3645,42 @@ void DEMO16()
 
 
 
-
+/// Update the image with functor
+template<typename T>
+struct _DEMO17_update_functor
+{
+	typedef thrust::tuple<T, T, T> TP;
+	T coef;
+	T minV;
+	T maxV;
+	_DEMO17_update_functor(const T& c, const T& miv, const T& mav) :coef(c), minV(miv), maxV(mav) {}
+	_DEMO17_update_functor(const T& c, const T& miv) :coef(c), minV(miv), maxV(10000.0) {}
+	_DEMO17_update_functor(const T& c) :coef(c), minV(0), maxV(10000.0) {}
+	__host__ __device__ T operator()(const TP& fdw)
+	{
+		T f = thrust::get < 0 >(fdw);
+		T d = thrust::get < 1 >(fdw);
+		T w = thrust::get < 2 >(fdw);
+		T res = 0;
+		if (!IS_ZERO(w))
+		{
+			res = f + coef * d / w;
+		}
+		else
+		{
+			res = minV;
+		}
+		if (res > maxV)
+		{
+			res = maxV;
+		}
+		if (res < minV)
+		{
+			res = minV;
+		}
+		return res;
+	}
+};
 void DEMO17()
 {
 	CUDA_CHECK_RETURN(cudaSetDevice(0));
@@ -3924,7 +4082,40 @@ void DEMO17(
 }
 
 
-
+/// Update the image with functor
+template<typename T>
+struct _DEMO18_update_functor
+{
+	typedef thrust::tuple<T, T, T> TP;
+	T coef;
+	T minV;
+	T maxV;
+	_DEMO18_update_functor(const T& c, const T& miv, const T& mav) :coef(c), minV(miv), maxV(mav) {}
+	__host__ __device__ T operator()(const TP& fdw)
+	{
+		T f = thrust::get < 0 >(fdw);
+		T d = thrust::get < 1 >(fdw);
+		T w = thrust::get < 2 >(fdw);
+		T res = 0;
+		if (!IS_ZERO(w))
+		{
+			res = f + coef * d / w;
+		}
+		else
+		{
+			res = minV;
+		}
+		if (res > maxV)
+		{
+			res = maxV;
+		}
+		if (res < minV)
+		{
+			res = minV;
+		}
+		return res;
+	}
+};
 void DEMO18()
 {
 	CUDA_CHECK_RETURN(cudaSetDevice(2));
@@ -4727,6 +4918,47 @@ void DEMO18v3()
 	//std::cout << "Finished\n";
 }
 
+
+
+template<typename T>
+struct _DEMO18v4_GenProjLambda_functor
+{
+	T _maxY;
+	_DEMO18v4_GenProjLambda_functor(const T& maxy) :_maxY(maxy) {}
+	__host__ __device__ T operator()(const T& yi, const T& weight)
+	{
+		if (IS_ZERO(weight))
+		{
+			return 0;
+		}
+		return yi / (_maxY * weight);
+	}
+};
+template<typename T>
+struct _DEMO18v4_GenBackLambda_functor
+{
+	T _val;
+	_DEMO18v4_GenBackLambda_functor(const T& vl) :_val(vl) {}
+	__host__ __device__ T operator()(const T& v)
+	{
+		if (IS_ZERO(v))
+		{
+			return 0;
+		}
+		return _val / v;
+	}
+};
+
+template<typename T>
+struct _DEMO18v4_updateImgSIR_functor
+{
+	T _lambda;
+	_DEMO18v4_updateImgSIR_functor(const T& lamb) :_lambda(lamb) {}
+	__host__ __device__ T operator()(const T& f, const T& upf)
+	{
+		return f - _lambda * upf;
+	}
+};
 // It is right
 void DEMO18v4_2D()
 {

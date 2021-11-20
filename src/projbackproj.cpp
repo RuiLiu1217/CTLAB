@@ -601,7 +601,7 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Image& Im
 						grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 
 						pdist = hypot((static_cast<T>(curIdx) -cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx) -cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
@@ -703,7 +703,7 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Image& Im
 						grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(sliceIdx) -cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx) -cntImgY)*Img.m_Step.y - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
 						summ += coef * dimg[curIdx * Img.m_Reso.x + sliceIdx];
@@ -804,7 +804,7 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Image& Im
 						grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(curIdx) -cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(sliceIdx) -cntImgY)*Img.m_Step.y - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
 						summ += coef * dimg[sliceIdx* Img.m_Reso.x + curIdx];
@@ -905,7 +905,7 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Image& Im
 						grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(sliceIdx) -cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx) -cntImgY)*Img.m_Step.y - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 						coef = coef / (pdist * FanGeo.m_DetStp);
@@ -1075,7 +1075,7 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Im
 						grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 
 						pdist = hypot((static_cast<T>(curIdx) -cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx) -cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
@@ -1177,7 +1177,7 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Im
 						grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(sliceIdx) -cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx) -cntImgY)*Img.m_Step.y - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
 						summ += coef * dimg[curIdx * Img.m_Reso.x + sliceIdx];
@@ -1278,7 +1278,7 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Im
 						grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(curIdx) -cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(sliceIdx) -cntImgY)*Img.m_Step.y - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area) / (pdist * FanGeo.m_DetStp);
 						summ += coef * dimg[sliceIdx* Img.m_Reso.x + curIdx];
@@ -1379,7 +1379,7 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Im
 						grid[3][2] = atan(-initDir[0] / (initDir[1] - FanGeo.m_S2O)) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(sliceIdx) -cntImgX)*Img.m_Step.x - sour[0], (static_cast<T>(curIdx) -cntImgY)*Img.m_Step.y - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 						coef = coef / (pdist * FanGeo.m_DetStp);
@@ -1533,7 +1533,7 @@ void bakproj_AIM_CPU_temp(T* dprj, T* dimg, cuint angIdx, const FanEAGeo& FanGeo
 			grid[3][2] = beta[3] / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 			/////����;
-			SortProj<T>(grid);
+			SortProjection<T>(grid);
 
 			////��С���index
 			minDetIdx = int(grid[0][2]);
@@ -1722,7 +1722,7 @@ void bakproj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, cuint angIdx, const FanEAGeo&
 			grid[3][2] = beta[3] / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 			/////����;
-			SortProj<T>(grid);
+			SortProjection<T>(grid);
 
 			////��С���index
 			minDetIdx = int(grid[0][2]);
@@ -1895,7 +1895,7 @@ void bakproj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const
 				grid[3][2] = beta[3] / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 				/////����;
-				SortProj<T>(grid);
+				SortProjection<T>(grid);
 
 				////��С���index
 				minDetIdx = int(grid[0][2]);
@@ -2047,7 +2047,7 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Image& Im
 						grid[3][2] = xPos / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(curIdx) -cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx) -cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 						coef = coef / (pdist*pangle);
@@ -2125,7 +2125,7 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Image& Im
 
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(curIdx) -cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx) -cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 						coef = coef / (pdist*pangle);
@@ -2205,7 +2205,7 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Image& Im
 
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(curIdx) -cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx) -cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 						coef = coef / (pdist*pangle);
@@ -2285,7 +2285,7 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Image& Im
 
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(curIdx) -cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx) -cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 						coef = coef / (pdist*pangle);
@@ -2421,7 +2421,7 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Im
 						grid[3][2] = xPos / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(curIdx) -cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx) -cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 						coef = coef / (pdist*pangle);
@@ -2498,7 +2498,7 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Im
 
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(curIdx) -cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx) -cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 						coef = coef / (pdist*pangle);
@@ -2577,7 +2577,7 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Im
 
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(curIdx) -cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx) -cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 						coef = coef / (pdist*pangle);
@@ -2656,7 +2656,7 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Im
 
 
 						//����;
-						SortProj<T>(grid);
+						SortProjection<T>(grid);
 						pdist = hypot((static_cast<T>(curIdx) -cntImgX)*static_cast<T>(Img.m_Step.x) - sour[0], (static_cast<T>(sliceIdx) -cntImgY)*static_cast<T>(Img.m_Step.y) - sour[1]);
 						coef = ComputeCoefficient<T>(grid, SVA, SVB, sour, area);
 						coef = coef / (pdist*pangle);
@@ -2729,7 +2729,7 @@ void bakproj_AIM_CPU_temp(T* dprj, T*dimg, cuint angidx, const FanEDGeo& FanGeo,
 			vv = -grid[3][0] * sinT + grid[3][1] * cosT - FanGeo.m_S2O;
 			grid[3][2] = (-(pdist * FanGeo.m_S2D) / vv) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
-			SortProj<T>(grid);
+			SortProjection<T>(grid);
 
 			minDetIdx = static_cast<int>(grid[0][2]);
 			maxDetIdx = (int(ceil(grid[3][2])));
@@ -2825,7 +2825,7 @@ void bakproj_AIM_CPU_temp(T* dprj, T*dimg, const FanEDGeo& FanGeo, const Image& 
 
 
 				//����
-				SortProj<T>(grid);
+				SortProjection<T>(grid);
 
 				minDetIdx = static_cast<int>(grid[0][2]);
 				maxDetIdx = (int(ceil(grid[3][2])));
@@ -2926,7 +2926,7 @@ void bakproj_AIM_CPU_OPENMP_temp(T* dprj, T*dimg, const FanEDGeo& FanGeo, const 
 
 
 				//����
-				SortProj<T>(grid);
+				SortProjection<T>(grid);
 
 				minDetIdx = static_cast<int>(grid[0][2]);
 				maxDetIdx = (int(ceil(grid[3][2])));
@@ -3016,7 +3016,7 @@ void bakproj_AIM_CPU_OPENMP_temp(T* dprj, T*dimg, cuint angidx, const FanEDGeo& 
 			grid[3][2] = (-(pdist * FanGeo.m_S2D) / vv) / FanGeo.m_DetStp + FanGeo.m_DetCntIdx;
 
 			//����
-			SortProj<T>(grid);
+			SortProjection<T>(grid);
 
 			minDetIdx = static_cast<int>(grid[0][2]);
 			maxDetIdx = (int(ceil(grid[3][2])));
