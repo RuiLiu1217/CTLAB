@@ -1857,11 +1857,11 @@ __global__ void _proj_AIM_Ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 		const T cntImgY = (static_cast<T>(Img.m_Reso.y) - 1) * 0.5 + (Img.m_Bias.y / Img.m_Step.y);
 		const T area = Img.m_Step.x * Img.m_Step.y;
 		T curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		while (curAng < 0){ curAng += (_TWOPI); }
-		while (curAng > _TWOPI){ curAng -= (_TWOPI); }
+		while (curAng < 0){ curAng += (TWOPI); }
+		while (curAng > TWOPI){ curAng -= (TWOPI); }
 		T cosT = cos(curAng);
 		T sinT = sin(curAng);
-		T sour[2] = { -FanGeo.m_S2O * sinT, FanGeo.m_S2O * cosT };
+		T sour[2] = { -FanGeo.m_S2O * sinT, FanGeo.m_S2O * cosT };			
 		T SVA[3];
 		T SVB[3];
 		calSVASVB<T>(SVA, SVB, sour, cosT, sinT, FanGeo, Img, detIdx);
@@ -1878,11 +1878,11 @@ __global__ void _proj_AIM_Ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 		T pdist, coef;
 		T curDirAng = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp + curAng;
 
-		while (curDirAng < 0){ curDirAng += (_TWOPI); }
-		while (curDirAng > _TWOPI){ curDirAng -= (_TWOPI); }
+		while (curDirAng < 0){ curDirAng += (TWOPI); }
+		while (curDirAng > TWOPI){ curDirAng -= (TWOPI); }
 		int levelIdx; // index different slices in Z direction
 		T weight = 0;
-		if (curDirAng <= _PI_4 || curDirAng > _7PI_4)
+		if (curDirAng <= PI / 4.0 || curDirAng > PI * 1.75)
 		{
 			for (levelIdx = 0; levelIdx != sliceNum; ++levelIdx)
 			{
@@ -2018,7 +2018,7 @@ __global__ void _proj_AIM_Ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 			}
 			return;
 		} //End case 1
-		else if (curDirAng > _PI_4 && curDirAng <= _3PI_4)
+		else if (curDirAng > PI * 0.25 && curDirAng <= PI * 0.75)
 		{
 			for (levelIdx = 0; levelIdx != sliceNum; ++levelIdx)
 			{
@@ -2028,7 +2028,7 @@ __global__ void _proj_AIM_Ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 			for (sliceIdx = 0; sliceIdx < Img.m_Reso.x; ++sliceIdx)
 			{
 				coord = (sliceIdx - cntImgX - 0.5)* Img.m_Step.x;
-				//�������λ�ù����ཻ�����;
+				
 				minC = sour[1] + SVA[1] * (coord - sour[0]) / SVA[0];
 				maxC = sour[1] + SVB[1] * (coord - sour[0]) / SVB[0];
 				if (maxC < minC)
@@ -2141,7 +2141,7 @@ __global__ void _proj_AIM_Ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 			}
 			return;
 		}// End case 2
-		else if (curDirAng > _3PI_4 && curDirAng <= _5PI_4)
+		else if (curDirAng > PI * 0.75 && curDirAng <= PI * 1.25)
 		{
 			for (levelIdx = 0; levelIdx != sliceNum; ++levelIdx)
 			{
@@ -2408,8 +2408,8 @@ __global__ void _proj_AIMslow_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const
 		const T cntImgY = (static_cast<T>(Img.m_Reso.y) - 1) * 0.5 + (Img.m_Bias.y / Img.m_Step.y);
 		const T area = Img.m_Step.x * Img.m_Step.y;
 		T curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		while (curAng < 0){ curAng += (_TWOPI); }
-		while (curAng > _TWOPI){ curAng -= (_TWOPI); }
+		while (curAng < 0){ curAng += (TWOPI); }
+		while (curAng > TWOPI){ curAng -= (TWOPI); }
 		T cosT = cos(curAng);
 		T sinT = sin(curAng);
 		T sour[2] = { -FanGeo.m_S2O * sinT, FanGeo.m_S2O * cosT };
@@ -2523,8 +2523,8 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Ima
 		const T cntImgY = (static_cast<T>(Img.m_Reso.y) - 1) * 0.5 + (Img.m_Bias.y / Img.m_Step.y);
 		const T area = Img.m_Step.x * Img.m_Step.y;
 		T curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		while (curAng < 0){ curAng += (_TWOPI); }
-		while (curAng > _TWOPI){ curAng -= (_TWOPI); }
+		while (curAng < 0){ curAng += (TWOPI); }
+		while (curAng > TWOPI){ curAng -= (TWOPI); }
 		T cosT = cos(curAng);
 		T sinT = sin(curAng);
 		T sour[2] = { -FanGeo.m_S2O * sinT, FanGeo.m_S2O * cosT };
@@ -2543,10 +2543,10 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Ima
 		T len;
 		T pdist, coef;
 		T curDirAng = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp + curAng;
-		while (curDirAng < 0){ curDirAng += (_TWOPI); }
-		while (curDirAng > _TWOPI){ curDirAng -= (_TWOPI); }
+		while (curDirAng < 0){ curDirAng += (TWOPI); }
+		while (curDirAng > TWOPI){ curDirAng -= (TWOPI); }
 
-		if (curDirAng <= _PI_4 || curDirAng > _7PI_4)
+		if (curDirAng <= PI * 0.25 || curDirAng > PI * 1.75)
 		{
 			summ = 0;
 
@@ -2657,7 +2657,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Ima
 			dprj[angIdx* FanGeo.m_DetN + detIdx] = summ;
 			return;
 		} //End case 1
-		else if (curDirAng > _PI_4 && curDirAng <= _3PI_4)
+		else if (curDirAng > PI * 0.25 && curDirAng <= PI * 0.75)
 		{
 			summ = 0;
 			for (sliceIdx = 0; sliceIdx < Img.m_Reso.x; ++sliceIdx)
@@ -2759,7 +2759,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Ima
 			dprj[angIdx * FanGeo.m_DetN + detIdx] = summ;
 			return;
 		}// End case 2
-		else if (curDirAng > _3PI_4 && curDirAng <= _5PI_4)
+		else if (curDirAng > PI * 0.75 && curDirAng <= PI * 1.25)
 		{
 			summ = 0;
 			for (sliceIdx = 0; sliceIdx < Img.m_Reso.y; ++sliceIdx)
@@ -2998,8 +2998,8 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEAGeo FanGeo, 
 		const T cntImgY = (static_cast<T>(Img.m_Reso.y) - 1) * 0.5 + (Img.m_Bias.y / Img.m_Step.y);
 		const T area = Img.m_Step.x * Img.m_Step.y;
 		T curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		while (curAng < 0){ curAng += (_TWOPI); }
-		while (curAng > _TWOPI){ curAng -= (_TWOPI); }
+		while (curAng < 0){ curAng += (TWOPI); }
+		while (curAng > TWOPI){ curAng -= (TWOPI); }
 		T cosT = cos(curAng);
 		T sinT = sin(curAng);
 		T sour[2] = { -FanGeo.m_S2O * sinT, FanGeo.m_S2O * cosT };
@@ -3019,11 +3019,11 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEAGeo FanGeo, 
 		T pdist, coef;
 		T curDirAng = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp + curAng;
 
-		while (curDirAng < 0){ curDirAng += (_TWOPI); }
-		while (curDirAng > _TWOPI){ curDirAng -= (_TWOPI); }
+		while (curDirAng < 0){ curDirAng += (TWOPI); }
+		while (curDirAng > TWOPI){ curDirAng -= (TWOPI); }
 
 		T weight = 0;
-		if (curDirAng <= _PI_4 || curDirAng > _7PI_4)
+		if (curDirAng <= PI * 0.25 || curDirAng > PI * 1.75)
 		{
 			summ = 0;
 			weight = 0;
@@ -3143,7 +3143,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEAGeo FanGeo, 
 
 			return;
 		} //End case 1
-		else if (curDirAng > _PI_4 && curDirAng <= _3PI_4)
+		else if (curDirAng > PI * 0.25 && curDirAng <= PI * 0.75)
 		{
 			summ = 0;
 			weight = 0;
@@ -3253,7 +3253,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEAGeo FanGeo, 
 			}
 			return;
 		}// End case 2
-		else if (curDirAng > _3PI_4 && curDirAng <= _5PI_4)
+		else if (curDirAng > PI * 0.75 && curDirAng <= PI * 1.25)
 		{
 			summ = 0;
 			weight = 0;
@@ -3506,8 +3506,8 @@ __global__ void _proj_AIM_ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 		const T cntImgY = (static_cast<T>(Img.m_Reso.y) - 1) * 0.5 + (Img.m_Bias.y / Img.m_Step.y);
 		const T area = Img.m_Step.x * Img.m_Step.y;
 		T curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		while (curAng < 0){ curAng += (_TWOPI); }
-		while (curAng > _TWOPI){ curAng -= (_TWOPI); }
+		while (curAng < 0){ curAng += (TWOPI); }
+		while (curAng > TWOPI){ curAng -= (TWOPI); }
 		T cosT = cos(curAng);
 		T sinT = sin(curAng);
 		T sour[2] = { -FanGeo.m_S2O * sinT, FanGeo.m_S2O * cosT };
@@ -3527,11 +3527,11 @@ __global__ void _proj_AIM_ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 		T pdist, coef;
 		T curDirAng = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp + curAng;
 
-		while (curDirAng < 0){ curDirAng += (_TWOPI); }
-		while (curDirAng > _TWOPI){ curDirAng -= (_TWOPI); }
+		while (curDirAng < 0){ curDirAng += (TWOPI); }
+		while (curDirAng > TWOPI){ curDirAng -= (TWOPI); }
 
 		T weight = 0;
-		if (curDirAng <= _PI_4 || curDirAng > _7PI_4)
+		if (curDirAng <= PI * 0.25 || curDirAng > PI * 1.75)
 		{
 			summ = 0;
 			weight = 0;
@@ -3651,7 +3651,7 @@ __global__ void _proj_AIM_ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 			}
 			return;
 		} //End case 1
-		else if (curDirAng > _PI_4 && curDirAng <= _3PI_4)
+		else if (curDirAng > PI * 0.25 && curDirAng <= PI * 0.75)
 		{
 			summ = 0;
 			weight = 0;
@@ -3761,7 +3761,7 @@ __global__ void _proj_AIM_ker(T* dimg, T* dprj, T* draw, const FanEAGeo FanGeo, 
 			}
 			return;
 		}// End case 2
-		else if (curDirAng > _3PI_4 && curDirAng <= _5PI_4)
+		else if (curDirAng > PI * 0.75 && curDirAng <= PI * 1.25)
 		{
 			summ = 0;
 			weight = 0;
@@ -4020,8 +4020,8 @@ __global__ void _proj_AIM2_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Im
 	T SVA[3];
 	T SVB[3];
 	T curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-	while (curAng < 0){ curAng += (_TWOPI); }
-	while (curAng > (_TWOPI)){ curAng -= (_TWOPI); }
+	while (curAng < 0){ curAng += (TWOPI); }
+	while (curAng > (TWOPI)){ curAng -= (TWOPI); }
 
 	int sliceIdx;
 	T summ;
@@ -4068,7 +4068,7 @@ __global__ void _proj_AIM2_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Im
 	SVB[2] = SV[detIdx + 1][2];
 
 
-	if (curAng <= (_PI_4) || curAng > (_7PI_4))
+	if (curAng <= (PI * 0.25) || curAng > (PI * 1.75))
 	{
 		summ = 0;
 
@@ -4177,7 +4177,7 @@ __global__ void _proj_AIM2_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Im
 		}
 		dprj[angIdx* FanGeo.m_DetN + detIdx] = summ;
 	} //End case 1
-	else if (curAng > (_PI_4) && curAng <= (_3PI_4))
+	else if (curAng > (PI * 0.25) && curAng <= (PI * 0.75))
 	{
 		summ = 0;
 		for (sliceIdx = 0; sliceIdx != Img.m_Reso.x; ++sliceIdx)
@@ -4276,7 +4276,7 @@ __global__ void _proj_AIM2_ker(T* dprj, T* dimg, const FanEAGeo FanGeo, const Im
 		}// End all slices
 		dprj[angIdx * FanGeo.m_DetN + detIdx] = summ;
 	}// End case 2
-	else if (curAng > (_3PI_4) && curAng <= (_5PI_4))
+	else if (curAng > (PI * 0.75) && curAng <= (PI * 1.25))
 	{
 		summ = 0;
 		for (sliceIdx = 0; sliceIdx != Img.m_Reso.y; ++sliceIdx)
@@ -4512,8 +4512,8 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEDGeo FanGeo, const Ima
 		const T cntImgY = (static_cast<T>(Img.m_Reso.y) - 1) * 0.5 + (Img.m_Bias.y / Img.m_Step.y);
 		const T area = Img.m_Step.x * Img.m_Step.y;
 		T curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		while (curAng < 0){ curAng += (_TWOPI); }
-		while (curAng > _TWOPI){ curAng -= (_TWOPI); }
+		while (curAng < 0){ curAng += (TWOPI); }
+		while (curAng > TWOPI){ curAng -= (TWOPI); }
 		T cosT = cos(curAng);
 		T sinT = sin(curAng);
 		T sour[2] = { -FanGeo.m_S2O * sinT, FanGeo.m_S2O * cosT };
@@ -4532,11 +4532,11 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEDGeo FanGeo, const Ima
 
 		T pdist, coef;
 		T curDirAng = atan(((detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp) / FanGeo.m_O2D) + curAng;
-		while (curDirAng < 0){ curDirAng += (_TWOPI); }
-		while (curDirAng > _TWOPI){ curDirAng -= (_TWOPI); }
+		while (curDirAng < 0){ curDirAng += (TWOPI); }
+		while (curDirAng > TWOPI){ curDirAng -= (TWOPI); }
 		T initP[2]; // initial pixel position
 		T xPos;
-		if (curDirAng <= _PI_4 || curDirAng > _7PI_4)
+		if (curDirAng <= PI * 0.25 || curDirAng > PI * 1.75)
 		{
 			summ = 0;
 			for (sliceIdx = 0; sliceIdx < Img.m_Reso.y; ++sliceIdx)
@@ -4609,7 +4609,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEDGeo FanGeo, const Ima
 			dprj[angIdx* FanGeo.m_DetN + detIdx] = summ;
 			return;
 		} //End case 1
-		else if (curDirAng > _PI_4 && curDirAng <= _3PI_4)
+		else if (curDirAng > PI * 0.25 && curDirAng <= PI * 0.75)
 		{
 			summ = 0;
 			for (sliceIdx = 0; sliceIdx < Img.m_Reso.x; ++sliceIdx)
@@ -4688,7 +4688,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* dimg, const FanEDGeo FanGeo, const Ima
 			dprj[angIdx * FanGeo.m_DetN + detIdx] = summ;
 			return;
 		}// End case 2
-		else if (curDirAng > _3PI_4 && curDirAng <= _5PI_4)
+		else if (curDirAng > PI * 0.75 && curDirAng <= PI * 1.25)
 		{
 			summ = 0;
 			for (sliceIdx = 0; sliceIdx < Img.m_Reso.y; ++sliceIdx)
@@ -4892,8 +4892,8 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 		const T cntImgY = (static_cast<T>(Img.m_Reso.y) - 1) * 0.5 + (Img.m_Bias.y / Img.m_Step.y);
 		const T area = Img.m_Step.x * Img.m_Step.y;
 		T curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		while (curAng < 0){ curAng += (_TWOPI); }
-		while (curAng > _TWOPI){ curAng -= (_TWOPI); }
+		while (curAng < 0){ curAng += (TWOPI); }
+		while (curAng > TWOPI){ curAng -= (TWOPI); }
 		T cosT = cos(curAng);
 		T sinT = sin(curAng);
 		T sour[2] = { -FanGeo.m_S2O * sinT, FanGeo.m_S2O * cosT };
@@ -4912,12 +4912,12 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 
 		T pdist, coef;
 		T curDirAng = atan(((detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp) / FanGeo.m_O2D) + curAng;
-		while (curDirAng < 0){ curDirAng += (_TWOPI); }
-		while (curDirAng > _TWOPI){ curDirAng -= (_TWOPI); }
+		while (curDirAng < 0){ curDirAng += (TWOPI); }
+		while (curDirAng > TWOPI){ curDirAng -= (TWOPI); }
 		T initP[2]; // initial pixel position
 		T xPos;
 		T weight;
-		if (curDirAng <= _PI_4 || curDirAng > _7PI_4)
+		if (curDirAng <= PI * 0.25 || curDirAng > PI * 1.75)
 		{
 			summ = 0;
 			weight = 0;
@@ -5000,7 +5000,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 			}
 			return;
 		} //End case 1
-		else if (curDirAng > _PI_4 && curDirAng <= _3PI_4)
+		else if (curDirAng > PI * 0.25 && curDirAng <= PI * 0.75)
 		{
 			summ = 0;
 			weight = 0;
@@ -5088,7 +5088,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 			}
 			return;
 		}// End case 2
-		else if (curDirAng > _3PI_4 && curDirAng <= _5PI_4)
+		else if (curDirAng > PI * 0.75 && curDirAng <= PI * 1.25)
 		{
 			summ = 0;
 			weight = 0;
@@ -5294,8 +5294,8 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 		const T cntImgY = (static_cast<T>(Img.m_Reso.y) - 1) * 0.5 + (Img.m_Bias.y / Img.m_Step.y);
 		const T area = Img.m_Step.x * Img.m_Step.y;
 		T curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		while (curAng < 0){ curAng += (_TWOPI); }
-		while (curAng > _TWOPI){ curAng -= (_TWOPI); }
+		while (curAng < 0){ curAng += (TWOPI); }
+		while (curAng > TWOPI){ curAng -= (TWOPI); }
 		T cosT = cos(curAng);
 		T sinT = sin(curAng);
 		T sour[2] = { -FanGeo.m_S2O * sinT, FanGeo.m_S2O * cosT };
@@ -5314,12 +5314,12 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 
 		T pdist, coef;
 		T curDirAng = atan(((detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp) / FanGeo.m_O2D) + curAng;
-		while (curDirAng < 0){ curDirAng += (_TWOPI); }
-		while (curDirAng > _TWOPI){ curDirAng -= (_TWOPI); }
+		while (curDirAng < 0){ curDirAng += (TWOPI); }
+		while (curDirAng > TWOPI){ curDirAng -= (TWOPI); }
 		T initP[2]; // initial pixel position
 		T xPos;
 		T weight;
-		if (curDirAng <= _PI_4 || curDirAng > _7PI_4)
+		if (curDirAng <= PI * 0.25 || curDirAng > PI * 1.75)
 		{
 			summ = 0;
 			weight = 0;
@@ -5402,7 +5402,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 			}
 			return;
 		} //End case 1
-		else if (curDirAng > _PI_4 && curDirAng <= _3PI_4)
+		else if (curDirAng > PI * 0.25 && curDirAng <= PI * 0.75)
 		{
 			summ = 0;
 			weight = 0;
@@ -5490,7 +5490,7 @@ __global__ void _proj_AIM_ker(T* dprj, T* draw, T* dimg, const FanEDGeo FanGeo, 
 			}
 			return;
 		}// End case 2
-		else if (curDirAng > _3PI_4 && curDirAng <= _5PI_4)
+		else if (curDirAng > PI * 0.75 && curDirAng <= PI * 1.25)
 		{
 			summ = 0;
 			weight = 0;

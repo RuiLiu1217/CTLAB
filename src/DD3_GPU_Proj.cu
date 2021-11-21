@@ -12,6 +12,15 @@
 #define BLKY 8
 #define BLKZ 1
 
+template<typename T>
+std::vector<T> operator-(const std::vector<T>& a, const std::vector<T>& b)
+{
+	std::vector<T> c(a.size(), 0);
+	std::transform(a.begin(), a.end(), b.begin(), c.begin(), std::minus<T>());
+	return c;
+}
+
+
 // masking the volume with provided mask. The mask size is XN * YN
 // the volume is with size [ZN, XN, YN] ZN is the primary order.
 template<typename T>
@@ -267,7 +276,7 @@ thrust::device_vector<float3> getCosSinZPosFromAngleAndZPos(float* hangs, float*
 	thrust::transform(
 		thrust::make_zip_iterator(thrust::make_tuple(angs.begin(), zPos.begin())),
 		thrust::make_zip_iterator(thrust::make_tuple(angs.end(), zPos.end())),
-		cossinZT.begin(), CTMBIR::ConstantForBackProjection4(x0, y0, z0));
+		cossinZT.begin(), CTMBIR::ConstantForBackProjection<float>(x0, y0, z0));
 	return cossinZT;
 }
 
@@ -450,7 +459,7 @@ byte* mask, int gpunum)
 	thrust::transform(
 		thrust::make_zip_iterator(thrust::make_tuple(angs.begin(), zPos.begin())),
 		thrust::make_zip_iterator(thrust::make_tuple(angs.end(), zPos.end())),
-		cossinZT.begin(), CTMBIR::ConstantForBackProjection4(x0, y0, z0));
+		cossinZT.begin(), CTMBIR::ConstantForBackProjection<float>(x0, y0, z0));
 
 	dim3 blk(BLKX, BLKY, BLKZ);
 	dim3 gid(
@@ -473,162 +482,6 @@ byte* mask, int gpunum)
 	CUDA_CHECK_RETURN(cudaDestroyTextureObject(texObj));
 
 	CUDA_CHECK_RETURN(cudaFreeArray(d_volumeArray));
-}
-
-void DD3_gpu_proj_branchless_sat2d_alreadyinGPU(
-	float x0, float y0, float z0,
-	int DNU, int DNV,
-	const thrust::device_vector<float>& xds,
-	const thrust::device_vector<float>& yds,
-	const thrust::device_vector<float>& zds,
-	float imgXCenter, float imgYCenter, float imgZCenter,
-	const thrust::device_vector<float>& hangs,const thrust::device_vector<float>& hzPos, int PN,
-	int XN, int YN, int ZN,
-	const thrust::device_vector<float>& vol,
-	thrust::device_vector<float>& hprj, float dx, float dz,
-	const thrust::device_vector<byte>& mask, int gpunum)
-{
-	cudaSetDevice(gpunum);
-	cudaDeviceReset();
-
-	thrust::host_vector<float> hxds = xds;
-	thrust::host_vector<float> hyds = yds;
-	thrust::host_vector<float> hzds = zds;
-
-	thrust::host_vector<float> bxds(DNU+1,0);
-	thrust::host_vector<float> byds(DNU+1,0);
-	thrust::host_vector<float> bzds(DNV+1,0);
-
-
-	DD3Boundaries(DNU + 1, &hxds[0], &bxds[0]);
-	DD3Boundaries(DNU + 1, &hyds[0], &byds[0]);
-	DD3Boundaries(DNV + 1, &hzds[0], &bzds[0]);
-
-	float objCntIdxX = (XN - 1.0) * 0.5 - imgXCenter / dx;
-	float objCntIdxY = (YN - 1.0) * 0.5 - imgYCenter / dx;
-	float objCntIdxZ = (ZN - 1.0) * 0.5 - imgZCenter / dz;
-
-	thrust::device_vector<float> SATZXY;
-	thrust::device_vector<float> SATZYX;
-	genSAT_fof_Volume_alreadyinGPU(vol, SATZXY, SATZYX, XN, YN, ZN);
-
-	cudaExtent volumeSize1;
-	cudaExtent volumeSize2;
-	volumeSize1.width = ZN + 1;
-	volumeSize1.height = XN + 1;
-	volumeSize1.depth = YN;
-
-	volumeSize2.width = ZN + 1;
-	volumeSize2.height = YN + 1;
-	volumeSize2.depth = XN;
-
-	cudaChannelFormatDesc channelDesc1 = cudaCreateChannelDesc<float>();
-	cudaChannelFormatDesc channelDesc2 = cudaCreateChannelDesc<float>();
-
-	cudaArray* d_volumeArray1;
-	cudaArray* d_volumeArray2;
-
-	cudaMalloc3DArray(&d_volumeArray1, &channelDesc1, volumeSize1);
-	cudaMalloc3DArray(&d_volumeArray2, &channelDesc2, volumeSize2);
-
-	cudaMemcpy3DParms copyParams1 = { 0 };
-	copyParams1.srcPtr = make_cudaPitchedPtr((void*)
-		thrust::raw_pointer_cast(&SATZXY[0]),
-		volumeSize1.width * sizeof(float),
-		volumeSize1.width, volumeSize1.height);
-	copyParams1.dstArray = d_volumeArray1;
-	copyParams1.extent = volumeSize1;
-	copyParams1.kind = cudaMemcpyDeviceToDevice;
-
-	cudaMemcpy3DParms copyParams2 = { 0 };
-	copyParams2.srcPtr = make_cudaPitchedPtr((void*)
-		thrust::raw_pointer_cast(&SATZYX[0]),
-		volumeSize2.width * sizeof(float),
-		volumeSize2.width, volumeSize2.height);
-	copyParams2.dstArray = d_volumeArray2;
-	copyParams2.extent = volumeSize2;
-	copyParams2.kind = cudaMemcpyDeviceToDevice;
-
-	cudaMemcpy3D(&copyParams1);
-	cudaMemcpy3D(&copyParams2);
-
-	SATZXY.clear();
-	SATZYX.clear();
-
-	cudaResourceDesc resDesc1;
-	cudaResourceDesc resDesc2;
-	memset(&resDesc1, 0, sizeof(resDesc1));
-	memset(&resDesc2, 0, sizeof(resDesc2));
-
-	resDesc1.resType = cudaResourceTypeArray;
-	resDesc2.resType = cudaResourceTypeArray;
-
-	resDesc1.res.array.array = d_volumeArray1;
-	resDesc2.res.array.array = d_volumeArray2;
-
-	cudaTextureDesc texDesc1;
-	cudaTextureDesc texDesc2;
-
-	memset(&texDesc1, 0, sizeof(texDesc1));
-	memset(&texDesc2, 0, sizeof(texDesc2));
-
-	texDesc1.addressMode[0] = cudaAddressModeClamp;
-	texDesc1.addressMode[1] = cudaAddressModeClamp;
-	texDesc1.addressMode[2] = cudaAddressModeClamp;
-
-	texDesc2.addressMode[0] = cudaAddressModeClamp;
-	texDesc2.addressMode[1] = cudaAddressModeClamp;
-	texDesc2.addressMode[2] = cudaAddressModeClamp;
-
-	texDesc1.filterMode = cudaFilterModeLinear;
-	texDesc2.filterMode = cudaFilterModeLinear;
-
-	texDesc1.readMode = cudaReadModeElementType;
-	texDesc2.readMode = cudaReadModeElementType;
-
-	texDesc1.normalizedCoords = false;
-	texDesc2.normalizedCoords = false;
-
-	cudaTextureObject_t texObj1 = 0;
-	cudaTextureObject_t texObj2 = 0;
-
-	cudaCreateTextureObject(&texObj1, &resDesc1, &texDesc1, nullptr);
-	cudaCreateTextureObject(&texObj2, &resDesc2, &texDesc2, nullptr);
-
-	thrust::device_vector<float> d_bxds = bxds;
-	thrust::device_vector<float> d_byds = byds;
-	thrust::device_vector<float> d_bzds = bzds;
-
-	thrust::device_vector<float3> cossinZT(PN);
-	thrust::transform(
-		thrust::make_zip_iterator(thrust::make_tuple(hangs.begin(), hzPos.begin())),
-		thrust::make_zip_iterator(thrust::make_tuple(hangs.end(), hzPos.end())),
-		cossinZT.begin(), CTMBIR::ConstantForBackProjection4(x0, y0, z0));
-
-	dim3 blk(BLKX, BLKY, BLKZ);
-	dim3 gid(
-		(DNV + blk.x - 1) / blk.x,
-		(DNU + blk.y - 1) / blk.y,
-		(PN + blk.z - 1) / blk.z);
-
-	DD3_gpu_proj_branchless_sat2d_ker << <gid, blk >> >(texObj1, texObj2,
-		thrust::raw_pointer_cast(&hprj[0]),
-		make_float3(x0, y0, z0),
-		thrust::raw_pointer_cast(&cossinZT[0]),
-		thrust::raw_pointer_cast(&xds[0]),
-		thrust::raw_pointer_cast(&yds[0]),
-		thrust::raw_pointer_cast(&zds[0]),
-		thrust::raw_pointer_cast(&d_bxds[0]),	thrust::raw_pointer_cast(&d_byds[0]),
-		thrust::raw_pointer_cast(&d_bzds[0]),
-		make_float3(objCntIdxX, objCntIdxY, objCntIdxZ),
-		dx, dz, XN, YN, ZN, DNU, DNV, PN);
-
-
-	cudaDestroyTextureObject(texObj1);
-	cudaDestroyTextureObject(texObj2);
-
-	cudaFreeArray(d_volumeArray1);
-	cudaFreeArray(d_volumeArray2);
 }
 
 //
@@ -1096,7 +949,7 @@ void DD3_gpu_proj_pseudodistancedriven(
 	thrust::transform(
 		thrust::make_zip_iterator(thrust::make_tuple(angs.begin(), zPos.begin())),
 		thrust::make_zip_iterator(thrust::make_tuple(angs.end(), zPos.end())),
-		cossinZT.begin(), CTMBIR::ConstantForBackProjection4(x0, y0, z0));
+		cossinZT.begin(), CTMBIR::ConstantForBackProjection<float>(x0, y0, z0));
 
 
 	dim3 blk(64, 16, 1);
@@ -1117,30 +970,6 @@ void DD3_gpu_proj_pseudodistancedriven(
 		dx, dz, XN, YN, DNU, DNV, PN);
 	thrust::copy(prj.begin(), prj.end(), hprj);
 }
-
-
-
-
-extern "C"
-void DD3Proj_gpu_alreadyinGPU(
-float x0, float y0, float z0,
-int DNU, int DNV,
-const thrust::device_vector<float>& xds,
-const thrust::device_vector<float>& yds,
-const thrust::device_vector<float>& zds,
-float imgXCenter, float imgYCenter, float imgZCenter,
-const thrust::device_vector<float>& hangs,
-const thrust::device_vector<float>& hzPos, int PN,
-int XN, int YN, int ZN,
-const thrust::device_vector<float>& hvol,
-thrust::device_vector<float>& hprj,
-float dx, float dz,
-const thrust::device_vector<byte>& mask, int gpunum, int prjMode)
-{
-	DD3_gpu_proj_branchless_sat2d_alreadyinGPU(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
-					hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
-}
-
 
 
 
@@ -1427,6 +1256,17 @@ __global__ void DDM3D_EA_helical_proj_GPU(float* proj, const float* vol,
 // Using DOUBLE PRECISION BRANCHLESS GPU
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+INLINE __device__ double bilerp(int2 v0, int2 v1, int2 v2, int2 v3, double t1, double t2)
+{
+	double v0_ = __hiloint2double(v0.y, v0.x);
+	double v1_ = __hiloint2double(v1.y, v1.x);
+	double v2_ = __hiloint2double(v2.y, v2.x);
+	double v3_ = __hiloint2double(v3.y, v3.x);
+
+	double vv0 = v0_ * (1.0 - t1) + v1_ * t1;
+	double vv1 = v2_ * (1.0 - t1) + v3_ * t1;
+	return vv0 * (1 - t2) + vv1 * t2;
+}
 
 // \brief Kernel function of Double precision based branchless DD with 2D SAT
 __global__ void DD3_gpu_proj_doubleprecisionbranchless_ker(
@@ -2385,7 +2225,7 @@ void DD3_gpu_proj_pseudodistancedriven_multiGPU(
 		thrust::transform(
 			thrust::make_zip_iterator(thrust::make_tuple(angs[i].begin(), zPos[i].begin())),
 			thrust::make_zip_iterator(thrust::make_tuple(angs[i].end(), zPos[i].end())),
-			cossinZT[i].begin(), CTMBIR::ConstantForBackProjection4(x0, y0, z0));
+			cossinZT[i].begin(), CTMBIR::ConstantForBackProjection<float>(x0, y0, z0));
 		angs[i].clear();
 		zPos[i].clear();
 
@@ -2437,7 +2277,9 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 		float* hvol, float* hprj,
 		float dx, float dz,
 		byte* mask, int* startPN, int gpuNum)
-{
+{	
+
+
 	thrust::host_vector<float> hangs(h_angs, h_angs+PN);
 	thrust::host_vector<float> hzPos(h_zPos, h_zPos+PN);
 
@@ -2689,7 +2531,7 @@ void DD3_gpu_proj_branchless_sat2d_multiGPU(
 		thrust::transform(
 			thrust::make_zip_iterator(thrust::make_tuple(angs[i].begin(), zPos[i].begin())),
 			thrust::make_zip_iterator(thrust::make_tuple(angs[i].end(), zPos[i].end())),
-			cossinZT[i].begin(), CTMBIR::ConstantForBackProjection4(x0, y0, z0));
+			cossinZT[i].begin(), CTMBIR::ConstantForBackProjection<float>(x0, y0, z0));
 		angs[i].clear();
 		zPos[i].clear();
 

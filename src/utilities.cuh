@@ -10,35 +10,6 @@
 #include <thrust/device_vector.h>
 
 
-
-
-
-INLINE __device__ double bilerp(int2 v0, int2 v1, int2 v2, int2 v3, float t1, float t2)
-{
-	double v0_ = __hiloint2double(v0.y, v0.x);
-	double v1_ = __hiloint2double(v1.y, v1.x);
-	double v2_ = __hiloint2double(v2.y, v2.x);
-	double v3_ = __hiloint2double(v3.y, v3.x);
-
-	double vv0 = v0_ * (1.0 - t1) + v1_ * t1;
-	double vv1 = v2_ * (1.0 - t1) + v3_ * t1;
-	return vv0 * (1 - t2) + vv1 * t2;
-}
-
-
-INLINE __device__ double bilerp(int2 v0, int2 v1, int2 v2, int2 v3, double t1, double t2)
-{
-	double v0_ = __hiloint2double(v0.y, v0.x);
-	double v1_ = __hiloint2double(v1.y, v1.x);
-	double v2_ = __hiloint2double(v2.y, v2.x);
-	double v3_ = __hiloint2double(v3.y, v3.x);
-
-	double vv0 = v0_ * (1.0 - t1) + v1_ * t1;
-	double vv1 = v2_ * (1.0 - t1) + v3_ * t1;
-	return vv0 * (1 - t2) + vv1 * t2;
-}
-
-
 /// \brief SIDDON line integral function in 3D
 inline __device__ float calSiddonOneRayKer(
 	const float startX, const float startY, const float startZ,

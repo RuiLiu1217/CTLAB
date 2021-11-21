@@ -471,7 +471,7 @@ double3 crossProduct(const double3& a, const double3& b)
 	res.y = (a.z*b.x - a.x*b.z);
 	res.z = (a.x*b.y - a.y*b.x);
 	return res;
-}
+}								
 float3 crossProduct(const float3& a, const float3& b)
 {
 	float3 res;
@@ -489,10 +489,10 @@ void toPolarCoords(const float& x, const float& y, float& r, float& t)
 			r = t = 0;
 		}
 		else if (y > 0) {
-			r = y; t = _PI_2;
+			r = y; t = PI * 0.5;
 		}
 		else {
-			r = -y; t = -_PI_2;
+			r = -y; t = -PI * 0.5;
 		}
 	}
 	else if (IS_ZERO(y)) {
@@ -500,7 +500,7 @@ void toPolarCoords(const float& x, const float& y, float& r, float& t)
 			r = x; t = 0;
 		}
 		else {
-			r = -x; t = _PI;
+			r = -x; t = PI;
 		}
 	}
 	else {
@@ -520,14 +520,14 @@ void toSphericalCoords(const float& x, const float& y, const float& z, float& r,
 		}
 		else {
 			r = -z;
-			s = _PI;
+			s = PI;
 			t = 0;
 		}
 	}
 	else {
 		toPolarCoords(x, y, r, s);
 		if (IS_ZERO(z)) {
-			t = _PI_2;
+			t = PI * 0.5;
 		}
 		else {
 			r = std::hypotf(z, r);
@@ -853,8 +853,8 @@ void GenerateProjectionMatrix_AIM_temp(const FanEAGeo& FanGeo, const Image& Img,
 	for (angIdx = 0; angIdx != FanGeo.m_ViwN; ++angIdx)
 	{
 		curAng = FanGeo.m_ViwBeg + angIdx* FanGeo.m_ViwStp;
-		while (curAng < 0){ curAng += _TWOPI; }
-		while (curAng > _TWOPI){ curAng -= (_TWOPI); }
+		while (curAng < 0){ curAng += TWOPI; }
+		while (curAng > TWOPI){ curAng -= (TWOPI); }
 		cosT = cos(curAng);
 		sinT = sin(curAng);
 		sour[0] = -FanGeo.m_S2O * sinT;
@@ -1025,8 +1025,8 @@ void GenerateMatrix_OpenMP_AIM_temp(FanEAGeo FanGeo, Image Img, const std::strin
 		{
 			//std::cout << "I am Here " << thID << "\n";
 			curAng = FanGeo.m_ViwBeg + (angIdx + thID * angN)* FanGeo.m_ViwStp;
-			while (curAng < 0){ curAng += _TWOPI; }
-			while (curAng > _TWOPI){ curAng -= _TWOPI; }
+			while (curAng < 0){ curAng += TWOPI; }
+			while (curAng > TWOPI){ curAng -= TWOPI; }
 			cosT = cos(curAng);
 			sinT = sin(curAng);
 			sour[0] = -FanGeo.m_S2O * sinT;

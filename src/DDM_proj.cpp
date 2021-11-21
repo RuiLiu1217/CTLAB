@@ -6,9 +6,9 @@
  * @file DDM_proj.cpp
  * @brief The CPU based DD projection in brute force method
  *
- * @version 1.0
+ * @version 1.1
  * @author Rui Liu
- * @date May. 1, 2015
+ * @date Nov. 21, 2021
  *
  */
 
@@ -16,38 +16,6 @@
 #include "DDM_proj.h"
 #include "utilities.hpp"
 
-
-template<typename T>
-void findMinMax_X(T& minX, T& maxX, const T x1, const T x2, const T x3, const T x4)
-{
-	minX = x1;
-	if (x2 < minX)
-	{
-		minX = x2;
-	}
-	if (x3 < minX)
-	{
-		minX = x3;
-	}
-	if (x4 < minX)
-	{
-		minX = x4;
-	}
-
-	maxX = x1;
-	if (x2 > maxX)
-	{
-		maxX = x2;
-	}
-	if (x3 > maxX)
-	{
-		maxX = x3;
-	}
-	if (x4 > maxX)
-	{
-		maxX = x4;
-	}
-}
 
 //The ray propagate along Y axis
 template<typename T>
@@ -65,34 +33,33 @@ void projCase4(std::vector<T>& proj, const std::vector<T>& img, const T cursourX
 	T curminy, curmaxy;
 	initX = -O2D;
 
-	initYLeft = -(0 - detCntIdx - 0.5) * dd; //初始det左边Y坐标
-	curDetXLeft = initX * cosT - initYLeft * sinT; //当前det左边X坐标
-	curDetYLeft = initX * sinT + initYLeft * cosT; //当前det左边Y坐标
+	initYLeft = -(0 - detCntIdx - 0.5) * dd;
+	curDetXLeft = initX * cosT - initYLeft * sinT;
+	curDetYLeft = initX * sinT + initYLeft * cosT;
 
 	for (detIdx = 0; detIdx != DN; ++detIdx)
 	{
 		summ = 0;
 
-		initYRight = -(detIdx - detCntIdx - 0.5 + 1) * dd; //初始det右边Y坐标;
-		initY = -(detIdx - detCntIdx) * dd; //初始det中心Y坐标;
-		curDetXRight = initX * cosT - initYRight * sinT; //当前det右边X坐标
-		curDetYRight = initX * sinT + initYRight * cosT; //当前det右边Y坐标
-		curDetX = initX * cosT - initY * sinT; //当前det中心X坐标
-		curDetY = initX * sinT + initY * cosT; //当前det中心Y坐标
+		initYRight = -(detIdx - detCntIdx - 0.5 + 1) * dd;
+		initY = -(detIdx - detCntIdx) * dd;
+		curDetXRight = initX * cosT - initYRight * sinT;
+		curDetYRight = initX * sinT + initYRight * cosT;
+		curDetX = initX * cosT - initY * sinT;
+		curDetY = initX * sinT + initY * cosT;
 		dirX = curDetX - cursourX;
 		dirY = curDetY - cursourY;
 		legth = hypot(dirX, dirY);
 		dirX /= legth;
 		dirY /= legth;
-		cosAng = abs(dirX); //与Case1区别;
+		cosAng = abs(dirX);
 
-		//这里是从X坐标算Y坐标;
 
-		detPosLeft = (0 - cursourX) / (curDetXLeft - cursourX) * (curDetYLeft - cursourY) + cursourY; //det左边界X轴上的坐标;
-		detPosRight = (0 - cursourX) / (curDetXRight - cursourX) * (curDetYRight - cursourY) + cursourY;//det右边界在x轴上的坐标;
+		detPosLeft = (0 - cursourX) / (curDetXLeft - cursourX) * (curDetYLeft - cursourY) + cursourY; 
+		detPosRight = (0 - cursourX) / (curDetXRight - cursourX) * (curDetYRight - cursourY) + cursourY;
 		detprojLength = abs(detPosRight - detPosLeft);
 
-		//沿X方向扫描;
+
 		for (ii = 0; ii < XN; ++ii)
 		{
 
@@ -148,50 +115,43 @@ void projCase4(std::vector<T>& proj, const std::vector<T>& img, const T cursourX
 
 //沿X轴传播;
 template<typename T>
-void projCase1(std::vector<T>& proj, const std::vector<T>& img, const T cursourX, const T cursourY, const T S2O, const T O2D, const T objSizeX, const T objSizeY, const T detSize, const T detCntIdx,
-	const int XN, const int YN, const int DN, const int PN, const T dx, const T dy, const T dd, const T curAng, const T cosT, const T sinT, const int angIdx)
+void projCase1(std::vector<T>& proj, const std::vector<T>& img, const T cursourX, const T cursourY, const T S2O, const T O2D, const T objSizeX, const T objSizeY, const T detSize, const T detCntIdx, const int XN, const int YN, const int DN, const int PN, 
+	const T dx, const T dy, const T dd, const T curAng, const T cosT, const T sinT, const int angIdx)
 {
-	int detIdx = 0;
-	int ii = 0, jj = 0;
-	T initX, initYLeft, initYRight;
-	T curDetXLeft, curDetYLeft;
-	T curDetXRight, curDetYRight;
-	T minX, maxX;
-	int minXIdx, maxXIdx;
-	T detPosLeft;
-	T detPosRight;
-	T initY;
-	T curDetX, curDetY;
-	T dirX, dirY;
-	T legth;
-	T cosAng;
-	T detprojLength = 0;
-	T objY;
 	T summ = 0;
-	T curminx, curmaxx;
+
+	T initX, initY, initYLeft, initYRight, curDetXLeft, curDetXRight, curDetYLeft, curDetYRight;
+	T curDetX, curDetY, dirX, dirY, legth, cosAng, detPosLeft, detPosRight;
+	T detprojLength;
+	T objX;
+
+	T minY, maxY;
+	int minYIdx, maxYIdx, detIdx, ii, jj;
+	T curminy, curmaxy;
 
 	initX = -O2D;
-	initYLeft = -(0 - detCntIdx - 0.5) * dd; //初始det左边Y坐标
-	curDetXLeft = initX * cosT - initYLeft * sinT; //当前det左边X坐标
-	curDetYLeft = initX * sinT + initYLeft * cosT; //当前det左边Y坐标
+	initYLeft = -(0 - detCntIdx - 0.5) * dd;
+	curDetXLeft = initX * cosT - initYLeft * sinT;
+	curDetYLeft = initX * sinT + initYLeft * cosT;
+
 	for (detIdx = 0; detIdx != DN; ++detIdx)
 	{
 		summ = 0;
-		initYRight = initYLeft - dd;// -(detIdx - detCntIdx - 0.5 + 1) * dd; //初始det右边Y坐标;
-		initY = -(detIdx - detCntIdx) * dd; //初始det中心Y坐标;
-		curDetXRight = initX * cosT - initYRight * sinT; //当前det右边X坐标
-		curDetYRight = initX * sinT + initYRight * cosT; //当前det右边Y坐标
-		curDetX = initX * cosT - initY * sinT; //当前det中心X坐标
-		curDetY = initX * sinT + initY * cosT; //当前det中心Y坐标
+		initYRight = initYLeft - dd;
+		initY = -(detIdx - detCntIdx) * dd;
+		curDetXRight = initX * cosT - initYRight * sinT;
+		curDetYRight = initX * sinT + initYRight * cosT;
+		curDetX = initX * cosT - initY * sinT;
+		curDetY = initX * sinT + initY * cosT;
 		dirX = curDetX - cursourX;
 		dirY = curDetY - cursourY;
 		legth = hypot(dirX, dirY);
 		dirX /= legth;
 		dirY /= legth;
-		cosAng = abs(dirY); //当前光线和Y轴夹角余弦
+		cosAng = abs(dirY);
 
-		detPosLeft = (0 - cursourY) / (curDetYLeft - cursourY) * (curDetXLeft - cursourX) + cursourX; //det左边界X轴上的坐标;
-		detPosRight = (0 - cursourY) / (curDetYRight - cursourY) * (curDetXRight - cursourX) + cursourX;//det右边界在x轴上的坐标;
+		detPosLeft = (0 - cursourY) / (curDetYLeft - cursourY) * (curDetXLeft - cursourX) + cursourX;
+		detPosRight = (0 - cursourY) / (curDetYRight - cursourY) * (curDetXRight - cursourX) + cursourX;
 		detprojLength = abs(detPosRight - detPosLeft);
 
 		for (jj = 0; jj < YN; jj++)
@@ -245,6 +205,9 @@ void projCase1(std::vector<T>& proj, const std::vector<T>& img, const T cursourX
 }
 
 
+
+
+
 template<typename T>
 void DDM_ED_proj_template(std::vector<T>& proj, const std::vector<T>& img,
 	const T S2O, const T O2D,
@@ -271,7 +234,7 @@ void DDM_ED_proj_template(std::vector<T>& proj, const std::vector<T>& img,
 		cursourx = S2O * cosT; //以X轴为准;
 		cursoury = S2O * sinT;
 
-		if ((curang > _PI_4 && curang <= _3PI_4) || (curang >= _5PI_4 && curang < _7PI_4)) //按照角度来计算;
+		if ((curang > PI * 0.25 && curang <= PI * 0.75) || (curang >= PI * 1.25 && curang < PI * 1.75)) //按照角度来计算;
 		{
 			//the ray propagate along Y axis
 			projCase1<T>(proj, img, cursourx, cursoury, S2O, O2D,
@@ -287,35 +250,6 @@ void DDM_ED_proj_template(std::vector<T>& proj, const std::vector<T>& img,
 		}
 	}
 }
-
-
-void DDM_ED_proj(std::vector<double>& proj, const std::vector<double>& img,
-	const double S2O, const double O2D,
-	const double objSizeX, const double objSizeY,
-	const double detSize,
-	const double detCntIdx,
-	const int XN, const int YN, const int DN, const int PN,
-	const std::vector<double>& angs)
-{
-	DDM_ED_proj_template<double>(proj, img, S2O, O2D, objSizeX, objSizeY, detSize, detCntIdx, XN, YN, DN, PN,
-		angs);
-}
-
-
-void DDM_ED_proj(std::vector<float>& proj, const std::vector<float>& img,
-	const float S2O, const float O2D,
-	const float objSizeX, const float objSizeY,
-	const float detSize,
-	const float detCntIdx,
-	const int XN, const int YN, const int DN, const int PN,
-	const std::vector<float>& angs)
-{
-	DDM_ED_proj_template<float>(proj, img, S2O, O2D, objSizeX, objSizeY, detSize, detCntIdx, XN, YN, DN, PN,
-		angs);
-}
-
-
-
 
 
 //DDM projection from one angle
@@ -346,7 +280,7 @@ void DDM3D_ED_proj_template(std::vector<T>& proj, const std::vector<T>& vol,
 		T cursoury = S2O * sinT;
 		T cursourz = 0;
 
-		if ((curang > _PI_4 && curang <= _3PI_4) || (curang >= _5PI_4 && curang < _7PI_4))
+		if ((curang > PI * 0.25 && curang <= PI * 0.75) || (curang >= PI * 1.25 && curang < PI * 1.75))
 		{
 			for (int detIdV = 0; detIdV < DNV; ++detIdV)
 			{
@@ -614,35 +548,8 @@ void DDM3D_ED_proj_template(std::vector<T>& proj, const std::vector<T>& vol,
 				}
 			}
 		}
-
 	}
-
 }
-
-void DDM3D_ED_proj(std::vector<double>& proj, const std::vector<double>& vol,
-	const double S2O, const double O2D,
-	const double objSizeX, const double objSizeY, const double objSizeZ,
-	const double detSizeU, const double detSizeV,
-	const double detCntIdxU, const double detCntIdxV,
-	const int XN, const int YN, const int ZN, const int DNU, const int DNV, const int PN,
-	const std::vector<double>& angs)
-{
-	DDM3D_ED_proj_template(proj, vol, S2O, O2D, objSizeX, objSizeY, objSizeZ,
-		detSizeU, detSizeV, detCntIdxU, detCntIdxV, XN, YN, ZN, DNU, DNV, PN, angs);
-}
-
-void DDM3D_ED_proj(std::vector<float>& proj, const std::vector<float>& vol,
-	const float S2O, const float O2D,
-	const float objSizeX, const float objSizeY, const float objSizeZ,
-	const float detSizeU, const float detSizeV,
-	const float detCntIdxU, const float detCntIdxV,
-	const int XN, const int YN, const int ZN, const int DNU, const int DNV, const int PN,
-	const std::vector<float>& angs)
-{
-	DDM3D_ED_proj_template(proj, vol, S2O, O2D, objSizeX, objSizeY, objSizeZ,
-		detSizeU, detSizeV, detCntIdxU, detCntIdxV, XN, YN, ZN, DNU, DNV, PN, angs);
-}
-
 
 
 template<typename T>
@@ -955,36 +862,6 @@ void DDM_EA_proj_template(std::vector<T>& proj, const std::vector<T>& img,
 	}
 }
 
-
-void DDM_EA_proj(std::vector<float>& proj, const std::vector<float>& img,
-	const float S2O, const float O2D,
-	const float objSizeX, const float objSizeY,
-	const float detArc,
-	const float detCntIdx,
-	const int XN, const int YN, const int DN, const int PN,
-	const std::vector<float>& angs)
-{
-	DDM_EA_proj_template<float>(proj, img, S2O, O2D, objSizeX, objSizeY, detArc,
-		detCntIdx, XN, YN, DN, PN, angs);
-}
-void DDM_EA_proj(std::vector<double>& proj, const std::vector<double>& img,
-	const double S2O, const double O2D,
-	const double objSizeX, const double objSizeY,
-	const double detArc,
-	const double detCntIdx,
-	const int XN, const int YN, const int DN, const int PN,
-	const std::vector<double>& angs)
-{
-	DDM_EA_proj_template<double>(proj, img, S2O, O2D, objSizeX, objSizeY, detArc,
-		detCntIdx, XN, YN, DN, PN, angs);
-}
-
-
-
-
-
-
-
 template<typename T>
 void DDM3D_EA_proj_template(std::vector<T>& proj, const std::vector<T>& vol,
 	const T S2O, const T O2D,
@@ -1294,34 +1171,6 @@ void DDM3D_EA_proj_template(std::vector<T>& proj, const std::vector<T>& vol,
 
 
 
-void DDM3D_EA_proj(std::vector<float>& proj, const std::vector<float>& vol,
-	const float S2O, const float O2D,
-	const float objSizeX, const float objSizeY, const float objSizeZ,
-	const float detArc, const float detSizeH,
-	const float detCntIdU, const float detCntIdV,
-	const int XN, const int YN, const int ZN, const int DNU, const int DNV, const int PN,
-	const std::vector<float>& angs)
-{
-	DDM3D_EA_proj_template<float>(proj, vol, S2O, O2D, objSizeX, objSizeY, objSizeZ,
-		detArc, detSizeH, detCntIdU, detCntIdV, XN, YN, ZN, DNU, DNV, PN, angs);
-}
-
-
-void DDM3D_EA_proj(std::vector<double>& proj, const std::vector<double>& vol,
-	const double S2O, const double O2D,
-	const double objSizeX, const double objSizeY, const double objSizeZ,
-	const double detArc, const double detSizeH,
-	const double detCntIdU, const double detCntIdV,
-	const int XN, const int YN, const int ZN, const int DNU, const int DNV, const int PN,
-	const std::vector<double>& angs)
-{
-	DDM3D_EA_proj_template<double>(proj, vol, S2O, O2D, objSizeX, objSizeY, objSizeZ,
-		detArc, detSizeH, detCntIdU, detCntIdV, XN, YN, ZN, DNU, DNV, PN, angs);
-}
-
-
-
-
 
 template<typename T>
 void DDM3D_EA_helical_proj_template(std::vector<T>& proj, const std::vector<T>& vol,
@@ -1628,39 +1477,3 @@ void DDM3D_EA_helical_proj_template(std::vector<T>& proj, const std::vector<T>& 
 		}
 	}
 }
-
-
-
-
-
-void DDM3D_EA_helical_proj(std::vector<float>& proj, const std::vector<float>& vol,
-	const float S2O, const float O2D,
-	const float objSizeX, const float objSizeY, const float objSizeZ,
-	const float detArc, const float detSizeH,
-	const float detCntIdU, const float detCntIdV,
-	const int XN, const int YN, const int ZN, const int DNU, const int DNV, const int PN,
-	const float initZPos, const float pitch, const std::vector<float>& angs)
-{
-	DDM3D_EA_helical_proj_template<float>(proj, vol, S2O, O2D, objSizeX, objSizeY, objSizeZ,
-		detArc, detSizeH, detCntIdU, detCntIdV,
-		XN, YN, ZN, DNU, DNV, PN, initZPos, pitch, angs);
-}
-
-
-void DDM3D_EA_helical_proj(std::vector<double>& proj, const std::vector<double>& vol,
-	const double S2O, const double O2D,
-	const double objSizeX, const double objSizeY, const double objSizeZ,
-	const double detArc, const double detSizeH,
-	const double detCntIdU, const double detCntIdV,
-	const int XN, const int YN, const int ZN, const int DNU, const int DNV, const int PN,
-	const double initZPos, const double pitch, const std::vector<double>& angs)
-{
-	DDM3D_EA_helical_proj_template<double>(proj, vol, S2O, O2D, objSizeX, objSizeY, objSizeZ,
-		detArc, detSizeH, detCntIdU, detCntIdV,
-		XN, YN, ZN, DNU, DNV, PN, initZPos, pitch, angs);
-}
-
-
-
-
-

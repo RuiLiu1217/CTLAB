@@ -6,6 +6,10 @@ C:/Program Files/CMake/share/cmake-3.22/Modules/FindCUDA/select_compute_arch.cma
 C:/Program Files/CMake/share/cmake-3.22/Modules/FindOpenMP.cmake
 C:/Program Files/CMake/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake
 C:/Program Files/CMake/share/cmake-3.22/Modules/FindPackageMessage.cmake
+C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/CMakeFiles/FindOpenMP/OpenMPCheckVersion.c
+C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/CMakeFiles/FindOpenMP/OpenMPCheckVersion.cpp
+C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c
+C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.cpp
 C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir/CTLAB_generated_DD3_GPU_Back.cu.obj.cmake.pre-gen
 C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir/CTLAB_generated_DD3_GPU_Back.cu.obj.depend
 C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir/CTLAB_generated_DD3_GPU_Proj.cu.obj.cmake.pre-gen
@@ -32,8 +36,6 @@ C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir/CTLAB_gene
 C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir/CTLAB_generated_projbackproj.cu.obj.depend
 C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir/CTLAB_generated_spectralCTscan.cu.obj.cmake.pre-gen
 C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir/CTLAB_generated_spectralCTscan.cu.obj.depend
-C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir/CTLAB_generated_threeGPUHouseholder.cu.obj.cmake.pre-gen
-C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir/CTLAB_generated_threeGPUHouseholder.cu.obj.depend
 C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir/CTLAB_generated_useful.cu.obj.cmake.pre-gen
 C:/Users/liuru/Dropbox/MyWebsite/CTLAB/build/bin/CMakeFiles/CTLAB.dir/CTLAB_generated_useful.cu.obj.depend
 C:/Users/liuru/Dropbox/MyWebsite/CTLAB/src/CMakeLists.txt

@@ -737,7 +737,28 @@ void invDiscreteGradientTransform(double* f, double* d, double* r, const double 
 	_invDiscreteGradientTransform_ker<double> << <gid, blk >> >(f, d, r, omega, L, W, H);
 }
 
-
+/// \brief Inverse transform for the soft thresholding filtering called by OptimumMU function
+template<typename T>
+struct _softThreshold_functor
+{
+	const T _g;
+	_softThreshold_functor(const T& g) :_g(g) {}
+	__host__ __device__ T operator()(const T& r) const
+	{
+		if (r < -_g)
+		{
+			return r + _g;
+		}
+		else if (r > _g)
+		{
+			return r - _g;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+};
 //Find the optimum mu
 template<typename T>
 T OptimizedW0_ker(thrust::device_ptr<T>& TVImg, const T& ObjTV, const unsigned int length)
@@ -2274,7 +2295,7 @@ void DEMO5_1()
 void DEMO7()
 {
 	CUDA_CHECK_RETURN(cudaDeviceReset());
-	ConeEDGeo ConeGeo(85.0f, 15.0f, 360, 0.0f, _TWOPI, make_float2(34.0f, 34.0f), make_int2(1024, 1024));
+	ConeEDGeo ConeGeo(85.0f, 15.0f, 360, 0.0f, TWOPI, make_float2(34.0f, 34.0f), make_int2(1024, 1024));
 	Volume Vol(512, 512, 512, 20.0f, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f);
 
 
@@ -2318,7 +2339,7 @@ void DEMO7()
 void DEMO7_1()
 {
 	CUDA_CHECK_RETURN(cudaDeviceReset());
-	ConeEDGeo ConeGeo(85.0f, 15.0f, 360, 0.0f, _TWOPI, make_float2(34.0f, 3.4f), make_int2(512, 512));
+	ConeEDGeo ConeGeo(85.0f, 15.0f, 360, 0.0f, TWOPI, make_float2(34.0f, 3.4f), make_int2(512, 512));
 	Volume Vol(512, 512, 512, 20.0f, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f);
 
 
@@ -2676,7 +2697,7 @@ void DEMO9_1()
 	FanGeo.m_S2D = FanGeo.m_S2O + FanGeo.m_O2D;
 	FanGeo.m_ViwBeg = 0.0f;// (-2.668082275390625e+02 / 180.0* 3.14159265358979323846264);
 	FanGeo.m_ViwN = 2200;
-	FanGeo.m_ViwStp = _TWOPI / FanGeo.m_ViwN;
+	FanGeo.m_ViwStp = TWOPI / FanGeo.m_ViwN;
 
 	Img.m_Bias.x = 0.0f;
 	Img.m_Bias.y = 0.0f;  //ÕâžöÆ«ÒÆµÄµ¥Î»ÊÇÕæÊµÎïÀíµ¥Î»;
@@ -2744,7 +2765,7 @@ void DEMO10()
 		static_cast<float>(4.082259521484375e+02), // O2D
 		2200,				   // viwNum
 		0.0f,				   // Viw Begin
-		_TWOPI,   // Viw End
+		TWOPI,   // Viw End
 		0.95928517242269f,      // Detector Arc,
 		888);    			   // Detector Element Num
 	FanGeo.m_DetCntIdx = 444.75f;
@@ -2837,7 +2858,7 @@ void DEMO11()
 		static_cast<float>(4.082259521484375e+02),
 		2200,
 		0.0f,
-		_TWOPI,
+		TWOPI,
 		0.95928517242269f,
 		888);
 	FanGeo.m_DetCntIdx = 444.75f;
@@ -3045,7 +3066,7 @@ void DEMO12()
 		static_cast<float>(4.082259521484375e+02),
 		2200,
 		0.0f,
-		_TWOPI,
+		TWOPI,
 		0.95928517242269f,
 		888);
 	FanGeo.m_DetCntIdx = 444.75f;
@@ -3172,7 +3193,7 @@ void DEMO13()
 		static_cast<float>(4.082259521484375e+02),
 		2200,
 		0.0f,
-		_TWOPI,
+		TWOPI,
 		0.95928517242269f,
 		888);
 	FanGeo.m_DetCntIdx = 444.75f;

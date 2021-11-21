@@ -41,7 +41,6 @@ SET(CTLAB_HEADERS
 	differentialFuncs.hpp 	# The interface of the differential operation
 	useful.hpp		# head files useful functions for CT library
 	projbackproj.hpp 	# The interface of conventional projection and backprojection 
-	threeGPUHouseholder.hpp # The interface of GPU Based Householder transform, it requires three GPUs
 	spectralCTscan.hpp      # The interface of spectral CT projection simulation
 	#DD3_demo.hpp	# The interface of the demo of the Branchless DD
 	readwrite.hpp           # Read and write the raw data (in GPU or CPU) from/to disk
@@ -58,11 +57,16 @@ SET(CTLAB_HEADERS
 	GenerateSummedAreaTable.h
 	cudaCheckReturner.h
 	VolumeToTextures.h
+	FanEAGeo.h
+	FanEDGeo.h
+	ConeEAGeo.h
+	ConeEDGeo.h
+	# DD3_GPU_doublePrecisonBranchless.h
 	
 )
 
 SET(CTLAB_SRC 
-        DD3_GPU_Proj.cu 	# implementation of branchless DD projection
+    DD3_GPU_Proj.cu 	# implementation of branchless DD projection
 	DD3_GPU_Back.cu 	# implementation of branchless DD backprojection
 	DD3_GPU_demo.cu   	# Demo of using the DD3 lib
 	DD3_GPU_recon.cu         # GPU based reconstruction methods
@@ -75,7 +79,6 @@ SET(CTLAB_SRC
 	useful.cu		# useful functions for CT library
 	projbackproj.cpp 	# The conventional projection and backprojection in CPU
 	projbackproj.cu 	# The conventional projection and backprojection in GPU
-	threeGPUHouseholder.cu  # The interface of GPU Based Householder transform, it requires three GPUs
 	spectralCTscan.cpp 	# The spectral CT projection simulation in CPU
 	spectralCTscan.cu 	# The spectral CT projection simulation in GPU
 #	DD3_demo.cu	# The interface of the demo of the Branchless DD
@@ -90,6 +93,11 @@ SET(CTLAB_SRC
 	GenerateSummedAreaTable.cu
 	TextureObjectProvider.cpp
 	VolumeToTextures.cu
+	FanEAGeo.cpp
+	FanEDGeo.cpp
+	ConeEAGeo.cpp
+	ConeEDGeo.cpp
+	# DD3_GPU_doublePrecisonBranchless.cu
 )
 
 

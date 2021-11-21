@@ -12,7 +12,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "lib/MinSizeRel/CTLAB.lib"
+			"path" : "lib/RelWithDebInfo/CTLAB.lib"
 		}
 	],
 	"backtrace" : 2,
@@ -38,7 +38,7 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 138,
+				"line" : 146,
 				"parent" : 0
 			},
 			{
@@ -50,7 +50,7 @@
 			{
 				"command" : 2,
 				"file" : 1,
-				"line" : 130,
+				"line" : 138,
 				"parent" : 0
 			},
 			{
@@ -73,7 +73,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc  -openmp /MD /O1 /Ob1 /DNDEBUG"
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc  -openmp /MD /Zi /O2 /Ob1 /DNDEBUG"
 				}
 			],
 			"includes" : 
@@ -90,18 +90,22 @@
 			"language" : "CXX",
 			"sourceIndexes" : 
 			[
-				19,
+				18,
+				20,
 				21,
-				22,
-				24,
-				26,
-				29,
+				23,
+				25,
+				27,
+				30,
 				32,
-				34,
+				33,
 				35,
-				37,
+				36,
 				38,
-				40
+				40,
+				41,
+				42,
+				43
 			]
 		}
 	],
@@ -138,14 +142,14 @@
 				10,
 				11,
 				12,
-				13,
-				14
+				13
 			]
 		},
 		{
 			"name" : "Source Files",
 			"sourceIndexes" : 
 			[
+				14,
 				15,
 				16,
 				17,
@@ -172,23 +176,23 @@
 				38,
 				39,
 				40,
-				41
+				41,
+				42,
+				43
 			]
 		},
 		{
 			"name" : "",
 			"sourceIndexes" : 
 			[
-				42,
-				63
+				44,
+				64
 			]
 		},
 		{
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
-				43,
-				44,
 				45,
 				46,
 				47,
@@ -207,13 +211,18 @@
 				60,
 				61,
 				62,
-				64,
+				63,
 				65,
 				66,
 				67,
 				68,
 				69,
-				70
+				70,
+				71,
+				72,
+				73,
+				74,
+				75
 			]
 		}
 	],
@@ -265,12 +274,6 @@
 			"backtrace" : 2,
 			"isGenerated" : true,
 			"path" : "build/bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_projbackproj.cu.obj",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 2,
-			"isGenerated" : true,
-			"path" : "build/bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_threeGPUHouseholder.cu.obj",
 			"sourceGroupIndex" : 0
 		},
 		{
@@ -381,11 +384,6 @@
 		},
 		{
 			"backtrace" : 2,
-			"path" : "src/threeGPUHouseholder.cu",
-			"sourceGroupIndex" : 1
-		},
-		{
-			"backtrace" : 2,
 			"compileGroupIndex" : 0,
 			"path" : "src/spectralCTscan.cpp",
 			"sourceGroupIndex" : 1
@@ -458,6 +456,30 @@
 		},
 		{
 			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/FanEAGeo.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/FanEDGeo.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/ConeEAGeo.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/ConeEDGeo.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
 			"path" : "src/utilities.cuh",
 			"sourceGroupIndex" : 2
 		},
@@ -519,11 +541,6 @@
 		{
 			"backtrace" : 2,
 			"path" : "src/projbackproj.hpp",
-			"sourceGroupIndex" : 3
-		},
-		{
-			"backtrace" : 2,
-			"path" : "src/threeGPUHouseholder.hpp",
 			"sourceGroupIndex" : 3
 		},
 		{
@@ -599,6 +616,26 @@
 		{
 			"backtrace" : 2,
 			"path" : "src/VolumeToTextures.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/FanEAGeo.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/FanEDGeo.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/ConeEAGeo.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/ConeEDGeo.h",
 			"sourceGroupIndex" : 3
 		}
 	],

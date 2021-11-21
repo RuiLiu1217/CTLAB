@@ -487,8 +487,8 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Image& Im
 	for (angIdx = 0; angIdx < FanGeo.m_ViwN; ++angIdx)
 	{
 		curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		while (curAng < 0){ curAng += _TWOPI; }
-		while (curAng> _TWOPI){ curAng -= _TWOPI; }
+		while (curAng < 0){ curAng += TWOPI; }
+		while (curAng> TWOPI){ curAng -= TWOPI; }
 		cosT = cos(curAng);
 		sinT = sin(curAng);
 		sour[0] = -FanGeo.m_S2O * sinT;
@@ -497,9 +497,9 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Image& Im
 		{
 			calSVASVB<T>(SVA, SVB, sour, cosT, sinT, FanGeo, Img, detIdx);
 			curDirAng = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp + curAng;
-			while (curDirAng < 0)	{ curDirAng += _TWOPI; }
-			while (curDirAng > _TWOPI){ curDirAng -= _TWOPI; }
-			if (curDirAng <= _PI_4 || curDirAng > _7PI_4) //��һ�����;
+			while (curDirAng < 0)	{ curDirAng += TWOPI; }
+			while (curDirAng > TWOPI){ curDirAng -= TWOPI; }
+			if (curDirAng <= PI * 0.25 || curDirAng > PI * 1.75) //��һ�����;
 			{
 				//����y����ֲ� ??����������;
 				summ = 0;
@@ -611,7 +611,7 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Image& Im
 				dprj[angIdx* FanGeo.m_DetN + detIdx] = summ;
 
 			}
-			else if (curDirAng > _PI_4 && curDirAng <= _3PI_4)
+			else if (curDirAng > PI * 0.25 && curDirAng <= PI * 0.75)
 			{
 				summ = 0;
 				for (sliceIdx = 0; sliceIdx < Img.m_Reso.x; ++sliceIdx)
@@ -712,7 +712,7 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Image& Im
 				}// End all slices
 				dprj[angIdx * FanGeo.m_DetN + detIdx] = summ;
 			}
-			else if (curDirAng > _3PI_4 && curDirAng <= _5PI_4)
+			else if (curDirAng > PI * 0.75 && curDirAng <= PI * 1.25)
 			{
 				summ = 0;
 				for (sliceIdx = 0; sliceIdx < Img.m_Reso.y; ++sliceIdx)
@@ -939,8 +939,8 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Im
 	for (angIdx = 0; angIdx < FanGeo.m_ViwN; ++angIdx)
 	{
 		T curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		while (curAng < 0){ curAng += _TWOPI; }
-		while (curAng > _TWOPI){ curAng -= _TWOPI; }
+		while (curAng < 0){ curAng += TWOPI; }
+		while (curAng > TWOPI){ curAng -= TWOPI; }
 		T cosT = cos(curAng);
 		T sinT = sin(curAng);
 		T sour[2] = { -FanGeo.m_S2O * sinT, FanGeo.m_S2O * cosT };
@@ -964,16 +964,16 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Im
 
 		sour[0] = -FanGeo.m_S2O * sinT;
 		sour[1] = FanGeo.m_S2O * cosT;
-		while (curAng < 0){ curAng += _TWOPI; }
-		while (curAng > _TWOPI){ curAng -= _TWOPI; }
+		while (curAng < 0){ curAng += TWOPI; }
+		while (curAng > TWOPI){ curAng -= TWOPI; }
 		T curDirAng;// = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp + curAng;
 		for (int detIdx = 0; detIdx != FanGeo.m_DetN; ++detIdx)
 		{
 			calSVASVB<T>(SVA, SVB, sour, cosT, sinT, FanGeo, Img, detIdx);
 			curDirAng = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp + curAng;
-			while (curDirAng < 0)	{ curDirAng += _TWOPI; }
-			while (curDirAng > _TWOPI){ curDirAng -= _TWOPI; }
-			if (curDirAng <= _PI_4 || curDirAng > _7PI_4)
+			while (curDirAng < 0)	{ curDirAng += TWOPI; }
+			while (curDirAng > TWOPI){ curDirAng -= TWOPI; }
+			if (curDirAng <= PI * 0.25 || curDirAng > PI * 1.75)
 			{
 				//����y����ֲ� ??����������;
 				summ = 0;
@@ -1085,7 +1085,7 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Im
 				dprj[angIdx* FanGeo.m_DetN + detIdx] = summ;
 
 			}
-			else if (curDirAng > _PI_4 && curDirAng <= _3PI_4)
+			else if (curDirAng > PI * 0.25 && curDirAng <= PI * 0.75)
 			{
 				summ = 0;
 				for (sliceIdx = 0; sliceIdx < Img.m_Reso.x; ++sliceIdx)
@@ -1186,7 +1186,7 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEAGeo& FanGeo, const Im
 				}// End all slices
 				dprj[angIdx * FanGeo.m_DetN + detIdx] = summ;
 			}
-			else if (curDirAng > _3PI_4 && curDirAng <= _5PI_4)
+			else if (curDirAng > PI * 0.75 && curDirAng <= PI * 1.25)
 			{
 				summ = 0;
 				for (sliceIdx = 0; sliceIdx < Img.m_Reso.y; ++sliceIdx)
@@ -1964,8 +1964,8 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Image& Im
 	for (angIdx = 0; angIdx < FanGeo.m_ViwN; angIdx++)
 	{
 		curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		while (curAng < 0){ curAng += _TWOPI; }
-		while (curAng> _TWOPI){ curAng -= _TWOPI; }
+		while (curAng < 0){ curAng += TWOPI; }
+		while (curAng> TWOPI){ curAng -= TWOPI; }
 		cosT = cos(curAng);
 		sinT = sin(curAng);
 		sour[0] = -FanGeo.m_S2O * sinT;
@@ -1978,10 +1978,10 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Image& Im
 
 
 			curDirAng = atan2(((detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp), FanGeo.m_O2D) + curAng;
-			while (curDirAng < 0){ curDirAng += _TWOPI; }
-			while (curDirAng> _TWOPI){ curDirAng -= _TWOPI; }
+			while (curDirAng < 0){ curDirAng += TWOPI; }
+			while (curDirAng> TWOPI){ curDirAng -= TWOPI; }
 
-			if (curDirAng <= _PI_4 || curDirAng > _7PI_4)
+			if (curDirAng <= PI * 0.25 || curDirAng > PI * 1.75)
 			{
 				summ = 0;
 				for (sliceIdx = 0; sliceIdx < Img.m_Reso.y; ++sliceIdx)
@@ -2057,7 +2057,7 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Image& Im
 				dprj[angIdx* FanGeo.m_DetN + detIdx] = summ;
 				//continue;
 			} //End case 1
-			else if (curDirAng > _PI_4 && curDirAng <= _3PI_4)
+			else if (curDirAng > PI * 0.25 && curDirAng <= PI * 0.75)
 			{
 				summ = 0;
 				for (sliceIdx = 0; sliceIdx < Img.m_Reso.x; ++sliceIdx)
@@ -2136,7 +2136,7 @@ void proj_AIM_CPU_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Image& Im
 				dprj[angIdx * FanGeo.m_DetN + detIdx] = summ;
 				//continue;
 			}// End case 2
-			else if (curDirAng > _3PI_4 && curDirAng <= _5PI_4)
+			else if (curDirAng > PI * 0.75 && curDirAng <= PI * 1.25)
 			{
 
 				summ = 0;
@@ -2341,8 +2341,8 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Im
 		for (int detIdx = 0; detIdx < FanGeo.m_DetN; ++detIdx)
 		{
 			curAng = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-			while (curAng < 0){ curAng += _TWOPI; }
-			while (curAng> _TWOPI){ curAng -= _TWOPI; }
+			while (curAng < 0){ curAng += TWOPI; }
+			while (curAng> TWOPI){ curAng -= TWOPI; }
 			cosT = cos(curAng);
 			sinT = sin(curAng);
 			sour[0] = -FanGeo.m_S2O * sinT;
@@ -2353,11 +2353,11 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Im
 
 
 			curDirAng = atan2(((detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp), FanGeo.m_O2D) + curAng;
-			while (curDirAng < 0){ curDirAng += _TWOPI; }
-			while (curDirAng> _TWOPI){ curDirAng -= _TWOPI; }
+			while (curDirAng < 0){ curDirAng += TWOPI; }
+			while (curDirAng> TWOPI){ curDirAng -= TWOPI; }
 			//dprj[angIdx * FanGeo.m_DetN + detIdx] = curDirAng;
 			//continue;
-			if (curDirAng <= _PI_4 || curDirAng > _7PI_4)
+			if (curDirAng <= PI * 0.25 || curDirAng > PI * 1.75)
 			{
 				summ = 0;
 				for (sliceIdx = 0; sliceIdx < Img.m_Reso.y; ++sliceIdx)
@@ -2430,7 +2430,7 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Im
 				}
 				dprj[angIdx* FanGeo.m_DetN + detIdx] = summ;
 			} //End case 1
-			else if (curDirAng > _PI_4 && curDirAng <= _3PI_4)
+			else if (curDirAng > PI * 0.25 && curDirAng <= PI * 0.75)
 			{
 				summ = 0;
 				for (sliceIdx = 0; sliceIdx < Img.m_Reso.x; ++sliceIdx)
@@ -2508,7 +2508,7 @@ void proj_AIM_CPU_OPENMP_temp(T* dprj, T* dimg, const FanEDGeo& FanGeo, const Im
 				}// End all slices
 				dprj[angIdx * FanGeo.m_DetN + detIdx] = summ;
 			}// End case 2
-			else if (curDirAng > _3PI_4 && curDirAng <= _5PI_4)
+			else if (curDirAng > PI * 0.75 && curDirAng <= PI * 1.25)
 			{
 
 				summ = 0;
