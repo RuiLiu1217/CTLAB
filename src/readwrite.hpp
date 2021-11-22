@@ -8,106 +8,28 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <thrust/host_vector.h>
-#include <thrust/device_vector.h>
-typedef const unsigned int cuint;
-
-/// \brief Read data in host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, thrust::host_vector<float>& inputData, cuint FileSize);
-/// \brief Read data in host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, thrust::host_vector<double>& inputData, cuint FileSize);
-
-/// \brief Read data in device memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, thrust::device_vector<float>& inputData, cuint FileSize);
-/// \brief Read data in device memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, thrust::device_vector<double>& inputData, cuint FileSize);
-
-
-/// \brief Read data in host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, std::vector<float>& inputData, cuint FileSize);
-/// \brief Read data in host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, std::vector<double>& inputData, cuint FileSize);
-/// \brief Read data in host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, float* inputData, cuint FileSize);
-/// \brief Read data in host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, double* inputData, cuint FileSize);
-
-/// \brief Write data from host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName,const thrust::host_vector<float>& inputData, cuint FileSize);
-
-/// \brief Write data from host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName,const thrust::host_vector<double>& inputData, cuint FileSize);
-
-/// \brief Write data from device memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName,const thrust::device_vector<float>& inputData, cuint FileSize);
-
-/// \brief Write data from device memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName,const thrust::device_vector<double>& inputData, cuint FileSize);
-
-
-/// \brief Write data from host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName,const std::vector<float>& inputData, cuint FileSize);
-/// \brief Write data from host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName,const std::vector<double>& inputData, cuint FileSize);
-/// \brief Write data from host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName, float* inputData, cuint FileSize);
-/// \brief Write data from host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName, double* inputData, cuint FileSize);
-/// \brief Write data from device memory
-/// \param FileName File name to be stored
-/// \param data the data to be stored
-/// \param bytes elements of number
-void writeFileFromDeviceToDisk(const std::string& FileName, double* data, cuint bytes);
-/// \brief Write data from device memory
-/// \param FileName File name to be stored
-/// \param data the data to be stored
-/// \param bytes elements of number
-void writeFileFromDeviceToDisk(const std::string& FileName, float* data, cuint bytes);
+#include <fstream>
+template<typename T>
+std::vector<T> readData(const std::string& fileName, const size_t fileSize) {
+	std::vector<T> res(fileSize, 0);
+	std::ifstream fin(FileName.c_str(), std::ios::binary);
+	if (!fin.is_open()) {
+		std::cout << "Cannot open File " << fileName << std::endl;
+		exit(-1);
+	}
+	fin.read((char*)res, sizeof(T) * FileSize);
+	fin.close();
+	return res;
+}
+template<typename T>
+bool writeData(const std::vector<T>& source, const std::string& fileName) {
+	std::ofstream fout(fileName.c_str(), std::ios::binary);
+	if (!fout.is_open()) {
+		std::cout << "Cannot open file " << fileName << " to write\n";
+		return -1;
+	}
+	const size_t fileSize = source.size();
+	fout.write((char*)(&source[0]), sizeof(T) * fileSize);
+	fout.close();
+	return 0;
+}

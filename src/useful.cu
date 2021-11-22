@@ -2390,7 +2390,18 @@ void DEMO7_1()
 
 
 
-
+/// \brief the rotation of the 3D vector according to cos(T) and sin(T)
+/// \param p original vector
+/// \param cosT cos(T)
+/// \param sinT sin(T)
+inline __host__ __device__ float3 rotation(const float3& p, const float& cosT, const float& sinT)
+{
+	float3 curP;
+	curP.x = p.x * cosT - p.y * sinT;
+	curP.y = p.x * sinT + p.y * cosT;
+	curP.z = p.z;
+	return curP;
+}
 
 cudaArray *demo8_volarray = 0;
 cudaArray *demo8_prjarray = 0;
@@ -3222,7 +3233,57 @@ void DEMO13()
 	frec.close();
 }
 
-
+template<typename T>
+struct _ADD_TUPLE_functor
+{
+	typedef thrust::tuple<T, T> TP;
+	__host__ __device__ TP operator()(const TP& a, const TP& b)
+	{
+		T agk = thrust::get<0>(a);
+		T agk1 = thrust::get<1>(a);
+		T bgk = thrust::get<0>(b);
+		T bgk1 = thrust::get<1>(b);
+		return thrust::make_tuple(agk + bgk, agk1 + bgk1);
+	}
+};
+template<typename T, int cases>
+struct _betaupdate_functor
+{
+	typedef thrust::tuple<T, T, T> ITP;
+	typedef thrust::tuple<T, T> OTP;
+	__host__ __device__ OTP operator()(const ITP& a)
+	{
+		T gk = thrust::get<0>(a);
+		T gk1 = thrust::get<1>(a);
+		T d = thrust::get<2>(a);
+		switch (cases)
+		{
+		case 0:
+			return thrust::make_tuple(gk1 * gk1, gk * gk);
+		case 1:
+			return thrust::make_tuple(gk1 * (gk1 - gk), gk * gk);
+		case 2:
+			return thrust::make_tuple(gk1 * (gk1 - gk), d * (gk1 - gk));
+		case 3:
+			return thrust::make_tuple(gk1 * gk1, -d * gk);
+		case 4:
+			return thrust::make_tuple(gk1 * gk1, d * (gk1 - gk));
+		default:
+			return thrust::make_tuple(gk1 * gk1, gk * gk);
+		}
+	}
+};
+/// \brief The beta update formula for Conjugate Gradient method. Please DO NOT modify this function unless you exactly know what you are doing.
+template<typename T, int cases = 0>
+T calculateBetaForCG(thrust::device_vector<T>& gk, thrust::device_vector<T>& gk1, thrust::device_vector<T>& d)
+{
+	thrust::tuple<T, T> init = thrust::make_tuple<T>(0.0f, 0.0f);
+	thrust::tuple<T, T> res = thrust::transform_reduce(
+		thrust::make_zip_iterator(thrust::make_tuple(gk.begin(), gk1.begin(), d.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(gk.end(), gk1.end(), d.end())),
+		_betaupdate_functor < T, cases>(), init, _ADD_TUPLE_functor<T>());
+	return thrust::get<0>(res) / thrust::get<1>(res);
+}
 
 template<typename T>
 void CG_recon_AIM_temp(thrust::host_vector<T>& img, thrust::host_vector<T>& prj, const FanEAGeo& FanGeo, const Image& Img, cuint maxIter, T err, cuint cases)

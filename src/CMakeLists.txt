@@ -61,6 +61,8 @@ SET(CTLAB_HEADERS
 	FanEDGeo.h
 	ConeEAGeo.h
 	ConeEDGeo.h
+	Image.h
+	Volume.h
 	# DD3_GPU_doublePrecisonBranchless.h
 	
 )
@@ -83,7 +85,6 @@ SET(CTLAB_SRC
 	spectralCTscan.cu 	# The spectral CT projection simulation in GPU
 #	DD3_demo.cu	# The interface of the demo of the Branchless DD
 	FastMatrixVectorMultiplication.cu # Fast Matrix-Vector multiplication function in GPU
-	readwrite.cpp           # Read and write the raw data (in GPU or CPU) from/to disk
 	genModifiedPhantom.cu   # Generate modified Shepp-Logan phantom in GPU
 	genSheppLoganProjection.cpp # Generate Shepp Logan phantom based projection
 	genSysMatrix.cpp        # Generate system matrix with SIDDON/AIM model
@@ -97,6 +98,8 @@ SET(CTLAB_SRC
 	FanEDGeo.cpp
 	ConeEAGeo.cpp
 	ConeEDGeo.cpp
+	Image.cpp
+	Volume.cpp
 	# DD3_GPU_doublePrecisonBranchless.cu
 )
 

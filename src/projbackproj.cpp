@@ -1,6 +1,30 @@
 #include "utilities.hpp"
 #include "projbackproj.hpp"
 
+/// \brief the rotation of the 2D vector according to cos(T) and sin(T)
+/// \param p original vector
+/// \param cosT cos(T)
+/// \param sinT sin(T)
+inline __host__	__device__ float2 rotation(const float2& p, const float& cosT, const float& sinT)
+{
+	float2 curP;
+	curP.x = p.x * cosT - p.y * sinT;
+	curP.y = p.x * sinT + p.y * cosT;
+	return curP;
+}
+/// \brief the rotation of the 3D vector according to cos(T) and sin(T)
+/// \param p original vector
+/// \param cosT cos(T)
+/// \param sinT sin(T)
+inline __host__ __device__ float3 rotation(const float3& p, const float& cosT, const float& sinT)
+{
+	float3 curP;
+	curP.x = p.x * cosT - p.y * sinT;
+	curP.y = p.x * sinT + p.y * cosT;
+	curP.z = p.z;
+	return curP;
+}
+
 void bakproj_PIXEL_CPU_OPENMP(float* donp, float* dimg, float* dmsk, const FanEAGeo& FanGeo, const Image& Img)
 {
 	int idY = 0;

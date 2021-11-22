@@ -19,9 +19,6 @@
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\spectralCTscan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\readwrite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSheppLoganProjection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -47,6 +44,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ConeEDGeo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Volume.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -139,6 +142,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ConeEDGeo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Volume.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

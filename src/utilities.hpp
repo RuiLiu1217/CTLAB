@@ -8,7 +8,7 @@
  *
  * \version 1.0
  * \author Rui Liu
- * \date Sep. 1, 2015
+ * \date Nov. 21, 2021
  *
  */
 #pragma once
@@ -65,6 +65,8 @@
 #include "FanEDGeo.h"
 #include "ConeEAGeo.h"
 #include "ConeEDGeo.h"
+#include "Image.h"
+#include "Volume.h"
 
 // TODO: TO A STATIC VARIABLES
 #ifndef __PI__
@@ -655,282 +657,6 @@ namespace CTMBIR {
 	};
 }
 
-/// \brief Image configuration class
-class Image
-{
-public:
-	uint2 m_Reso; ///< Image resolution
-	float2 m_Size;///< Image size
-	float2 m_Step; ///< Image Step
-	float2 m_Bias; ///< The bias of the image
-public:
-	/// \brief constructor
-	Image(void);
-	/// \brief destructor
-	~Image(void){};
-	/// \brief copy constructor
-	Image(const Image& rhs);
-	/// \brief constructor
-	Image(
-		const unsigned int resoL,///< resolution on length direction
-		const unsigned int resoW,///< resolution on width direction
-		const float sizeL, ///< length size of the image
-		const float sizeW,///< width size of the image
-		const float BiasL, ///< bias on length direction
-		const float BiasW ///<bias on width direction
-		);
-};
-
-/// \brief Volume configuration class
-class Volume
-{
-public:
-	uint3 m_Reso; ///< Volume resolution
-	float3 m_Size; ///< Image size
-	float3 m_Step; ///< Image step size
-	float3 m_Bias; ///< Bias of the image
-public:
-	/// \brief constructor
-	Volume(void);
-	/// \brief destructor
-	~Volume(void){}
-	/// \brief copy constructor
-	Volume(const Volume& rhs);
-	/// \brief
-	Volume(
-		const unsigned int resoL, ///< object length resolution
-		const unsigned int resoW,///<object width resolution
-		const unsigned int resoH, ///< object height resolution
-		const float sizeL, ///< object size on length direction
-		const float sizeW,///< object size on width direction
-		const float sizeH,///< object size on height direction
-		const float biasL,///< object bias on length direction
-		const float biasW,///< object bias on width direction
-		const float biasH///< object bias on height direction
-		);
-};
-
-//
-//template<typename T>
-//struct _ValueLimit_functor
-//{
-//	T _UpLim;
-//	T _DownLim;
-//	_ValueLimit_functor(const T& up, const T& down) :_UpLim(up), _DownLim(down){}
-//	__host__ __device__ T operator()(const T& V)
-//	{
-//		if (V > _UpLim)
-//		{
-//			return _UpLim;
-//		}
-//		else if (V < _DownLim)
-//		{
-//			return _DownLim;
-//		}
-//		else
-//			return V;
-//
-//	}
-//};
-
-
-template<typename T>
-struct _ADD_TUPLE_functor
-{
-	typedef thrust::tuple<T, T> TP;
-	__host__ __device__ TP operator()(const TP& a, const TP& b)
-	{
-		T agk = thrust::get<0>(a);
-		T agk1 = thrust::get<1>(a);
-		T bgk = thrust::get<0>(b);
-		T bgk1 = thrust::get<1>(b);
-		return thrust::make_tuple(agk + bgk, agk1 + bgk1);
-	}
-};
-
-template<typename T, int cases>
-struct _betaupdate_functor
-{
-	typedef thrust::tuple<T, T, T> ITP;
-	typedef thrust::tuple<T, T> OTP;
-	__host__ __device__ OTP operator()(const ITP& a)
-	{
-		T gk = thrust::get<0>(a);
-		T gk1 = thrust::get<1>(a);
-		T d = thrust::get<2>(a);
-		switch (cases)
-		{
-		case 0:
-			return thrust::make_tuple(gk1 * gk1, gk * gk);
-		case 1:
-			return thrust::make_tuple(gk1 * (gk1 - gk), gk * gk);
-		case 2:
-			return thrust::make_tuple(gk1 *(gk1 - gk), d*(gk1 - gk));
-		case 3:
-			return thrust::make_tuple(gk1 * gk1, -d * gk);
-		case 4:
-			return thrust::make_tuple(gk1 * gk1, d * (gk1 - gk));
-		default:
-			return thrust::make_tuple(gk1 * gk1, gk * gk);
-		}
-	}
-};
-
-
-template<typename T>
-class Comparer_functor
-{
-private:
-	enum CMP{ LESS = -1, EQUI = 0, BIGG = 1 };
-
-	int m_comType;
-public:
-	Comparer_functor(const int comType)
-	{
-		m_comType = comType;
-	}
-	__host__ __device__ bool operator()(T& num1, T& num2) const{
-		bool res;
-		switch (m_comType)
-		{
-		case LESS:
-			res = (num1 < num2);
-			break;
-		case EQUI:
-			res = (num1 == num2);
-			break;
-		case BIGG:
-			res = (num1 > num2);
-			break;
-		default:
-			res = false;
-			break;
-		}
-		return res;
-	}
-};
-
-/// \brief The beta update formula for Conjugate Gradient method. Please DO NOT modify this function unless you exactly know what you are doing.
-template<typename T, int cases = 0>
-T calculateBetaForCG(thrust::device_vector<T>& gk, thrust::device_vector<T>& gk1, thrust::device_vector<T>& d)
-{
-	thrust::tuple<T, T> init = thrust::make_tuple<T>(0.0f, 0.0f);
-	thrust::tuple<T, T> res = thrust::transform_reduce(
-		thrust::make_zip_iterator(thrust::make_tuple(gk.begin(), gk1.begin(), d.begin())),
-		thrust::make_zip_iterator(thrust::make_tuple(gk.end(), gk1.end(), d.end())),
-		_betaupdate_functor < T, cases>(), init, _ADD_TUPLE_functor<T>());
-	return thrust::get<0>(res) / thrust::get<1>(res);
-}
-
-
-
-/// \brief the rotation of the 2D vector according to cos(T) and sin(T)
-/// \param p original vector
-/// \param cosT cos(T)
-/// \param sinT sin(T)
-inline __host__	__device__ float2 rotation(const float2& p, const float& cosT, const float& sinT)
-{
-	float2 curP;
-	curP.x = p.x * cosT - p.y * sinT;
-	curP.y = p.x * sinT + p.y * cosT;
-	return curP;
-}
-
-/// \brief the rotation of the 2D vector according to cos(T) and sin(T)
-/// \param p original vector
-/// \param cosT cos(T)
-/// \param sinT sin(T)
-inline __host__	__device__ double2 rotation(const double2& p, const double& cosT, const double& sinT)
-{
-	double2 curP;
-	curP.x = p.x * cosT - p.y * sinT;
-	curP.y = p.x * sinT + p.y * cosT;
-	return curP;
-}
-
-/// \brief the inverse rotation of the 2D vector according to cos(T) and sin(T)
-/// \param p original vector
-/// \param cosT cos(T)
-/// \param sinT sin(T)
-inline __host__ __device__ float2 invRotation(const float2& p, const float& cosT, const float& sinT)
-{
-	float2 curP;
-	curP.x = p.x * cosT + p.y * sinT;
-	curP.y = -p.x * sinT + p.y * cosT;
-	return curP;
-}
-
-
-/// \brief the inverse rotation of the 2D vector according to cos(T) and sin(T)
-/// \param p original vector
-/// \param cosT cos(T)
-/// \param sinT sin(T)
-inline __host__ __device__ double2 invRotation(const double2& p, const double& cosT, const double& sinT)
-{
-	double2 curP;
-	curP.x = p.x * cosT + p.y * sinT;
-	curP.y = -p.x * sinT + p.y * cosT;
-	return curP;
-}
-
-/// \brief the rotation of the 3D vector according to cos(T) and sin(T)
-/// \param p original vector
-/// \param cosT cos(T)
-/// \param sinT sin(T)
-inline __host__ __device__ float3 rotation(const float3& p, const float& cosT, const float& sinT)
-{
-	float3 curP;
-	curP.x = p.x * cosT - p.y * sinT;
-	curP.y = p.x * sinT + p.y * cosT;
-	curP.z = p.z;
-	return curP;
-}
-
-
-
-/// \brief the rotation of the 3D vector according to cos(T) and sin(T)
-/// \param p original vector
-/// \param cosT cos(T)
-/// \param sinT sin(T)
-inline __host__ __device__ double3 rotation(const double3& p, const double& cosT, const double& sinT)
-{
-	double3 curP;
-	curP.x = p.x * cosT - p.y * sinT;
-	curP.y = p.x * sinT + p.y * cosT;
-	curP.z = p.z;
-	return curP;
-}
-
-
-
-/// \brief the inverse rotation of the 3D vector according to cos(T) and sin(T)
-/// \param p original vector
-/// \param cosT cos(T)
-/// \param sinT sin(T)
-inline __host__ __device__ float3 invRotation(const float3& p, const float& cosT, const float& sinT)
-{
-	float3 curP;
-	curP.x = p.x * cosT + p.y * sinT;
-	curP.y = -p.x * sinT + p.y * cosT;
-	curP.z = p.z;
-	return curP;
-}
-
-
-/// \brief the inverse rotation of the 3D vector according to cos(T) and sin(T)
-/// \param p original vector
-/// \param cosT cos(T)
-/// \param sinT sin(T)
-inline __host__ __device__ double3 invRotation(const double3& p, const double& cosT, const double& sinT)
-{
-	double3 curP;
-	curP.x = p.x * cosT + p.y * sinT;
-	curP.y = -p.x * sinT + p.y * cosT;
-	curP.z = p.z;
-	return curP;
-}
-
-
 /// \brief the bilinear interpolation of the data
 /// \param x input x coordinate
 /// \param y input y coordinate
@@ -947,9 +673,8 @@ inline __host__ __device__  T _bilinearInterpolation_ker(
 	T x, T y,
 	T x1, T x2,
 	T y1, T y2,
-	T Qmm, T Qmb, //Í¬ÑùµÄX;
-	T Qbm, T Qbb) //Í¬ÑùµÄY;
-{
+	T Qmm, T Qmb,
+	T Qbm, T Qbb) {
 	if (IS_ZERO(x1 - x2) && IS_ZERO(y1 - y2))
 		return (Qmm + Qmb + Qbm + Qbb) * 0.25f;
 	else if (IS_ZERO(x1 - x2))
@@ -987,87 +712,77 @@ __host__ __device__ inline T _trilinearInterpolation(
 
 
 
-
-
-/// \brief SIDDON line integral function in 2D
-inline	__host__ __device__ float calSiddonOneRayKer2D(
-	const float& startX, const float& startY,
-	const float& endX, const float& endY,
-	const float& __MINOL__, const float& __MINOW__,
-	const float& __OBJSTPL__, const float& __OBJSTPW__,
+template<typename T>
+inline	__host__ __device__ T calSiddonOneRayKer2D(
+	const T& startX, const T& startY,
+	const T& endX, const T& endY,
+	const T& __MINOL__, const T& __MINOW__,
+	const T& __OBJSTPL__, const T& __OBJSTPW__,
 	const unsigned int& __OBJLR__, const unsigned int& __OBJWR__,
-	float* dev_vol, float* totWeight)
+	T* dev_vol, T* totWeight)
 {
-	float dirX = endX - startX;
-	float dirY = endY - startY;
-	const float dconv = sqrtf(dirX * dirX + dirY * dirY);
+	T dirX = endX - startX;
+	T dirY = endY - startY;
+	const T dconv = sqrt(dirX * dirX + dirY * dirY);
 	int imin(0), imax(0), jmin(0), jmax(0);
 
-	float alphaxmin = 0.0f;
-	float alphaxmax = 0.0f;
-	float alphaymin = 0.0f;
-	float alphaymax = 0.0f;
+	T alphaxmin = 0.0f;
+	T alphaxmax = 0.0f;
+	T alphaymin = 0.0f;
+	T alphaymax = 0.0f;
 
 	dirX = dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, 0);
 	dirY = dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, __OBJLR__);
-	if (dirX < dirY)
-	{
+	if (dirX < dirY) {
 		alphaxmin = dirX;
 		alphaxmax = dirY;
-	}
-	else
-	{
+	} else {
 		alphaxmin = dirY;
 		alphaxmax = dirX;
 	}
+
 	dirX = dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, 0);
 	dirY = dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, __OBJWR__);
-	if (dirX < dirY)
-	{
+	if (dirX < dirY) {
 		alphaymin = dirX;
 		alphaymax = dirY;
-	}
-	else
-	{
+	} else {
 		alphaymin = dirY;
 		alphaymax = dirX;
 	}
 
-	const float alphaMIN = MY_MAX<float>(alphaxmin, alphaymin); // (alphaxmin > alphaymin) ? alphaxmin : alphaymin;
-	const float alphaMAX = MY_MIN<float>(alphaxmax, alphaymax); // (alphaxmax < alphaymax) ? alphaxmax : alphaymax;
+	const T alphaMIN = MY_MAX<T>(alphaxmin, alphaymin); // (alphaxmin > alphaymin) ? alphaxmin : alphaymin;
+	const T alphaMAX = MY_MIN<T>(alphaxmax, alphaymax); // (alphaxmax < alphaymax) ? alphaxmax : alphaymax;
 	dev_minmaxIdxFun(startX, endX, __MINOL__, __OBJSTPL__, alphaMIN, alphaMAX, alphaxmin, alphaxmax, __OBJLR__ + 1, &imin, &imax);
 	dev_minmaxIdxFun(startY, endY, __MINOW__, __OBJSTPW__, alphaMIN, alphaMAX, alphaymin, alphaymax, __OBJWR__ + 1, &jmin, &jmax);
 
-	float alphaX = (startX < endX) ? dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imin) : dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imax);
-	float alphaY = (startY < endY) ? dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmin) : dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmax);
+	T alphaX = (startX < endX) ? dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imin) : dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imax);
+	T alphaY = (startY < endY) ? dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmin) : dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmax);
 
-	int Np = static_cast<int>(MY_ABS<float>(static_cast<float>(imax - imin)) + MY_ABS<float>(static_cast<float>(jmax - jmin)) + 3.0f); //fabsf(imax - imin) + fabsf(jmax - jmin) + 3.0f;
-	const float alphaxu = dev_alphaU_Fun(__OBJSTPL__, startX, endX);
-	const float alphayu = dev_alphaU_Fun(__OBJSTPW__, startY, endY);
+	int Np = static_cast<int>(MY_ABS<float>(static_cast<T>(imax - imin)) + MY_ABS<float>(static_cast<T>(jmax - jmin)) + 3.0f); //fabsf(imax - imin) + fabsf(jmax - jmin) + 3.0f;
+	const T alphaxu = dev_alphaU_Fun(__OBJSTPL__, startX, endX);
+	const T alphayu = dev_alphaU_Fun(__OBJSTPW__, startY, endY);
 
-	float alphaC = alphaMIN;
-	//float minalpha = MY_MIN<float>(alphaX,alphaY); //min(alphaX, alphaY);
-	//float talpha = MY_MIN<float>(alphaX,alphaY); //fminf(alphaX,alphaY);
-	int i = int(dev_varphiFun(alphaMIN*1.00003f, __MINOL__, __OBJSTPL__, startX, endX));
-	int j = int(dev_varphiFun(alphaMIN*1.00003f, __MINOW__, __OBJSTPW__, startY, endY));
+	T alphaC = alphaMIN;
+	//T minalpha = MY_MIN<T>(alphaX,alphaY); //min(alphaX, alphaY);
+	//T talpha = MY_MIN<T>(alphaX,alphaY); //fminf(alphaX,alphaY);
+	int i = int(dev_varphiFun(alphaMIN * 1.00003f, __MINOL__, __OBJSTPL__, startX, endX));
+	int j = int(dev_varphiFun(alphaMIN * 1.00003f, __MINOW__, __OBJSTPW__, startY, endY));
 	//int i = floor(dev_varphiFun((talpha + alphaMIN)*0.5, __MINOL__, __OBJSTPL__, startX, endX));
 	//int j = floor(dev_varphiFun((talpha + alphaMIN)*0.5, __MINOW__, __OBJSTPW__, startY, endY));
 
 	const int iuu = (startX < endX) ? 1 : -1;
 	const int juu = (startY < endY) ? 1 : -1;
 
-	float d12(0);
-	float weight(0);
+	T d12(0);
+	T weight(0);
 
 
-	for (int repIdx(0); repIdx < Np; ++repIdx)
-	{
-		if (i < 0 || i >= static_cast<int>(__OBJLR__) || j < 0 || j >= static_cast<int>(__OBJWR__))
-		{
+	for (int repIdx(0); repIdx < Np; ++repIdx) {
+		if (i < 0 || i >= static_cast<int>(__OBJLR__) || j < 0 || j >= static_cast<int>(__OBJWR__)) {
 			break;
 		}
-		if (alphaX <= alphaY)
-		{
+		if (alphaX <= alphaY) {
 			weight = (alphaX - alphaC) * dconv;
 			d12 += weight * dev_vol[j * __OBJLR__ + i];
 			i += iuu;
@@ -1075,9 +790,7 @@ inline	__host__ __device__ float calSiddonOneRayKer2D(
 			alphaC = alphaX;
 			alphaX += alphaxu;
 			continue;
-		}
-		else
-		{
+		} else {
 			weight = (alphaY - alphaC) * dconv;
 			d12 += weight * dev_vol[j * __OBJLR__ + i];
 			j += juu;
@@ -1090,193 +803,64 @@ inline	__host__ __device__ float calSiddonOneRayKer2D(
 	return d12;
 }
 
-
-/// \brief SIDDON line integral function in 2D
-inline	__host__ __device__ double calSiddonOneRayKer2D(
-	const double& startX, const double& startY,
-	const double& endX, const double& endY,
-	const double& __MINOL__, const double& __MINOW__,
-	const double& __OBJSTPL__, const double& __OBJSTPW__,
-	const unsigned int& __OBJLR__, const unsigned int& __OBJWR__,
-	double* dev_vol, double* totWeight)
-{
-	double dirX = endX - startX;
-	double dirY = endY - startY;
-	const double dconv = sqrt(dirX * dirX + dirY * dirY);
-	int imin(0), imax(0), jmin(0), jmax(0);
-
-	double alphaxmin = 0.0f;
-	double alphaxmax = 0.0f;
-	double alphaymin = 0.0f;
-	double alphaymax = 0.0f;
-
-	dirX = dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, 0);
-	dirY = dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, __OBJLR__);
-	if (dirX < dirY)
-	{
-		alphaxmin = dirX;
-		alphaxmax = dirY;
+template<typename T>
+std::pair<T, T> calculateAlpha(T __MINO__, T __OBJSTP__, T start, T end, const unsigned int __OBJ__) {
+	T dirX = dev_alpha_IFun(__MINO__, __OBJSTP__, start, end, 0);
+	T dirY = dev_alpha_IFun(__MINO__, __OBJSTP__, start, end, __OBJ__);
+	if (dirX < dirY) {
+		return { dirX, dirY };
+	} else {
+		return { dirY, dirX };
 	}
-	else
-	{
-		alphaxmin = dirY;
-		alphaxmax = dirX;
-	}
-	dirX = dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, 0);
-	dirY = dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, __OBJWR__);
-	if (dirX < dirY)
-	{
-		alphaymin = dirX;
-		alphaymax = dirY;
-	}
-	else
-	{
-		alphaymin = dirY;
-		alphaymax = dirX;
-	}
-
-	const double alphaMIN = MY_MAX<double>(alphaxmin, alphaymin); // (alphaxmin > alphaymin) ? alphaxmin : alphaymin;
-	const double alphaMAX = MY_MIN<double>(alphaxmax, alphaymax); // (alphaxmax < alphaymax) ? alphaxmax : alphaymax;
-	dev_minmaxIdxFun(startX, endX, __MINOL__, __OBJSTPL__, alphaMIN, alphaMAX, alphaxmin, alphaxmax, __OBJLR__ + 1, &imin, &imax);
-	dev_minmaxIdxFun(startY, endY, __MINOW__, __OBJSTPW__, alphaMIN, alphaMAX, alphaymin, alphaymax, __OBJWR__ + 1, &jmin, &jmax);
-
-	double alphaX = (startX < endX) ? dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imin) : dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imax);
-	double alphaY = (startY < endY) ? dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmin) : dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmax);
-
-	int Np = static_cast<int>(MY_ABS<double>(static_cast<double>(imax - imin)) + MY_ABS<double>(static_cast<double>(jmax - jmin)) + 3.0f); //fabsf(imax - imin) + fabsf(jmax - jmin) + 3.0f;
-	const double alphaxu = dev_alphaU_Fun(__OBJSTPL__, startX, endX);
-	const double alphayu = dev_alphaU_Fun(__OBJSTPW__, startY, endY);
-
-	double alphaC = alphaMIN;
-	//double minalpha = MY_MIN<double>(alphaX,alphaY); //min(alphaX, alphaY);
-	//double talpha = MY_MIN<double>(alphaX,alphaY); //fminf(alphaX,alphaY);
-	int i = int(dev_varphiFun(alphaMIN*1.00003f, __MINOL__, __OBJSTPL__, startX, endX));
-	int j = int(dev_varphiFun(alphaMIN*1.00003f, __MINOW__, __OBJSTPW__, startY, endY));
-	//int i = floor(dev_varphiFun((talpha + alphaMIN)*0.5, __MINOL__, __OBJSTPL__, startX, endX));
-	//int j = floor(dev_varphiFun((talpha + alphaMIN)*0.5, __MINOW__, __OBJSTPW__, startY, endY));
-
-	const int iuu = (startX < endX) ? 1 : -1;
-	const int juu = (startY < endY) ? 1 : -1;
-
-	double d12(0);
-	double weight(0);
-
-
-	for (int repIdx(0); repIdx < Np; ++repIdx)
-	{
-		if (i < 0 || i >= static_cast<int>(__OBJLR__) || j < 0 || j >= static_cast<int>(__OBJWR__))
-		{
-			break;
-		}
-		if (alphaX <= alphaY)
-		{
-			weight = (alphaX - alphaC) * dconv;
-			d12 += weight * dev_vol[j * __OBJLR__ + i];
-			i += iuu;
-			(*totWeight) += weight;
-			alphaC = alphaX;
-			alphaX += alphaxu;
-			continue;
-		}
-		else
-		{
-			weight = (alphaY - alphaC) * dconv;
-			d12 += weight * dev_vol[j * __OBJLR__ + i];
-			j += juu;
-			(*totWeight) += weight;
-			alphaC = alphaY;
-			alphaY += alphayu;
-			continue;
-		}
-	}
-	return d12;
 }
 
-
-
-
-/// \brief SIDDON line integral function in 3D
-inline __host__ __device__ float calSiddonOneRayKer(
-	const float& startX, const float& startY, const float& startZ,
-	const float& endX, const float& endY, const float& endZ,
-	const float& __MINOL__, const float& __MINOW__, const float& __MINOH__,
-	const float& __OBJSTPL__, const float& __OBJSTPW__, const float& __OBJSTPH__,
-	cuint& __OBJLR__, cuint& __OBJWR__, cuint& __OBJHR__,
-	float* dev_vol, float* totWeight)
+template<typename T>
+inline __host__ __device__ T calSiddonOneRayKer(const T& startX, const T& startY, const T& startZ,
+	const T& endX, const T& endY, const T& endZ,
+	const T& __MINOL__, const T& __MINOW__, const T& __MINOH__,
+	const T& __OBJSTPL__, const T& __OBJSTPW__, const T& __OBJSTPH__,
+	const unsigned int& __OBJLR__, const unsigned int& __OBJWR__, const unsigned int& __OBJHR__,
+	T* dev_vol, T* totWeight)
 {
-	float dirX = endX - startX;
-	float dirY = endY - startY;
-	float dirZ = endZ - startZ;
+	T dirX = endX - startX;
+	T dirY = endY - startY;
+	T dirZ = endZ - startZ;
 
-	const float dconv = sqrtf(dirX * dirX + dirY * dirY + dirZ * dirZ);
+	const T dconv = sqrtf(dirX * dirX + dirY * dirY + dirZ * dirZ);
 	int imin(0), imax(0), jmin(0), jmax(0), kmin(0), kmax(0);
 
-	float alphaxmin = 0.0f;
-	float alphaxmax = 0.0f;
-	float alphaymin = 0.0f;
-	float alphaymax = 0.0f;
-	float alphazmin = 0.0f;
-	float alphazmax = 0.0f;
-
-	dirX = dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, 0);
-	dirY = dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, __OBJLR__);
-	if (dirX < dirY)
-	{
-		alphaxmin = dirX;
-		alphaxmax = dirY;
-	}
-	else
-	{
-		alphaxmin = dirY;
-		alphaxmax = dirX;
-	}
-	dirX = dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, 0);
-	dirY = dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, __OBJWR__);
-	if (dirX < dirY)
-	{
-		alphaymin = dirX;
-		alphaymax = dirY;
-	}
-	else
-	{
-		alphaymin = dirY;
-		alphaymax = dirX;
-	}
-	dirX = dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, 0);
-	dirY = dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, __OBJHR__);
-	if (dirX < dirY)
-	{
-		alphazmin = dirX;
-		alphazmax = dirY;
-	}
-	else
-	{
-		alphazmin = dirY;
-		alphazmax = dirX;
-	}
+	std::pair<T, T> alpX = calculateAlpha(__MINOL__, __OBJSTPL__, startX, endX, __OBJLR__);
+	std::pair<T, T> alpY = calculateAlpha(__MINOW__, __OBJSTPW__, startY, endY, __OBJWR__);
+	std::pair<T, T> alpZ = calculateAlpha(__MINOH__, __OBJSTPH__, startZ, endZ, __OBJHR__);
+	T alphaxmin = alpX.first;
+	T alphaxmax = alpX.second;
+	T alphaymin = alpY.first;
+	T alphaymax = alpY.second;
+	T alphazmin = alpZ.first;
+	T alphazmax = alpZ.second;
 
 
-	const float alphaMIN = MY_MAX<float>(alphaxmin, alphaymin, alphazmin);
-	const float alphaMAX = MY_MIN<float>(alphaxmax, alphaymax, alphazmax);
+	const T alphaMIN = MY_MAX<T>(alphaxmin, alphaymin, alphazmin);
+	const T alphaMAX = MY_MIN<T>(alphaxmax, alphaymax, alphazmax);
 	dev_minmaxIdxFun(startX, endX, __MINOL__, __OBJSTPL__, alphaMIN, alphaMAX, alphaxmin, alphaxmax, __OBJLR__ + 1, &imin, &imax);
 	dev_minmaxIdxFun(startY, endY, __MINOW__, __OBJSTPW__, alphaMIN, alphaMAX, alphaymin, alphaymax, __OBJWR__ + 1, &jmin, &jmax);
 	dev_minmaxIdxFun(startZ, endZ, __MINOH__, __OBJSTPH__, alphaMIN, alphaMAX, alphazmin, alphazmax, __OBJHR__ + 1, &kmin, &kmax);
 
-	float alphaX = (startX < endX) ? dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imin) : dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imax);
-	float alphaY = (startY < endY) ? dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmin) : dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmax);
-	float alphaZ = (startZ < endZ) ? dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, kmin) : dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, kmax);
+	T alphaX = (startX < endX) ? dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imin) : dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imax);
+	T alphaY = (startY < endY) ? dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmin) : dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmax);
+	T alphaZ = (startZ < endZ) ? dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, kmin) : dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, kmax);
 
-	int Np = static_cast<int>(MY_ABS<float>(static_cast<float>(imax - imin)) + MY_ABS<float>(static_cast<float>(jmax - jmin)) + MY_ABS<float>(static_cast<float>(kmax - kmin)) + 3.0f);
-	const float alphaxu = dev_alphaU_Fun(__OBJSTPL__, startX, endX);
-	const float alphayu = dev_alphaU_Fun(__OBJSTPW__, startY, endY);
-	const float alphazu = dev_alphaU_Fun(__OBJSTPH__, startZ, endZ);
+	int Np = static_cast<int>(MY_ABS<T>(static_cast<T>(imax - imin)) + MY_ABS<T>(static_cast<T>(jmax - jmin)) + MY_ABS<T>(static_cast<T>(kmax - kmin)) + 3.0f);
+	const T alphaxu = dev_alphaU_Fun(__OBJSTPL__, startX, endX);
+	const T alphayu = dev_alphaU_Fun(__OBJSTPW__, startY, endY);
+	const T alphazu = dev_alphaU_Fun(__OBJSTPH__, startZ, endZ);
 
-	float alphaC = alphaMIN;
-	//const float minApa = MY_MIN<float>(alphaX,alphaY,alphaZ);
+	T alphaC = alphaMIN;
+	//const T minApa = MY_MIN<T>(alphaX,alphaY,alphaZ);
 
-	int i = int(dev_varphiFun(alphaMIN*1.00003f, __MINOL__, __OBJSTPL__, startX, endX));
-	int j = int(dev_varphiFun(alphaMIN*1.00003f, __MINOW__, __OBJSTPW__, startY, endY));
-	int k = int(dev_varphiFun(alphaMIN*1.00003f, __MINOH__, __OBJSTPH__, startZ, endZ));
+	int i = int(dev_varphiFun(alphaMIN * 1.00003f, __MINOL__, __OBJSTPL__, startX, endX));
+	int j = int(dev_varphiFun(alphaMIN * 1.00003f, __MINOW__, __OBJSTPW__, startY, endY));
+	int k = int(dev_varphiFun(alphaMIN * 1.00003f, __MINOH__, __OBJSTPH__, startZ, endZ));
 	//int i = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOL__, __OBJSTPL__, startX, endX));
 	//int j = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOW__, __OBJSTPW__, startY, endY));
 	//int k = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOH__, __OBJSTPH__, startZ, endZ));
@@ -1285,21 +869,18 @@ inline __host__ __device__ float calSiddonOneRayKer(
 	const int juu = dev_iu_Fun(startY, endY);
 	const int kuu = dev_iu_Fun(startZ, endZ);
 
-	float d12(0);
-	float weight(0);
+	T d12(0);
+	T weight(0);
 
 
-	for (int repIdx(0); repIdx < Np; ++repIdx)
-	{
-		if (i < 0 || i > static_cast<int>(__OBJLR__ - 1) || j < 0 || j > static_cast<int>(__OBJWR__ - 1) || k < 0 || k > static_cast<int>(__OBJHR__ - 1))
-		{
+	for (int repIdx(0); repIdx < Np; ++repIdx) {
+		if (i < 0 || i > static_cast<int>(__OBJLR__ - 1) || j < 0 || j > static_cast<int>(__OBJWR__ - 1) || k < 0 || k > static_cast<int>(__OBJHR__ - 1)) {
 			break;
 		}
-		if (alphaX <= alphaY&&alphaX <= alphaZ)
-		{
+
+		if (alphaX <= alphaY && alphaX <= alphaZ) {
 			weight = (alphaX - alphaC) * dconv;
-			if (weight > 0)
-			{
+			if (weight > 0) {
 				d12 = d12 + weight * dev_vol[(k * __OBJWR__ + j) * __OBJLR__ + i];
 				(*totWeight) += weight;
 			}
@@ -1307,340 +888,32 @@ inline __host__ __device__ float calSiddonOneRayKer(
 			i = i + iuu;
 			alphaC = alphaX;
 			alphaX = alphaX + alphaxu;
-
-
-			continue;
-		}
-		else if (alphaY <= alphaX&&alphaY <= alphaZ)
-		{
+		} else if (alphaY <= alphaX && alphaY <= alphaZ) {
 			weight = (alphaY - alphaC) * dconv;
-			if (weight > 0)
-			{
+			if (weight > 0) {
 				d12 = d12 + weight * dev_vol[(k * __OBJWR__ + j) * __OBJLR__ + i];
 				(*totWeight) += weight;
 			}
+
 			j = j + juu;
 			alphaC = alphaY;
 			alphaY = alphaY + alphayu;
-
-			continue;
-		}
-		else
-		{
+		} else {
 			weight = (alphaZ - alphaC) * dconv;
-			if (weight > 0)
-			{
+			if (weight > 0) {
 				d12 = d12 + weight * dev_vol[(k * __OBJWR__ + j) * __OBJLR__ + i];
 				(*totWeight) += weight;
 			}
+
 			k = k + kuu;
 			alphaC = alphaZ;
 			alphaZ = alphaZ + alphazu;
-
-			continue;
 		}
 	}
 
 	return d12;
 }
 
-inline __host__ __device__ float calSiddonOneRayKer_Zfirst(
-	const float& startX, const float& startY, const float& startZ,
-	const float& endX, const float& endY, const float& endZ,
-	const float& __MINOL__, const float& __MINOW__, const float& __MINOH__,
-	const float& __OBJSTPL__, const float& __OBJSTPW__, const float& __OBJSTPH__,
-	cuint& __OBJLR__, cuint& __OBJWR__, cuint& __OBJHR__,
-	float* dev_vol, float* totWeight)
-{
-	float dirX = endX - startX;
-	float dirY = endY - startY;
-	float dirZ = endZ - startZ;
-
-	const float dconv = sqrtf(dirX * dirX + dirY * dirY + dirZ * dirZ);
-	int imin(0), imax(0), jmin(0), jmax(0), kmin(0), kmax(0);
-
-	float alphaxmin = 0.0f;
-	float alphaxmax = 0.0f;
-	float alphaymin = 0.0f;
-	float alphaymax = 0.0f;
-	float alphazmin = 0.0f;
-	float alphazmax = 0.0f;
-
-	dirX = dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, 0);
-	dirY = dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, __OBJLR__);
-	if (dirX < dirY)
-	{
-		alphaxmin = dirX;
-		alphaxmax = dirY;
-	}
-	else
-	{
-		alphaxmin = dirY;
-		alphaxmax = dirX;
-	}
-	dirX = dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, 0);
-	dirY = dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, __OBJWR__);
-	if (dirX < dirY)
-	{
-		alphaymin = dirX;
-		alphaymax = dirY;
-	}
-	else
-	{
-		alphaymin = dirY;
-		alphaymax = dirX;
-	}
-	dirX = dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, 0);
-	dirY = dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, __OBJHR__);
-	if (dirX < dirY)
-	{
-		alphazmin = dirX;
-		alphazmax = dirY;
-	}
-	else
-	{
-		alphazmin = dirY;
-		alphazmax = dirX;
-	}
-
-
-	const float alphaMIN = MY_MAX<float>(alphaxmin, alphaymin, alphazmin);
-	const float alphaMAX = MY_MIN<float>(alphaxmax, alphaymax, alphazmax);
-	dev_minmaxIdxFun(startX, endX, __MINOL__, __OBJSTPL__, alphaMIN, alphaMAX, alphaxmin, alphaxmax, __OBJLR__ + 1, &imin, &imax);
-	dev_minmaxIdxFun(startY, endY, __MINOW__, __OBJSTPW__, alphaMIN, alphaMAX, alphaymin, alphaymax, __OBJWR__ + 1, &jmin, &jmax);
-	dev_minmaxIdxFun(startZ, endZ, __MINOH__, __OBJSTPH__, alphaMIN, alphaMAX, alphazmin, alphazmax, __OBJHR__ + 1, &kmin, &kmax);
-
-	float alphaX = (startX < endX) ? dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imin) : dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imax);
-	float alphaY = (startY < endY) ? dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmin) : dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmax);
-	float alphaZ = (startZ < endZ) ? dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, kmin) : dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, kmax);
-
-	int Np = static_cast<int>(MY_ABS<float>(static_cast<float>(imax - imin)) + MY_ABS<float>(static_cast<float>(jmax - jmin)) + MY_ABS<float>(static_cast<float>(kmax - kmin)) + 3.0f);
-	const float alphaxu = dev_alphaU_Fun(__OBJSTPL__, startX, endX);
-	const float alphayu = dev_alphaU_Fun(__OBJSTPW__, startY, endY);
-	const float alphazu = dev_alphaU_Fun(__OBJSTPH__, startZ, endZ);
-
-	float alphaC = alphaMIN;
-	//const float minApa = MY_MIN<float>(alphaX,alphaY,alphaZ);
-
-	int i = int(dev_varphiFun(alphaMIN*1.00003f, __MINOL__, __OBJSTPL__, startX, endX));
-	int j = int(dev_varphiFun(alphaMIN*1.00003f, __MINOW__, __OBJSTPW__, startY, endY));
-	int k = int(dev_varphiFun(alphaMIN*1.00003f, __MINOH__, __OBJSTPH__, startZ, endZ));
-	//int i = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOL__, __OBJSTPL__, startX, endX));
-	//int j = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOW__, __OBJSTPW__, startY, endY));
-	//int k = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOH__, __OBJSTPH__, startZ, endZ));
-
-	const int iuu = dev_iu_Fun(startX, endX);
-	const int juu = dev_iu_Fun(startY, endY);
-	const int kuu = dev_iu_Fun(startZ, endZ);
-
-	float d12(0);
-	float weight(0);
-
-
-	for (int repIdx(0); repIdx < Np; ++repIdx)
-	{
-		if (i < 0 || i > static_cast<int>(__OBJLR__ - 1) || j < 0 || j > static_cast<int>(__OBJWR__ - 1) || k < 0 || k > static_cast<int>(__OBJHR__ - 1))
-		{
-			break;
-		}
-		if (alphaX <= alphaY&&alphaX <= alphaZ)
-		{
-			weight = (alphaX - alphaC) * dconv;
-			if (weight > 0)
-			{
-				d12 = d12 + weight * dev_vol[(j * __OBJLR__ + i) * __OBJHR__ + k];
-				(*totWeight) += weight;
-			}
-
-			i = i + iuu;
-			alphaC = alphaX;
-			alphaX = alphaX + alphaxu;
-
-
-			continue;
-		}
-		else if (alphaY <= alphaX&&alphaY <= alphaZ)
-		{
-			weight = (alphaY - alphaC) * dconv;
-			if (weight > 0)
-			{
-				d12 = d12 + weight * dev_vol[(j * __OBJLR__ + i) * __OBJHR__ + k];
-				(*totWeight) += weight;
-			}
-			j = j + juu;
-			alphaC = alphaY;
-			alphaY = alphaY + alphayu;
-
-			continue;
-		}
-		else
-		{
-			weight = (alphaZ - alphaC) * dconv;
-			if (weight > 0)
-			{
-				d12 = d12 + weight * dev_vol[(j * __OBJLR__ + i) * __OBJHR__ + k];
-				(*totWeight) += weight;
-			}
-			k = k + kuu;
-			alphaC = alphaZ;
-			alphaZ = alphaZ + alphazu;
-
-			continue;
-		}
-	}
-
-	return d12;
-}
-
-
-/// \brief SIDDON line integral function in 3D
-inline __host__ __device__ double calSiddonOneRayKer(
-	const double& startX, const double& startY, const double& startZ,
-	const double& endX, const double& endY, const double& endZ,
-	const double& __MINOL__, const double& __MINOW__, const double& __MINOH__,
-	const double& __OBJSTPL__, const double& __OBJSTPW__, const double& __OBJSTPH__,
-	cuint& __OBJLR__, cuint& __OBJWR__, cuint& __OBJHR__,
-	double* dev_vol, double* totWeight)
-{
-	double dirX = endX - startX;
-	double dirY = endY - startY;
-	double dirZ = endZ - startZ;
-
-	const double dconv = sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
-	int imin(0), imax(0), jmin(0), jmax(0), kmin(0), kmax(0);
-
-	double alphaxmin = 0.0f;
-	double alphaxmax = 0.0f;
-	double alphaymin = 0.0f;
-	double alphaymax = 0.0f;
-	double alphazmin = 0.0f;
-	double alphazmax = 0.0f;
-
-	dirX = dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, 0);
-	dirY = dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, __OBJLR__);
-	if (dirX < dirY)
-	{
-		alphaxmin = dirX;
-		alphaxmax = dirY;
-	}
-	else
-	{
-		alphaxmin = dirY;
-		alphaxmax = dirX;
-	}
-	dirX = dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, 0);
-	dirY = dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, __OBJWR__);
-	if (dirX < dirY)
-	{
-		alphaymin = dirX;
-		alphaymax = dirY;
-	}
-	else
-	{
-		alphaymin = dirY;
-		alphaymax = dirX;
-	}
-	dirX = dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, 0);
-	dirY = dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, __OBJHR__);
-	if (dirX < dirY)
-	{
-		alphazmin = dirX;
-		alphazmax = dirY;
-	}
-	else
-	{
-		alphazmin = dirY;
-		alphazmax = dirX;
-	}
-
-
-	const double alphaMIN = MY_MAX<double>(alphaxmin, alphaymin, alphazmin);
-	const double alphaMAX = MY_MIN<double>(alphaxmax, alphaymax, alphazmax);
-	dev_minmaxIdxFun(startX, endX, __MINOL__, __OBJSTPL__, alphaMIN, alphaMAX, alphaxmin, alphaxmax, __OBJLR__ + 1, &imin, &imax);
-	dev_minmaxIdxFun(startY, endY, __MINOW__, __OBJSTPW__, alphaMIN, alphaMAX, alphaymin, alphaymax, __OBJWR__ + 1, &jmin, &jmax);
-	dev_minmaxIdxFun(startZ, endZ, __MINOH__, __OBJSTPH__, alphaMIN, alphaMAX, alphazmin, alphazmax, __OBJHR__ + 1, &kmin, &kmax);
-
-	double alphaX = (startX < endX) ? dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imin) : dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imax);
-	double alphaY = (startY < endY) ? dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmin) : dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmax);
-	double alphaZ = (startZ < endZ) ? dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, kmin) : dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, kmax);
-
-	int Np = static_cast<int>(MY_ABS<double>(static_cast<double>(imax - imin)) + MY_ABS<double>(static_cast<double>(jmax - jmin)) + MY_ABS<double>(static_cast<double>(kmax - kmin)) + 3.0f);
-	const double alphaxu = dev_alphaU_Fun(__OBJSTPL__, startX, endX);
-	const double alphayu = dev_alphaU_Fun(__OBJSTPW__, startY, endY);
-	const double alphazu = dev_alphaU_Fun(__OBJSTPH__, startZ, endZ);
-
-	double alphaC = alphaMIN;
-	//const double minApa = MY_MIN<double>(alphaX,alphaY,alphaZ);
-
-	int i = int(dev_varphiFun(alphaMIN*1.00003f, __MINOL__, __OBJSTPL__, startX, endX));
-	int j = int(dev_varphiFun(alphaMIN*1.00003f, __MINOW__, __OBJSTPW__, startY, endY));
-	int k = int(dev_varphiFun(alphaMIN*1.00003f, __MINOH__, __OBJSTPH__, startZ, endZ));
-	//int i = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOL__, __OBJSTPL__, startX, endX));
-	//int j = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOW__, __OBJSTPW__, startY, endY));
-	//int k = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOH__, __OBJSTPH__, startZ, endZ));
-
-	const int iuu = dev_iu_Fun(startX, endX);
-	const int juu = dev_iu_Fun(startY, endY);
-	const int kuu = dev_iu_Fun(startZ, endZ);
-
-	double d12(0);
-	double weight(0);
-
-
-	for (int repIdx(0); repIdx < Np; ++repIdx)
-	{
-		if (i < 0 || i > static_cast<int>(__OBJLR__ - 1) || j < 0 || j > static_cast<int>(__OBJWR__ - 1) || k < 0 || k > static_cast<int>(__OBJHR__ - 1))
-		{
-			break;
-		}
-		if (alphaX <= alphaY&&alphaX <= alphaZ)
-		{
-			weight = (alphaX - alphaC) * dconv;
-			if (weight > 0)
-			{
-				d12 = d12 + weight * dev_vol[(k * __OBJWR__ + j) * __OBJLR__ + i];
-				(*totWeight) += weight;
-			}
-
-			i = i + iuu;
-			alphaC = alphaX;
-			alphaX = alphaX + alphaxu;
-
-
-			continue;
-		}
-		else if (alphaY <= alphaX&&alphaY <= alphaZ)
-		{
-			weight = (alphaY - alphaC) * dconv;
-			if (weight > 0)
-			{
-				d12 = d12 + weight * dev_vol[(k * __OBJWR__ + j) * __OBJLR__ + i];
-				(*totWeight) += weight;
-			}
-			j = j + juu;
-			alphaC = alphaY;
-			alphaY = alphaY + alphayu;
-
-			continue;
-		}
-		else
-		{
-			weight = (alphaZ - alphaC) * dconv;
-			if (weight > 0)
-			{
-				d12 = d12 + weight * dev_vol[(k * __OBJWR__ + j) * __OBJLR__ + i];
-				(*totWeight) += weight;
-			}
-			k = k + kuu;
-			alphaC = alphaZ;
-			alphaZ = alphaZ + alphazu;
-
-			continue;
-		}
-	}
-
-	return d12;
-}
 
 
 /// \brief intersection length of the rectangle box
@@ -1671,15 +944,6 @@ inline	__host__ __device__ bool intersectBox(Ray2D r, float2 boxmin, float2 boxm
 	return smallest_tmax > largest_tmin;
 }
 
-
-
-/// \brief intersection length of the rectangle box
-/// \param r ray
-/// \param boxmin min boundary of the box
-/// \param boxmax max boundary of the obx
-/// \param tnear pointer to the near intersection parameter
-/// \param tfar pointer to the far intersection parameter
-/// \return intersection or not
 inline	__host__ __device__ bool intersectBox(Ray2D r, double2 boxmin, double2 boxmax, double *tnear, double *tfar)
 {
 	// compute intersection of ray with all six bbox planes
@@ -1730,14 +994,6 @@ inline __host__ __device__ int intersectBox(Ray r, float3 boxmin, float3 boxmax,
 	return smallest_tmax > largest_tmin;
 }
 
-
-/// \brief intersection length of the 3D rectangle box
-/// \param r ray
-/// \param boxmin min boundary of the box
-/// \param boxmax max boundary of the obx
-/// \param tnear pointer to the near intersection parameter
-/// \param tfar pointer to the far intersection parameter
-/// \return intersection or not
 inline __host__ __device__ int intersectBox(Ray r, double3 boxmin, double3 boxmax, double *tnear, double *tfar)
 {
 	// compute intersection of ray with all six bbox planes
@@ -1759,79 +1015,61 @@ inline __host__ __device__ int intersectBox(Ray r, double3 boxmin, double3 boxma
 	return smallest_tmax > largest_tmin;
 }
 
-
-
-
 template<typename T>
 __host__ __device__ inline T intersectLength(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax)
 {
 	const T left = (fixedmin > varimin) ? fixedmin : varimin;
 	const T right = (fixedmax < varimax) ? fixedmax : varimax;
-	return abs(right - left) * static_cast<double>(right > left);
+	return abs(right - left) * (right > left);
 }
 
-
+/// \brief the core function for generating the projection matrix
+/// \param startX the start point x of the ray
+/// \param startY the start point y of the ray
+/// \param endX the end point x of the ray
+/// \param endY the end point y of the ray
+/// \param bx the minimum x coordinate of the object
+/// \param by the minimum y coordinate of the object
+/// \param dx the obj x direction step size
+/// \param dy the obj y direction step size
+/// \param objResoLen the object length resolution
+/// \param objResoWid the object width resolution
+/// \param rowidx row index
+/// \param rowIdx row index in the matrix
+/// \param colIdx col index in the matrix
+/// \param wgt weighting coefficient of the matrix
 template<typename T>
-__device__ inline T intersectLength_device(const T& fixedmin, const T& fixedmax, const T& varimin, const T& varimax)
-{
-	const T left = (fixedmin > varimin) ? fixedmin : varimin;
-	const T right = (fixedmax < varimax) ? fixedmax : varimax;
-	return fabsf(right - left) * static_cast<T>(right > left);
-}
-
-
-
-/// \brief the core function for generating the projection matrix
-/// \param startX the start point x of the ray
-/// \param startY the start point y of the ray
-/// \param endX the end point x of the ray
-/// \param endY the end point y of the ray
-/// \param bx the minimum x coordinate of the object
-/// \param by the minimum y coordinate of the object
-/// \param dx the obj x direction step size
-/// \param dy the obj y direction step size
-/// \param objResoLen the object length resolution
-/// \param objResoWid the object width resolution
-/// \param rowidx row index
-/// \param rowIdx row index in the matrix
-/// \param colIdx col index in the matrix
-/// \param wgt weighting coefficient of the matrix
-inline void pushMatrix(
-	float startX, float startY,
-	float endX, float endY,
-	float bx, float by,
-	float dx, float dy,
-	cuint objResoLen,
-	cuint objResoWid,
+inline void pushMatrix(T startX, T startY, T endX, T endY,
+	T bx, T by,T dx, T dy, const unsigned int objResoLen, const unsigned int  objResoWid,
 	int& rowidx,
 	std::vector<int>& rowIdx,
 	std::vector<int>& colIdx,
-	std::vector<float>& wgt)
-{
-	const float dirX(endX - startX);
-	const float dirY(endY - startY);
-	const float lengthSq = dirX * dirX + dirY * dirY;
-	const float dconv = sqrt(lengthSq);
-	int imin, imax, jmin, jmax;
-	const float alphaxmin = MY_MIN<float>(dev_alpha_IFun(bx, dx, startX, endX, 0), dev_alpha_IFun(bx, dx, startX, endX, objResoLen));
-	const float alphaxmax = MY_MAX<float>(dev_alpha_IFun(bx, dx, startX, endX, 0), dev_alpha_IFun(bx, dx, startX, endX, objResoLen));
-	const float alphaymin = MY_MIN<float>(dev_alpha_IFun(by, dy, startY, endY, 0), dev_alpha_IFun(by, dy, startY, endY, objResoWid));
-	const float alphaymax = MY_MAX<float>(dev_alpha_IFun(by, dy, startY, endY, 0), dev_alpha_IFun(by, dy, startY, endY, objResoWid));
+	std::vector<T>& wgt) {
 
-	const float alphaMIN = MY_MAX<float>(alphaxmin, alphaymin);
-	const float alphaMAX = MY_MIN<float>(alphaxmax, alphaymax);
+	const T dirX(endX - startX);
+	const T dirY(endY - startY);
+	const T lengthSq = dirX * dirX + dirY * dirY;
+	const T dconv = sqrt(lengthSq);
+	int imin, imax, jmin, jmax;
+	const T alphaxmin = MY_MIN<T>(dev_alpha_IFun(bx, dx, startX, endX, 0), dev_alpha_IFun(bx, dx, startX, endX, objResoLen));
+	const T alphaxmax = MY_MAX<T>(dev_alpha_IFun(bx, dx, startX, endX, 0), dev_alpha_IFun(bx, dx, startX, endX, objResoLen));
+	const T alphaymin = MY_MIN<T>(dev_alpha_IFun(by, dy, startY, endY, 0), dev_alpha_IFun(by, dy, startY, endY, objResoWid));
+	const T alphaymax = MY_MAX<T>(dev_alpha_IFun(by, dy, startY, endY, 0), dev_alpha_IFun(by, dy, startY, endY, objResoWid));
+
+	const T alphaMIN = MY_MAX<T>(alphaxmin, alphaymin);
+	const T alphaMAX = MY_MIN<T>(alphaxmax, alphaymax);
 	dev_minmaxIdxFun(startX, endX, bx, dx, alphaMIN, alphaMAX, alphaxmin, alphaxmax, objResoLen + 1, &imin, &imax);
 	dev_minmaxIdxFun(startY, endY, by, dy, alphaMIN, alphaMAX, alphaymin, alphaymax, objResoWid + 1, &jmin, &jmax);
 
-	float alphaX = (startX < endX) ? dev_alpha_IFun(bx, dx, startX, endX, imin) : dev_alpha_IFun(bx, dx, startX, endX, imax);
-	float alphaY = (startY < endY) ? dev_alpha_IFun(by, dy, startY, endY, jmin) : dev_alpha_IFun(by, dy, startY, endY, jmax);
+	T alphaX = (startX < endX) ? dev_alpha_IFun(bx, dx, startX, endX, imin) : dev_alpha_IFun(bx, dx, startX, endX, imax);
+	T alphaY = (startY < endY) ? dev_alpha_IFun(by, dy, startY, endY, jmin) : dev_alpha_IFun(by, dy, startY, endY, jmax);
 
-	int Np = static_cast<int>(MY_ABS<float>(imax - imin + 1.0f) + MY_ABS<float>(jmax - jmin + 1.0f) + 4.0f);
-	const float alphaxu = dev_alphaU_Fun(dx, startX, endX);
-	const float alphayu = dev_alphaU_Fun(dy, startY, endY);
+	int Np = static_cast<int>(MY_ABS<T>(imax - imin + 1.0f) + MY_ABS<T>(jmax - jmin + 1.0f) + 4.0f);
+	const T alphaxu = dev_alphaU_Fun(dx, startX, endX);
+	const T alphayu = dev_alphaU_Fun(dy, startY, endY);
 
-	float alphaC = alphaMIN;
-	float minApa = MY_MIN<float>(alphaX, alphaY);
+	T alphaC = alphaMIN;
+	T minApa = MY_MIN<T>(alphaX, alphaY);
 	/*int i = static_cast<int>(dev_varphiFun(alphaMIN* 1.00003f, bx, dx, startX, endX));
 	int j = static_cast<int>(dev_varphiFun(alphaMIN* 1.00003f, by, dy, startY, endY));
 	*/
@@ -1841,138 +1079,32 @@ inline void pushMatrix(
 	const int iuu = dev_iu_Fun(startX, endX);
 	const int juu = dev_iu_Fun(startY, endY);
 
-	float d12(0.0f);
-	float weight(0.0f);
+	T d12(0.0f);
+	T weight(0.0f);
 	unsigned int repIdx(0);
 	unsigned int colidx(0);
-	while (repIdx != Np)
-	{
-		if (i < 0 || i >= static_cast<int>(objResoLen) || j < 0 || j >= static_cast<int>(objResoWid))
-		{
+	while (repIdx != Np) {
+		if (i < 0 || i >= static_cast<int>(objResoLen) || j < 0 || j >= static_cast<int>(objResoWid)) {
 			break;
 		}
-		if (alphaX <= alphaY)
-		{
-			colidx = j * objResoLen + i;
-			weight = (alphaX - alphaC) * dconv;
-			wgt.push_back(weight);
-			rowIdx.push_back(rowidx);
-			colIdx.push_back(colidx);
-			d12 += weight;
+
+		colidx = j * objResoLen + i;
+		weight = (((alphaX <= alphaY) ? alphaX : alphaY) - alphaC) * dconv;
+		wgt.push_back(weight);
+		rowIdx.push_back(rowidx);
+		colIdx.push_back(colidx);
+		d12 += weight;
+
+		if (alphaX <= alphaY) {
 			i += iuu;
 			alphaC = alphaX;
 			alphaX += alphaxu;
-		}
-		else
-		{
-			colidx = j * objResoLen + i;
-			weight = (alphaY - alphaC) * dconv;
-			wgt.push_back(weight);
-			rowIdx.push_back(rowidx);
-			colIdx.push_back(colidx);
-			d12 += weight;
+		} else {
 			j += juu;
 			alphaC = alphaY;
 			alphaY += alphayu;
 		}
-		++repIdx;
-	}
-}
 
-/// \brief the core function for generating the projection matrix
-/// \param startX the start point x of the ray
-/// \param startY the start point y of the ray
-/// \param endX the end point x of the ray
-/// \param endY the end point y of the ray
-/// \param bx the minimum x coordinate of the object
-/// \param by the minimum y coordinate of the object
-/// \param dx the obj x direction step size
-/// \param dy the obj y direction step size
-/// \param objResoLen the object length resolution
-/// \param objResoWid the object width resolution
-/// \param rowidx row index
-/// \param rowIdx row index in the matrix
-/// \param colIdx col index in the matrix
-/// \param wgt weighting coefficient of the matrix
-inline void pushMatrix(
-	double startX, double startY,
-	double endX, double endY,
-	double bx, double by,
-	double dx, double dy,
-	cuint objResoLen,
-	cuint objResoWid,
-	int& rowidx,
-	std::vector<int>& rowIdx,
-	std::vector<int>& colIdx,
-	std::vector<double>& wgt)
-{
-	const double dirX(endX - startX);
-	const double dirY(endY - startY);
-	const double lengthSq = dirX * dirX + dirY * dirY;
-	const double dconv = sqrt(lengthSq);
-	int imin, imax, jmin, jmax;
-	const double alphaxmin = MY_MIN<double>(dev_alpha_IFun(bx, dx, startX, endX, 0), dev_alpha_IFun(bx, dx, startX, endX, objResoLen));
-	const double alphaxmax = MY_MAX<double>(dev_alpha_IFun(bx, dx, startX, endX, 0), dev_alpha_IFun(bx, dx, startX, endX, objResoLen));
-	const double alphaymin = MY_MIN<double>(dev_alpha_IFun(by, dy, startY, endY, 0), dev_alpha_IFun(by, dy, startY, endY, objResoWid));
-	const double alphaymax = MY_MAX<double>(dev_alpha_IFun(by, dy, startY, endY, 0), dev_alpha_IFun(by, dy, startY, endY, objResoWid));
-
-	const double alphaMIN = MY_MAX<double>(alphaxmin, alphaymin);
-	const double alphaMAX = MY_MIN<double>(alphaxmax, alphaymax);
-	dev_minmaxIdxFun(startX, endX, bx, dx, alphaMIN, alphaMAX, alphaxmin, alphaxmax, objResoLen + 1, &imin, &imax);
-	dev_minmaxIdxFun(startY, endY, by, dy, alphaMIN, alphaMAX, alphaymin, alphaymax, objResoWid + 1, &jmin, &jmax);
-
-	double alphaX = (startX < endX) ? dev_alpha_IFun(bx, dx, startX, endX, imin) : dev_alpha_IFun(bx, dx, startX, endX, imax);
-	double alphaY = (startY < endY) ? dev_alpha_IFun(by, dy, startY, endY, jmin) : dev_alpha_IFun(by, dy, startY, endY, jmax);
-
-	int Np = static_cast<int>(MY_ABS<double>(imax - imin + 1.0f) + MY_ABS<double>(jmax - jmin + 1.0f) + 4.0f);
-	const double alphaxu = dev_alphaU_Fun(dx, startX, endX);
-	const double alphayu = dev_alphaU_Fun(dy, startY, endY);
-
-	double alphaC = alphaMIN;
-	double minApa = MY_MIN<double>(alphaX, alphaY);
-	/*int i = static_cast<int>(dev_varphiFun(alphaMIN* 1.00003f, bx, dx, startX, endX));
-	int j = static_cast<int>(dev_varphiFun(alphaMIN* 1.00003f, by, dy, startY, endY));
-	*/
-	int i = static_cast<int>(dev_varphiFun((alphaMIN + minApa) * 0.5f, bx, dx, startX, endX));
-	int j = static_cast<int>(dev_varphiFun((alphaMIN + minApa) * 0.5f, by, dy, startY, endY));
-
-	const int iuu = dev_iu_Fun(startX, endX);
-	const int juu = dev_iu_Fun(startY, endY);
-
-	double d12(0.0f);
-	double weight(0.0f);
-	unsigned int repIdx(0);
-	unsigned int colidx(0);
-	while (repIdx != Np)
-	{
-		if (i < 0 || i >= static_cast<int>(objResoLen) || j < 0 || j >= static_cast<int>(objResoWid))
-		{
-			break;
-		}
-		if (alphaX <= alphaY)
-		{
-			colidx = j * objResoLen + i;
-			weight = (alphaX - alphaC) * dconv;
-			wgt.push_back(weight);
-			rowIdx.push_back(rowidx);
-			colIdx.push_back(colidx);
-			d12 += weight;
-			i += iuu;
-			alphaC = alphaX;
-			alphaX += alphaxu;
-		}
-		else
-		{
-			colidx = j * objResoLen + i;
-			weight = (alphaY - alphaC) * dconv;
-			wgt.push_back(weight);
-			rowIdx.push_back(rowidx);
-			colIdx.push_back(colidx);
-			d12 += weight;
-			j += juu;
-			alphaC = alphaY;
-			alphaY += alphayu;
-		}
 		++repIdx;
 	}
 }

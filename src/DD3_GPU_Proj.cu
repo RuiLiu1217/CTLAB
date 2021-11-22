@@ -1774,12 +1774,12 @@ __global__ void DD3Proj_branches_ker(float* proj, const float* vol,
 				for (int ii = minXIdx; ii < maxXIdx; ii++)
 				{
 					sinT = cosT - dx * cursour.y / y0;
-					dirX = intersectLength_device<float>(detPosLX, detPosRX, cosT, sinT);
+					dirX = intersectLength<float>(detPosLX, detPosRX, cosT, sinT);
 					x0 = (cursour.z - (minZIdx - objCntIdxZ) * dz) * cursour.y / y0 + cursour.z;
 					for (int kk = minZIdx; kk < maxZIdx; kk++)
 					{
 						z0 = x0 - dz * cursour.y / y0;
-						dirY = intersectLength_device<float>(detPosDZ, detPosUZ, x0, z0);
+						dirY = intersectLength<float>(detPosDZ, detPosUZ, x0, z0);
 						summ += vol[(jj * XN + ii) * ZN + kk] * (dirX * dirY);
 						x0 = z0;
 					}
@@ -1838,12 +1838,12 @@ __global__ void DD3Proj_branches_ker(float* proj, const float* vol,
 				for (int jj = minYIdx; jj < maxYIdx; jj++)
 				{
 					sinT = cosT - dx * cursour.x / x0;// (cursour.y - ((jj + 1) - YN / 2.0) * dx) * cursour.x / objdirX + cursour.y;
-					dirX = intersectLength_device<float>(detPosLY, detPosRY, cosT, sinT);
+					dirX = intersectLength<float>(detPosLY, detPosRY, cosT, sinT);
 					y0 = (cursour.z - (minZIdx - objCntIdxZ) * dz) * cursour.x / x0 + cursour.z;
 					for (int kk = minZIdx; kk < maxZIdx; kk++)
 					{
 						z0 = y0 - dz * cursour.x / x0;
-						dirY = intersectLength_device<float>(detPosDZ, detPosUZ, y0, z0);
+						dirY = intersectLength<float>(detPosDZ, detPosUZ, y0, z0);
 						summ += vol[(jj * XN + ii) * ZN + kk] * (dirX * dirY);
 						y0 = z0;
 					}

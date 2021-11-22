@@ -12,6 +12,62 @@
 #endif
 
 
+
+
+
+/// \brief the rotation of the 2D vector according to cos(T) and sin(T)
+/// \param p original vector
+/// \param cosT cos(T)
+/// \param sinT sin(T)
+inline __host__	__device__ float2 rotation(const float2& p, const float& cosT, const float& sinT)
+{
+	float2 curP;
+	curP.x = p.x * cosT - p.y * sinT;
+	curP.y = p.x * sinT + p.y * cosT;
+	return curP;
+}
+
+/// \brief the rotation of the 2D vector according to cos(T) and sin(T)
+/// \param p original vector
+/// \param cosT cos(T)
+/// \param sinT sin(T)
+inline __host__	__device__ double2 rotation(const double2& p, const double& cosT, const double& sinT)
+{
+	double2 curP;
+	curP.x = p.x * cosT - p.y * sinT;
+	curP.y = p.x * sinT + p.y * cosT;
+	return curP;
+}
+
+/// \brief the rotation of the 3D vector according to cos(T) and sin(T)
+/// \param p original vector
+/// \param cosT cos(T)
+/// \param sinT sin(T)
+inline __host__ __device__ float3 rotation(const float3& p, const float& cosT, const float& sinT)
+{
+	float3 curP;
+	curP.x = p.x * cosT - p.y * sinT;
+	curP.y = p.x * sinT + p.y * cosT;
+	curP.z = p.z;
+	return curP;
+}
+
+
+
+/// \brief the rotation of the 3D vector according to cos(T) and sin(T)
+/// \param p original vector
+/// \param cosT cos(T)
+/// \param sinT sin(T)
+inline __host__ __device__ double3 rotation(const double3& p, const double& cosT, const double& sinT)
+{
+	double3 curP;
+	curP.x = p.x * cosT - p.y * sinT;
+	curP.y = p.x * sinT + p.y * cosT;
+	curP.z = p.z;
+	return curP;
+}
+
+
 __global__ void _proj_Ker(float* dimg, float* donp, float* draw, cuint angIdx, const bool angDir, const FanEAGeo FanGeo, const Image Img)
 {
 	cuint detId = threadIdx.x + blockIdx.x * blockDim.x;
