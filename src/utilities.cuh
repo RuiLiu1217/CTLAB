@@ -9,8 +9,7 @@
 #define UTILITIES_CUH_
 #include <thrust/device_vector.h>
 
-
-/// \brief SIDDON line integral function in 3D
+ /// \brief SIDDON line integral function in 3D
 inline __device__ float calSiddonOneRayKer(
 	const float startX, const float startY, const float startZ,
 	const float endX, const float endY, const float endZ,
@@ -26,50 +25,15 @@ inline __device__ float calSiddonOneRayKer(
 	const float dconv = sqrtf(dirX * dirX + dirY * dirY + dirZ * dirZ);
 	int imin(0), imax(0), jmin(0), jmax(0), kmin(0), kmax(0);
 
-	float alphaxmin = 0.0f;
-	float alphaxmax = 0.0f;
-	float alphaymin = 0.0f;
-	float alphaymax = 0.0f;
-	float alphazmin = 0.0f;
-	float alphazmax = 0.0f;
-
-	dirX = dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, 0);
-	dirY = dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, __OBJLR__);
-	if (dirX < dirY)
-	{
-		alphaxmin = dirX;
-		alphaxmax = dirY;
-	}
-	else
-	{
-		alphaxmin = dirY;
-		alphaxmax = dirX;
-	}
-	dirX = dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, 0);
-	dirY = dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, __OBJWR__);
-	if (dirX < dirY)
-	{
-		alphaymin = dirX;
-		alphaymax = dirY;
-	}
-	else
-	{
-		alphaymin = dirY;
-		alphaymax = dirX;
-	}
-	dirX = dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, 0);
-	dirY = dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, __OBJHR__);
-	if (dirX < dirY)
-	{
-		alphazmin = dirX;
-		alphazmax = dirY;
-	}
-	else
-	{
-		alphazmin = dirY;
-		alphazmax = dirX;
-	}
-
+	thrust::pair<float, float> alpX = calculateAlpha(__MINOL__, __OBJSTPL__, startX, endX, __OBJLR__);
+	thrust::pair<float, float> alpY = calculateAlpha(__MINOW__, __OBJSTPW__, startY, endY, __OBJWR__);
+	thrust::pair<float, float> alpZ = calculateAlpha(__MINOH__, __OBJSTPH__, startZ, endZ, __OBJHR__);
+	float alphaxmin = alpX.first;
+	float alphaxmax = alpX.second;
+	float alphaymin = alpY.first;
+	float alphaymax = alpY.second;
+	float alphazmin = alpZ.first;
+	float alphazmax = alpZ.second;
 
 	const float alphaMIN = fmaxf(alphaxmin, fmaxf(alphaymin, alphazmin));
 	const float alphaMAX = fminf(alphaxmax, fminf(alphaymax, alphazmax));
@@ -89,9 +53,9 @@ inline __device__ float calSiddonOneRayKer(
 	float alphaC = alphaMIN;
 	//const float minApa = MY_MIN<float>(alphaX,alphaY,alphaZ);
 
-	int i = int(dev_varphiFun(alphaMIN*1.00003f, __MINOL__, __OBJSTPL__, startX, endX));
-	int j = int(dev_varphiFun(alphaMIN*1.00003f, __MINOW__, __OBJSTPW__, startY, endY));
-	int k = int(dev_varphiFun(alphaMIN*1.00003f, __MINOH__, __OBJSTPH__, startZ, endZ));
+	int i = int(dev_varphiFun(alphaMIN * 1.00003f, __MINOL__, __OBJSTPL__, startX, endX));
+	int j = int(dev_varphiFun(alphaMIN * 1.00003f, __MINOW__, __OBJSTPW__, startY, endY));
+	int k = int(dev_varphiFun(alphaMIN * 1.00003f, __MINOH__, __OBJSTPH__, startZ, endZ));
 	//int i = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOL__, __OBJSTPL__, startX, endX));
 	//int j = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOW__, __OBJSTPW__, startY, endY));
 	//int k = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOH__, __OBJSTPH__, startZ, endZ));
@@ -110,7 +74,7 @@ inline __device__ float calSiddonOneRayKer(
 		{
 			break;
 		}
-		if (alphaX <= alphaY&&alphaX <= alphaZ)
+		if (alphaX <= alphaY && alphaX <= alphaZ)
 		{
 			weight = (alphaX - alphaC) * dconv;
 			if (weight > 0)
@@ -124,7 +88,7 @@ inline __device__ float calSiddonOneRayKer(
 			alphaX = alphaX + alphaxu;
 			continue;
 		}
-		else if (alphaY <= alphaX&&alphaY <= alphaZ)
+		else if (alphaY <= alphaX && alphaY <= alphaZ)
 		{
 			weight = (alphaY - alphaC) * dconv;
 			if (weight > 0)
@@ -155,8 +119,6 @@ inline __device__ float calSiddonOneRayKer(
 
 	return d12;
 }
-
-
 enum ForwardDDMethod{PROJ_BRANCHLESS=0,PROJ_PSEUDODISTANCE=2};
 enum BackwardDDMethod{BACK_BRANCHLESS=0,BACK_PSEUDODISTANCE=2,BACK_ZLINEBRANCHLESS=3};
 

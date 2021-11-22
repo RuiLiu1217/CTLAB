@@ -60,6 +60,8 @@
 #include <thrust/transform.h>
 #include <thrust/transform_reduce.h>
 #include <thrust/tuple.h>
+#include <thrust/device_vector.h>
+
 
 #include "FanEAGeo.h"
 #include "FanEDGeo.h"
@@ -804,7 +806,62 @@ inline	__host__ __device__ T calSiddonOneRayKer2D(
 }
 
 template<typename T>
-std::pair<T, T> calculateAlpha(T __MINO__, T __OBJSTP__, T start, T end, const unsigned int __OBJ__) {
+void preCalculateSiddon(const T& startX, const T& startY, const T& startZ,
+	const T& endX, const T& endY, const T& endZ,
+	const T& __MINOL__, const T& __MINOW__, const T& __MINOH__,
+	const T& __OBJSTPL__, const T& __OBJSTPW__, const T& __OBJSTPH__,
+	const unsigned int& __OBJLR__, const unsigned int& __OBJWR__, const unsigned int& __OBJHR__,
+	T* dev_vol, T* totWeight) {
+	T dirX = endX - startX;
+	T dirY = endY - startY;
+	T dirZ = endZ - startZ;
+
+	const T dconv = sqrtf(dirX * dirX + dirY * dirY + dirZ * dirZ);
+	int imin(0), imax(0), jmin(0), jmax(0), kmin(0), kmax(0);
+
+	thrust::pair<T, T> alpX = calculateAlpha(__MINOL__, __OBJSTPL__, startX, endX, __OBJLR__);
+	thrust::pair<T, T> alpY = calculateAlpha(__MINOW__, __OBJSTPW__, startY, endY, __OBJWR__);
+	thrust::pair<T, T> alpZ = calculateAlpha(__MINOH__, __OBJSTPH__, startZ, endZ, __OBJHR__);
+	T alphaxmin = alpX.first;
+	T alphaxmax = alpX.second;
+	T alphaymin = alpY.first;
+	T alphaymax = alpY.second;
+	T alphazmin = alpZ.first;
+	T alphazmax = alpZ.second;
+
+
+	const T alphaMIN = MY_MAX<T>(alphaxmin, alphaymin, alphazmin);
+	const T alphaMAX = MY_MIN<T>(alphaxmax, alphaymax, alphazmax);
+	dev_minmaxIdxFun(startX, endX, __MINOL__, __OBJSTPL__, alphaMIN, alphaMAX, alphaxmin, alphaxmax, __OBJLR__ + 1, &imin, &imax);
+	dev_minmaxIdxFun(startY, endY, __MINOW__, __OBJSTPW__, alphaMIN, alphaMAX, alphaymin, alphaymax, __OBJWR__ + 1, &jmin, &jmax);
+	dev_minmaxIdxFun(startZ, endZ, __MINOH__, __OBJSTPH__, alphaMIN, alphaMAX, alphazmin, alphazmax, __OBJHR__ + 1, &kmin, &kmax);
+
+	T alphaX = (startX < endX) ? dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imin) : dev_alpha_IFun(__MINOL__, __OBJSTPL__, startX, endX, imax);
+	T alphaY = (startY < endY) ? dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmin) : dev_alpha_IFun(__MINOW__, __OBJSTPW__, startY, endY, jmax);
+	T alphaZ = (startZ < endZ) ? dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, kmin) : dev_alpha_IFun(__MINOH__, __OBJSTPH__, startZ, endZ, kmax);
+
+	int Np = static_cast<int>(MY_ABS<T>(static_cast<T>(imax - imin)) + MY_ABS<T>(static_cast<T>(jmax - jmin)) + MY_ABS<T>(static_cast<T>(kmax - kmin)) + 3.0f);
+	const T alphaxu = dev_alphaU_Fun(__OBJSTPL__, startX, endX);
+	const T alphayu = dev_alphaU_Fun(__OBJSTPW__, startY, endY);
+	const T alphazu = dev_alphaU_Fun(__OBJSTPH__, startZ, endZ);
+
+	T alphaC = alphaMIN;
+	//const T minApa = MY_MIN<T>(alphaX,alphaY,alphaZ);
+
+	int i = int(dev_varphiFun(alphaMIN * 1.00003f, __MINOL__, __OBJSTPL__, startX, endX));
+	int j = int(dev_varphiFun(alphaMIN * 1.00003f, __MINOW__, __OBJSTPW__, startY, endY));
+	int k = int(dev_varphiFun(alphaMIN * 1.00003f, __MINOH__, __OBJSTPH__, startZ, endZ));
+	//int i = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOL__, __OBJSTPL__, startX, endX));
+	//int j = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOW__, __OBJSTPW__, startY, endY));
+	//int k = floor(dev_varphiFun((alphaMIN+minApa) * 0.5f, __MINOH__, __OBJSTPH__, startZ, endZ));
+
+	const int iuu = dev_iu_Fun(startX, endX);
+	const int juu = dev_iu_Fun(startY, endY);
+	const int kuu = dev_iu_Fun(startZ, endZ);
+}
+
+template<typename T>
+__device__ thrust::pair<T, T> calculateAlpha(T __MINO__, T __OBJSTP__, T start, T end, const unsigned int __OBJ__) {
 	T dirX = dev_alpha_IFun(__MINO__, __OBJSTP__, start, end, 0);
 	T dirY = dev_alpha_IFun(__MINO__, __OBJSTP__, start, end, __OBJ__);
 	if (dirX < dirY) {
@@ -815,13 +872,14 @@ std::pair<T, T> calculateAlpha(T __MINO__, T __OBJSTP__, T start, T end, const u
 }
 
 template<typename T>
-inline __host__ __device__ T calSiddonOneRayKer(const T& startX, const T& startY, const T& startZ,
+inline __device__ T calSiddonOneRayKer(const T& startX, const T& startY, const T& startZ,
 	const T& endX, const T& endY, const T& endZ,
 	const T& __MINOL__, const T& __MINOW__, const T& __MINOH__,
 	const T& __OBJSTPL__, const T& __OBJSTPW__, const T& __OBJSTPH__,
 	const unsigned int& __OBJLR__, const unsigned int& __OBJWR__, const unsigned int& __OBJHR__,
 	T* dev_vol, T* totWeight)
 {
+
 	T dirX = endX - startX;
 	T dirY = endY - startY;
 	T dirZ = endZ - startZ;
@@ -829,9 +887,9 @@ inline __host__ __device__ T calSiddonOneRayKer(const T& startX, const T& startY
 	const T dconv = sqrtf(dirX * dirX + dirY * dirY + dirZ * dirZ);
 	int imin(0), imax(0), jmin(0), jmax(0), kmin(0), kmax(0);
 
-	std::pair<T, T> alpX = calculateAlpha(__MINOL__, __OBJSTPL__, startX, endX, __OBJLR__);
-	std::pair<T, T> alpY = calculateAlpha(__MINOW__, __OBJSTPW__, startY, endY, __OBJWR__);
-	std::pair<T, T> alpZ = calculateAlpha(__MINOH__, __OBJSTPH__, startZ, endZ, __OBJHR__);
+	thrust::pair<T, T> alpX = calculateAlpha(__MINOL__, __OBJSTPL__, startX, endX, __OBJLR__);
+	thrust::pair<T, T> alpY = calculateAlpha(__MINOW__, __OBJSTPW__, startY, endY, __OBJWR__);
+	thrust::pair<T, T> alpZ = calculateAlpha(__MINOH__, __OBJSTPH__, startZ, endZ, __OBJHR__);
 	T alphaxmin = alpX.first;
 	T alphaxmax = alpX.second;
 	T alphaymin = alpY.first;
@@ -913,6 +971,9 @@ inline __host__ __device__ T calSiddonOneRayKer(const T& startX, const T& startY
 
 	return d12;
 }
+
+
+
 
 
 
