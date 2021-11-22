@@ -190,50 +190,20 @@ inline __host__ __device__  int dev_iu_Fun(const T& start, const T& end) {
 
 
 /// \brief SIDDON kernel function 4
+template<typename T>
 inline	__host__ __device__ void dev_minmaxIdxFun(
-	const double& pstart, const double& pend,
-	const double& b, const double& d,
-	const double& alphaMIN, const double& alphaMAX,
-	const double& alphaPmin, const double& alphaPmax,
+	const T& pstart, const T& pend,
+	const T& b, const T& d,
+	const T& alphaMIN, const T& alphaMAX,
+	const T& alphaPmin, const T& alphaPmax,
 	const unsigned int& Nplane, int* imin, int* imax)
 {
-	if (pstart < pend)
-	{
-		if (IS_ZERO<double>(alphaMIN - alphaPmin))
-		{
-			*imin = 1;
-		}
-		else
-		{
-			*imin = static_cast<int>(ceil(dev_varphiFun(alphaMIN, b, d, pstart, pend)));
-		}
-		if (IS_ZERO<double>(alphaMAX - alphaPmax))
-		{
-			*imax = Nplane - 1;
-		}
-		else
-		{
-			*imax = static_cast<int>(floor(dev_varphiFun(alphaMAX, b, d, pstart, pend)));
-		}
-	}
-	else
-	{
-		if (IS_ZERO<double>(alphaMIN - alphaPmin))
-		{
-			*imax = Nplane - 2;
-		}
-		else
-		{
-			*imax = static_cast<int>(floor(dev_varphiFun(alphaMIN, b, d, pstart, pend)));
-		}
-		if (IS_ZERO<double>(alphaMAX - alphaPmax))
-		{
-			*imin = 0;
-		}
-		else
-		{
-			*imin = static_cast<int>(ceil(dev_varphiFun(alphaMAX, b, d, pstart, pend)));
-		}
+	if (pstart < pend) {
+		*imin = IS_ZERO<T>(alphaMIN - alphaPmin) ? 1 : static_cast<int>(ceil(dev_varphiFun(alphaMIN, b, d, pstart, pend)));
+		*imax = IS_ZERO<T>(alphaMAX - alphaPmax) ? Nplane - 1 : static_cast<int>(floor(dev_varphiFun(alphaMAX, b, d, pstart, pend)));
+	} else {
+		*imin = IS_ZERO<T>(alphaMAX - alphaPmax) ? 0 : static_cast<int>(ceil(dev_varphiFun(alphaMAX, b, d, pstart, pend)));
+		*imax = IS_ZERO<T>(alphaMIN - alphaPmin) ? Nplane - 2 : static_cast<int>(floor(dev_varphiFun(alphaMIN, b, d, pstart, pend)));
 	}
 }
 
