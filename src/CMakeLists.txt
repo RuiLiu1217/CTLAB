@@ -44,14 +44,11 @@ SET(CTLAB_HEADERS
 	spectralCTscan.hpp      # The interface of spectral CT projection simulation
 	#DD3_demo.hpp	# The interface of the demo of the Branchless DD
 	readwrite.hpp           # Read and write the raw data (in GPU or CPU) from/to disk
-	FastMatrixVectorMultiplication.hpp # Fast Matrix-Vector multiplication function in GPU
-	genModifiedPhantom.hpp  # Generate modified Shepp-Logan phantom in GPU
-	Ellipsoid.h             # kernel function for generation Shepp-Logan projection
-	genSheppLoganProjection.h # Generate Shepp Logan phantom based projection
+	# FastMatrixVectorMultiplication.hpp # Fast Matrix-Vector multiplication function in GPU
+	# genSheppLoganProjection.h # Generate Shepp Logan phantom based projection
 	genSysMatrix.hpp        # Generate system matrix with SIDDON/AIM model
 	multiSlices_ker.cuh     # multi slices based projection and backprojection
 	Geometry.h
-	OldCodes.h
 	CTLAB.h
 	TextureObjectProvider.h
 	GenerateSummedAreaTable.h
@@ -84,7 +81,7 @@ SET(CTLAB_SRC
 	spectralCTscan.cpp 	# The spectral CT projection simulation in CPU
 	spectralCTscan.cu 	# The spectral CT projection simulation in GPU
 #	DD3_demo.cu	# The interface of the demo of the Branchless DD
-	FastMatrixVectorMultiplication.cu # Fast Matrix-Vector multiplication function in GPU
+	# FastMatrixVectorMultiplication.cu # Fast Matrix-Vector multiplication function in GPU
 	genModifiedPhantom.cu   # Generate modified Shepp-Logan phantom in GPU
 	genSheppLoganProjection.cpp # Generate Shepp Logan phantom based projection
 	genSysMatrix.cpp        # Generate system matrix with SIDDON/AIM model

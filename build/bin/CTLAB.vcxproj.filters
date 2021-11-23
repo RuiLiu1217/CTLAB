@@ -96,25 +96,10 @@
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\readwrite.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\FastMatrixVectorMultiplication.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genModifiedPhantom.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Ellipsoid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSheppLoganProjection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSysMatrix.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Geometry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\OldCodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\CTLAB.h">
@@ -179,9 +164,6 @@
     <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\spectralCTscan.cu">
       <Filter>Source Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\FastMatrixVectorMultiplication.cu">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genModifiedPhantom.cu">
       <Filter>Source Files</Filter>
     </CustomBuild>
@@ -226,9 +208,6 @@
       <Filter>Object Files</Filter>
     </Object>
     <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_spectralCTscan.cu.obj">
-      <Filter>Object Files</Filter>
-    </Object>
-    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_FastMatrixVectorMultiplication.cu.obj">
       <Filter>Object Files</Filter>
     </Object>
     <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_genModifiedPhantom.cu.obj">

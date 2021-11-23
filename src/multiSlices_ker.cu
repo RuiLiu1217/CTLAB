@@ -998,22 +998,6 @@ void MultiSlices_DDBACK(
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 __global__ void MultiSlices_PDPROJ_ker(
 		cudaTextureObject_t texObj,
 		float* proj,

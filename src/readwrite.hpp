@@ -12,12 +12,12 @@
 template<typename T>
 std::vector<T> readData(const std::string& fileName, const size_t fileSize) {
 	std::vector<T> res(fileSize, 0);
-	std::ifstream fin(FileName.c_str(), std::ios::binary);
+	std::ifstream fin(fileName.c_str(), std::ios::binary);
 	if (!fin.is_open()) {
 		std::cout << "Cannot open File " << fileName << std::endl;
 		exit(-1);
 	}
-	fin.read((char*)res, sizeof(T) * FileSize);
+	fin.read((char*)res, sizeof(T) * fileSize);
 	fin.close();
 	return res;
 }

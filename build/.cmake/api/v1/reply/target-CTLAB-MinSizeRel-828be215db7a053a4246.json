@@ -12,7 +12,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "lib/RelWithDebInfo/CTLAB.lib"
+			"path" : "lib/MinSizeRel/CTLAB.lib"
 		}
 	],
 	"backtrace" : 2,
@@ -38,7 +38,7 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 149,
+				"line" : 146,
 				"parent" : 0
 			},
 			{
@@ -50,7 +50,7 @@
 			{
 				"command" : 2,
 				"file" : 1,
-				"line" : 141,
+				"line" : 138,
 				"parent" : 0
 			},
 			{
@@ -73,7 +73,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc  -openmp /MD /Zi /O2 /Ob1 /DNDEBUG"
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc  -openmp /MD /O1 /Ob1 /DNDEBUG"
 				}
 			],
 			"includes" : 
@@ -90,23 +90,23 @@
 			"language" : "CXX",
 			"sourceIndexes" : 
 			[
-				18,
+				17,
+				19,
 				20,
-				21,
-				23,
-				25,
-				27,
-				31,
+				22,
+				24,
+				26,
+				29,
+				30,
 				32,
-				34,
+				33,
 				35,
 				37,
+				38,
 				39,
 				40,
 				41,
-				42,
-				43,
-				44
+				42
 			]
 		}
 	],
@@ -142,14 +142,14 @@
 				9,
 				10,
 				11,
-				12,
-				13
+				12
 			]
 		},
 		{
 			"name" : "Source Files",
 			"sourceIndexes" : 
 			[
+				13,
 				14,
 				15,
 				16,
@@ -178,23 +178,23 @@
 				39,
 				40,
 				41,
-				42,
-				43,
-				44
+				42
 			]
 		},
 		{
 			"name" : "",
 			"sourceIndexes" : 
 			[
-				45,
-				65
+				43,
+				59
 			]
 		},
 		{
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
+				44,
+				45,
 				46,
 				47,
 				48,
@@ -208,25 +208,18 @@
 				56,
 				57,
 				58,
-				59,
 				60,
 				61,
 				62,
 				63,
 				64,
+				65,
 				66,
 				67,
 				68,
 				69,
 				70,
-				71,
-				72,
-				73,
-				74,
-				75,
-				76,
-				77,
-				78
+				71
 			]
 		}
 	],
@@ -284,12 +277,6 @@
 			"backtrace" : 2,
 			"isGenerated" : true,
 			"path" : "build/bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_spectralCTscan.cu.obj",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 2,
-			"isGenerated" : true,
-			"path" : "build/bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_FastMatrixVectorMultiplication.cu.obj",
 			"sourceGroupIndex" : 0
 		},
 		{
@@ -395,11 +382,6 @@
 		{
 			"backtrace" : 2,
 			"path" : "src/spectralCTscan.cu",
-			"sourceGroupIndex" : 1
-		},
-		{
-			"backtrace" : 2,
-			"path" : "src/FastMatrixVectorMultiplication.cu",
 			"sourceGroupIndex" : 1
 		},
 		{
@@ -565,26 +547,6 @@
 		},
 		{
 			"backtrace" : 2,
-			"path" : "src/FastMatrixVectorMultiplication.hpp",
-			"sourceGroupIndex" : 3
-		},
-		{
-			"backtrace" : 2,
-			"path" : "src/genModifiedPhantom.hpp",
-			"sourceGroupIndex" : 3
-		},
-		{
-			"backtrace" : 2,
-			"path" : "src/Ellipsoid.h",
-			"sourceGroupIndex" : 3
-		},
-		{
-			"backtrace" : 2,
-			"path" : "src/genSheppLoganProjection.h",
-			"sourceGroupIndex" : 3
-		},
-		{
-			"backtrace" : 2,
 			"path" : "src/genSysMatrix.hpp",
 			"sourceGroupIndex" : 3
 		},
@@ -596,11 +558,6 @@
 		{
 			"backtrace" : 2,
 			"path" : "src/Geometry.h",
-			"sourceGroupIndex" : 3
-		},
-		{
-			"backtrace" : 2,
-			"path" : "src/OldCodes.h",
 			"sourceGroupIndex" : 3
 		},
 		{

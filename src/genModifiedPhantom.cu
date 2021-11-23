@@ -1,4 +1,5 @@
-#include "genModifiedPhantom.hpp"
+#include "CTLAB.h"
+#include "cudaCheckReturner.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -103,18 +104,16 @@ void generateModiPhantom_template(
 	T *axis = new T[30];
 	T *d_axis;
 	const unsigned int totSize = lenReso * widReso * heiReso;
-	try
-	{
+	try	{
 		phantom = new T[totSize];
-	}
-	catch (std::bad_alloc)
-	{
+	} catch (std::bad_alloc) {
+		// Todo: try to logging it.
 		std::cout << "Your requirement is too large!\n";
 		exit(-1);
 	}
 	memset(phantom, 0, totSize);
-	for (unsigned int ElpIndex = 0; ElpIndex != 10; ++ElpIndex)
-	{
+
+	for (unsigned int ElpIndex = 0; ElpIndex != 10; ++ElpIndex)	{
 		axis[ElpIndex * 3 + 0] = pow(PhPar[ElpIndex * 11 + 0], 2);
 		axis[ElpIndex * 3 + 1] = pow(PhPar[ElpIndex * 11 + 1], 2);
 		axis[ElpIndex * 3 + 2] = pow(PhPar[ElpIndex * 11 + 2], 2);
@@ -123,42 +122,14 @@ void generateModiPhantom_template(
 	dim3 blockSize(8, 8, 8);
 	dim3 gridSize((lenReso + blockSize.x - 1) / blockSize.x, (widReso + blockSize.y - 1) / blockSize.y, (heiReso + blockSize.z - 1) / blockSize.z);
 
-	cudaError_t cudaStatus;
-	cudaStatus = cudaMalloc((void**) &d_PhPar, sizeof(T) * 110);
-	if (cudaStatus != cudaSuccess)
-	{
-		std::cerr << "Malloc Space for matrix failed\n";
-		exit(-1);
-	}
-	cudaStatus = cudaMalloc((void**) &d_phantom, sizeof(T)*totSize);
-	if (cudaStatus != cudaSuccess)
-	{
-		std::cerr << "Malloc space for phantom in GPU failed\n";
-		std::cerr << "Please call CPU version\n";
-		cudaFree(d_PhPar);
-		exit(-1); //change here
-	}
-	cudaStatus = cudaMalloc((void**) &d_axis, sizeof(T) * 30);
-	if (cudaStatus != cudaSuccess)
-	{
-		std::cerr << "Allocate Axis Failed\n";
-		cudaFree(d_PhPar);
-		cudaFree(d_phantom);
-		exit(-1);
-	}
-
-	cudaMemcpy(d_axis, axis, sizeof(T) * 30, cudaMemcpyHostToDevice);
-	cudaMemset(d_phantom, 0, sizeof(T)*totSize);
-
-	cudaStatus = cudaMemcpy(d_PhPar, PhPar, sizeof(T) * 110, cudaMemcpyHostToDevice);
-	if (cudaStatus != cudaSuccess)
-	{
-		std::cerr << "Copy ph par failed\n";
-		cudaFree(d_PhPar);
-		cudaFree(d_phantom);
-		cudaFree(d_axis);
-		exit(-1);
-	}
+	
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_PhPar, sizeof(T) * 110));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_phantom, sizeof(T)*totSize));
+	CUDA_CHECK_RETURN(cudaMalloc((void**) &d_axis, sizeof(T) * 30));
+	CUDA_CHECK_RETURN(cudaMemcpy(d_axis, axis, sizeof(T) * 30, cudaMemcpyHostToDevice));
+	CUDA_CHECK_RETURN(cudaMemset(d_phantom, 0, sizeof(T)*totSize));
+	CUDA_CHECK_RETURN(cudaMemcpy(d_PhPar, PhPar, sizeof(T) * 110, cudaMemcpyHostToDevice));
+	
 	T halfx = (lenReso - 1)*0.5f;
 	T halfy = (widReso - 1)*0.5f;
 	T halfz = (widReso - 1)*0.5f;
@@ -168,18 +139,16 @@ void generateModiPhantom_template(
 
 	genModiPhKer<T> << <gridSize, blockSize >> >(d_phantom, d_PhPar, d_axis, halfx, halfy, halfz, deltax, deltay, deltaz, lenReso, widReso, heiReso);
 
-	cudaMemcpy(phantom, d_phantom, sizeof(T)*totSize, cudaMemcpyDeviceToHost);
+	CUDA_CHECK_RETURN(cudaMemcpy(phantom, d_phantom, sizeof(T)*totSize, cudaMemcpyDeviceToHost));
 	std::ofstream fout(FileName.c_str(), std::ios::binary);
 	fout.write((char*) phantom, sizeof(T)*lenReso*widReso*heiReso);
 	fout.close();
 }
 
-void generateModiPhantomFloat(const std::string& FileName, const unsigned int& lenReso, const unsigned int& widReso, const unsigned int& heiReso)
-{
+void generateModiPhantomFloat(const std::string& FileName, const unsigned int& lenReso, const unsigned int& widReso, const unsigned int& heiReso) {
 	generateModiPhantom_template<float>(FileName, lenReso, widReso, heiReso);
 }
-void generateModiPhantomDouble(const std::string& FileName, const unsigned int& lenReso, const unsigned int& widReso, const unsigned int& heiReso)
-{
+void generateModiPhantomDouble(const std::string& FileName, const unsigned int& lenReso, const unsigned int& widReso, const unsigned int& heiReso) {
 	generateModiPhantom_template<double>(FileName, lenReso, widReso, heiReso);
 }
 
