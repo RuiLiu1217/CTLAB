@@ -34,9 +34,9 @@ FanEDGeo::FanEDGeo(const FanEDGeo& rhs)
 }
 
 
-FanEDGeo::FanEDGeo(const float S2O, const float O2D, const unsigned int ViwN,
+FanEDGeo::FanEDGeo(const float S2O, const float O2D, const int ViwN,
 	const float ViwBeg, const float ViwEnd, const float DetSize,
-	const unsigned int DetN) :m_S2O(S2O), m_O2D(O2D), m_S2D(S2O + O2D),
+	const int DetN) :m_S2O(S2O), m_O2D(O2D), m_S2D(S2O + O2D),
 	m_ViwN(ViwN), m_ViwBeg(ViwBeg), m_ViwStp((ViwEnd - ViwBeg) / ViwN),
 	m_DetSize(DetSize), m_DetN(DetN), m_DetStp(DetSize / DetN),
 	m_DetCntIdx(DetN * 0.5f - 0.5f) {}

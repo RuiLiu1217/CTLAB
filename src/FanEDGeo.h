@@ -8,12 +8,12 @@ public:
 	float m_O2D; ///< Object to Detector distance
 	float m_S2D; ///< Source to Detector distance
 
-	unsigned int m_ViwN; ///< view number
+	int m_ViwN; ///< view number
 	float m_ViwBeg;///< View begin
 	float m_ViwStp; ///< View Step
 
 	float m_DetSize; ///< Detector size;
-	unsigned int m_DetN; ///< How many detector cells
+	int m_DetN; ///< How many detector cells
 	float m_DetStp; ///< detector cells size;
 	float m_DetCntIdx; ///< detector center index;
 public:
@@ -31,9 +31,9 @@ public:
 	/// \param ViwEnd The end of the view
 	/// \param DetSize Detector size
 	/// \param DetN detector cells number on one row
-	FanEDGeo(const float S2O, const float O2D, const unsigned int ViwN,
+	FanEDGeo(const float S2O, const float O2D, const int ViwN,
 		const float ViwBeg, const float ViwEnd, const float DetSize,
-		const unsigned int DetN);
+		const int DetN);
 
 };
 #endif
