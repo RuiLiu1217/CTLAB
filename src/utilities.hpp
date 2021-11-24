@@ -551,27 +551,86 @@ INLINE __host__ __device__ T bilierp(T v0, T v1, T v2, T v3, T t1, T t2)
 	return fma(t2, vv1, fma(-t2, vv0, vv0));
 }
 
+template<typename T>
+INLINE __host__ __device__ bool intersectBox(
+	T sx, T sy, T sz,
+	T dx, T dy, T dz,
+	T bminx, T bminy, T bminz,
+	T bmaxx, T bmaxy, T bmaxz,
+	T* tnear, T* tfar) {
 
+	T invRx = dx == 0 ? 1.0E19 : 1.0f / dx;
+	T invRy = dy == 0 ? 1.0E19 : 1.0f / dy;
+	T invRz = dz == 0 ? 1.0E19 : 1.0f / dz;
+
+	T tbotx = invRx * (bminx - sx);
+	T tboty = invRy * (bminy - sy);
+	T tbotz = invRz * (bminz - sz);
+
+	T ttopx = invRx * (bmaxx - sx);
+	T ttopy = invRy * (bmaxy - sy);
+	T ttopz = invRz * (bmaxz - sz);
+
+	T tminx = fminf(tbotx, ttopx);
+	T tminy = fminf(tboty, ttopy);
+	T tminz = fminf(tbotz, ttopz);
+
+	T tmaxx = fmaxf(tbotx, ttopx);
+	T tmaxy = fmaxf(tboty, ttopy);
+	T tmaxz = fmaxf(tbotz, ttopz);
+
+	T largest_tmin = fmaxf(tminx, fmaxf(tminy, tminz));
+	T smallest_tmax = fminf(tmaxx, fminf(tmaxy, tmaxz));
+	*tnear = largest_tmin;
+	*tfar = smallest_tmax;
+	return smallest_tmax > largest_tmin;
+}
+
+
+template<typename T>
+INLINE __host__ __device__ bool intersectBox(
+	T sx, T sy,
+	T dx, T dy,
+	T bminx, T bminy,
+	T bmaxx, T bmaxy,
+	T* tnear, T* tfar) {
+
+	T invRx = dx == 0 ? 1.0E19 : 1.0f / dx;
+	T invRy = dy == 0 ? 1.0E19 : 1.0f / dy;
+	
+
+	T tbotx = invRx * (bminx - sx);
+	T tboty = invRy * (bminy - sy);
+
+	T ttopx = invRx * (bmaxx - sx);
+	T ttopy = invRy * (bmaxy - sy);
+
+	T tminx = fminf(tbotx, ttopx);
+	T tminy = fminf(tboty, ttopy);
+
+	T tmaxx = fmaxf(tbotx, ttopx);
+	T tmaxy = fmaxf(tboty, ttopy);
+
+	T largest_tmin = fmaxf(tminx, tminy);
+	T smallest_tmax = fminf(tmaxx,tmaxy);
+	*tnear = largest_tmin;
+	*tfar = smallest_tmax;
+	return smallest_tmax > largest_tmin;
+}
 
 INLINE __host__ __device__ bool intersectBox(
 	const float3& sour,
 	const float3& dir,
 	const float3& boxmin,
 	const float3& boxmax,
-	float* tnear, float* tfar)
-{
-	const float3 invR = make_float3(1.0 / dir.x, 1.0 / dir.y, 1.0 / dir.z);
-	const float3 tbot = invR * (boxmin - sour);
-	const float3 ttop = invR * (boxmax - sour);
+	float* tnear, float* tfar) {
 
-	const float3 tmin = fminf(ttop, tbot);
-	const float3 tmax = fmaxf(ttop, tbot);
-
-	const float largest_tmin = fmaxf(tmin);
-	const float smallest_tmax = fminf(tmax);
-	*tnear = largest_tmin;
-	*tfar = smallest_tmax;
-	return smallest_tmax > largest_tmin;
+	return intersectBox(
+		sour.x, sour.y, sour.z,
+		dir.x, dir.y, dir.z,
+		boxmin.x, boxmin.y, boxmin.z,
+		boxmax.x, boxmax.y, boxmax.z,
+		tnear, tfar);
 }
 
 
@@ -954,46 +1013,13 @@ inline __device__ T calSiddonOneRayKer(const T& startX, const T& startY, const T
 /// \param tnear pointer to the near intersection parameter
 /// \param tfar pointer to the far intersection parameter
 /// \return intersection or not
-inline	__host__ __device__ bool intersectBox(Ray2D r, float2 boxmin, float2 boxmax, float *tnear, float *tfar)
-{
-	// compute intersection of ray with all six bbox planes
-	float2 invR = make_float2(1.0f, 1.0f) / r.d;
-	float2 tbot = invR * (boxmin - r.o);
-	float2 ttop = invR * (boxmax - r.o);
-
-	// re-order intersections to find smallest and largest on each axis
-	float2 tmin = fminf(ttop, tbot);
-	float2 tmax = fmaxf(ttop, tbot);
-
-	// find the largest tmin and the smallest tmax
-	float largest_tmin = fmaxf(tmin.x, tmin.y);
-	float smallest_tmax = fminf(tmax.x, tmax.y);
-
-	*tnear = largest_tmin;
-	*tfar = smallest_tmax;
-
-	return smallest_tmax > largest_tmin;
+inline	__host__ __device__ bool intersectBox(Ray2D r, float2 boxmin, float2 boxmax, float *tnear, float *tfar) {
+	return intersectBox<float>(r.o.x, r.o.y, r.d.x, r.d.y, boxmin.x, boxmin.y, boxmax.x, boxmax.y, tnear, tfar);
+		
 }
 
-inline	__host__ __device__ bool intersectBox(Ray2D r, double2 boxmin, double2 boxmax, double *tnear, double *tfar)
-{
-	// compute intersection of ray with all six bbox planes
-	double2 invR = make_double2(1.0f, 1.0f) / r.d;
-	double2 tbot = invR * (boxmin - r.o);
-	double2 ttop = invR * (boxmax - r.o);
-
-	// re-order intersections to find smallest and largest on each axis
-	double2 tmin = fminf(ttop, tbot);
-	double2 tmax = fmaxf(ttop, tbot);
-
-	// find the largest tmin and the smallest tmax
-	double largest_tmin = fmax(tmin.x, tmin.y);
-	double smallest_tmax = fmin(tmax.x, tmax.y);
-
-	*tnear = largest_tmin;
-	*tfar = smallest_tmax;
-
-	return smallest_tmax > largest_tmin;
+inline	__host__ __device__ bool intersectBox(Ray2D r, double2 boxmin, double2 boxmax, double *tnear, double *tfar) {
+	return intersectBox<double>(r.o.x, r.o.y, r.d.x, r.d.y, boxmin.x, boxmin.y, boxmax.x, boxmax.y, tnear, tfar);
 }
 
 
@@ -1004,46 +1030,22 @@ inline	__host__ __device__ bool intersectBox(Ray2D r, double2 boxmin, double2 bo
 /// \param tnear pointer to the near intersection parameter
 /// \param tfar pointer to the far intersection parameter
 /// \return intersection or not
-inline __host__ __device__ int intersectBox(Ray r, float3 boxmin, float3 boxmax, float *tnear, float *tfar)
-{
-	// compute intersection of ray with all six bbox planes
-	float3 invR = make_float3(1.0f,1.0f,1.0f) / r.d;
-	float3 tbot = invR * (boxmin - r.o);
-	float3 ttop = invR * (boxmax - r.o);
-
-	// re-order intersections to find smallest and largest on each axis
-	float3 tmin = fminf(ttop, tbot);
-	float3 tmax = fmaxf(ttop, tbot);
-
-	// find the largest tmin and the smallest tmax
-	float largest_tmin = fmaxf(fmaxf(tmin.x, tmin.y), fmaxf(tmin.x, tmin.z));
-	float smallest_tmax = fminf(fminf(tmax.x, tmax.y), fminf(tmax.x, tmax.z));
-
-	*tnear = largest_tmin;
-	*tfar = smallest_tmax;
-
-	return smallest_tmax > largest_tmin;
+inline __host__ __device__ int intersectBox(Ray r, float3 boxmin, float3 boxmax, float *tnear, float *tfar) {
+	return intersectBox(
+		r.o.x, r.o.y, r.o.z,
+		r.d.x, r.d.y, r.d.z,
+		boxmin.x, boxmin.y, boxmin.z,
+		boxmax.x, boxmax.y, boxmax.z,
+		tnear, tfar);
 }
 
-inline __host__ __device__ int intersectBox(Ray r, double3 boxmin, double3 boxmax, double *tnear, double *tfar)
-{
-	// compute intersection of ray with all six bbox planes
-	double3 invR = make_double3(1.0f, 1.0f, 1.0f) / r.d;
-	double3 tbot = invR * (boxmin - r.o);
-	double3 ttop = invR * (boxmax - r.o);
-
-	// re-order intersections to find smallest and largest on each axis
-	double3 tmin = fminf(ttop, tbot);
-	double3 tmax = fmaxf(ttop, tbot);
-
-	// find the largest tmin and the smallest tmax
-	double largest_tmin = fmax(fmax(tmin.x, tmin.y), fmax(tmin.x, tmin.z));
-	double smallest_tmax = fmin(fmin(tmax.x, tmax.y), fmin(tmax.x, tmax.z));
-
-	*tnear = largest_tmin;
-	*tfar = smallest_tmax;
-
-	return smallest_tmax > largest_tmin;
+inline __host__ __device__ int intersectBox(Ray r, double3 boxmin, double3 boxmax, double *tnear, double *tfar) {
+	return intersectBox<double>(
+		r.o.x, r.o.y, r.o.z,
+		r.d.x, r.d.y, r.d.z,
+		boxmin.x, boxmin.y, boxmin.z,
+		boxmax.x, boxmax.y, boxmax.z,
+		tnear, tfar);
 }
 
 template<typename T>
