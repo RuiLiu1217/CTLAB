@@ -30,13 +30,13 @@ extern "C" { // Tested
 		const unsigned int& heiReso = 256);
 }
 
-/// \brief calculate the analytical projection of a Shepp-Logan Phantom
+/// \brief Generate the analytical projection of a Shepp-Logan Phantom. Assume the detector shape is arc.
 /// \param sid source to iso-center distance
 /// \param sdd source to detector distance
 /// \param DNU number of detector cell along channel direction
 /// \param angs all views
 /// \param col_size detector size 
-/// \param col_offset offset of the detector along column direction (channel direction)
+/// \param col_offset offset of the detector along column direction
 /// Example: calculateProjection(3.0f, 5.0f, 888, angs, 0.003f, 0.0f);
 std::vector<float> calculateProjection(
 	const float sid, const float sdd, const int DNU, std::vector<float> angs, const float col_size, const float col_offset);

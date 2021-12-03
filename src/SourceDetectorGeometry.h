@@ -1,0 +1,5 @@
+#ifndef SOURCE_DETECTOR_GEOMETRY_H_
+#define SOURCE_DETECTOR_GEOMETRY_H_
+
+
+#endif
