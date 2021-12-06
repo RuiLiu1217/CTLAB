@@ -37,7 +37,7 @@ extern "C" { // Tested
 /// \param angs all views
 /// \param col_size detector size 
 /// \param col_offset offset of the detector along column direction
-/// Example: calculateProjection(3.0f, 5.0f, 888, angs, 0.003f, 0.0f);
+/// Example: calculateProjection(3.0f, 5.0f, 888, angs, 0.003f, 0.0f); // The phantom size is 1.0x1.0
 std::vector<float> calculateProjection(
 	const float sid, const float sdd, const int DNU, std::vector<float> angs, const float col_size, const float col_offset);
 
