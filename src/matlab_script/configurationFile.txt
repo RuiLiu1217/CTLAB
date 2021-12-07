@@ -1,0 +1,14 @@
+SourceToObject= 5.385200195312500e+02
+ObjectToDetect= 4.082259521484375e+02
+ViewNum= 720
+ViewBegin= 0
+ViewStp= 0.008726646259972
+DetArcSize= 0.95928517242269f
+DetEleNum= 888
+DetCntIdx= 444
+ImageLength= 4.484740011196460e+02
+ImageWidth= 4.484740011196460e+02
+ImageLengthResolution= 512
+ImageWidthResolution= 512
+ImageBiasX= 0
+ImageBiasY= 0
