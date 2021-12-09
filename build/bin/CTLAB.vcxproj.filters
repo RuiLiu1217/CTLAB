@@ -52,6 +52,15 @@
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Volume.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Projection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Detector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\XraySource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\utilities.hpp">
@@ -133,6 +142,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Volume.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Projection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Detector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\XraySource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

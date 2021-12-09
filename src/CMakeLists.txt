@@ -60,6 +60,9 @@ SET(CTLAB_HEADERS
 	ConeEDGeo.h
 	Image.h
 	Volume.h
+	Projection.h
+	Detector.h
+	XraySource.h
 	# DD3_GPU_doublePrecisonBranchless.h
 	
 )
@@ -97,6 +100,9 @@ SET(CTLAB_SRC
 	ConeEDGeo.cpp
 	Image.cpp
 	Volume.cpp
+	Projection.cpp
+	Detector.cpp
+	XraySource.cpp
 	# DD3_GPU_doublePrecisonBranchless.cu
 )
 

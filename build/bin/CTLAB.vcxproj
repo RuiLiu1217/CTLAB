@@ -1339,6 +1339,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ConeEDGeo.cpp" />
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Image.cpp" />
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Volume.cpp" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Projection.cpp" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Detector.cpp" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\XraySource.cpp" />
     <None Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\utilities.cuh">
     </None>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\utilities.hpp" />
@@ -1370,6 +1373,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ConeEDGeo.h" />
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Image.h" />
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Volume.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Projection.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Detector.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\XraySource.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\ZERO_CHECK.vcxproj">

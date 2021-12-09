@@ -1954,6 +1954,55 @@ void DD3Proj_gpu(
 	}
 }
 
+void Proj(Image& image, float x0, float y0, float z0, int DNU, int DNV, float* xds, float* yds, float* zds,
+	float* hangs, float* hzPos, int PN, float* hprj, byte* mask, int gpunum, int prjMode) {
+	const float imgXCenter = image.getCentX();
+	const float imgYCenter = image.getCentY();
+	const float imgZCenter = image.getCentZ();
+	const int XN = image.getResoX();
+	const int YN = image.getResoY();
+	const int ZN = image.getResoZ();
+	const float dx = image.getDx();
+	const float dz = image.getDz();
+	float* hvol = image.getDataPtr();
+	
+	DD3Proj_gpu(x0, y0, z0, DNU, DNV, xds, yds, zds,
+		imgXCenter, imgYCenter, imgZCenter, hangs, hzPos, PN,
+		XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum, prjMode);
+}
+
+
+void Proj(Image& image, Projection& projection, byte* mask, int gpunum, int prjMode) {
+	const float imgXCenter = image.getCentX();
+	const float imgYCenter = image.getCentY();
+	const float imgZCenter = image.getCentZ();
+	const int XN = image.getResoX();
+	const int YN = image.getResoY();
+	const int ZN = image.getResoZ();
+	const float dx = image.getDx();
+	const float dz = image.getDz();
+	float* hvol = image.getDataPtr();
+
+	float* hprj = projection.getDataPtr();
+	int DNU = projection.getDNU();
+	int DNV = projection.getDNV();
+	int PN = projection.getPN();
+	float x0 = projection.getX0();
+	float y0 = projection.getY0();
+	float z0 = projection.getZ0();
+	float* xds = projection.getXdsPtr();
+	float* yds = projection.getYdsPtr();
+	float* zds = projection.getZdsPtr();
+	float* hangs = projection.getAnglePtr();
+	float* hzPos = projection.getZPosPtr();
+
+	DD3Proj_gpu(x0, y0, z0, DNU, DNV, xds, yds, zds,
+		imgXCenter, imgYCenter, imgZCenter, hangs, hzPos, PN,
+		XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum, prjMode);
+}
+
+
+
 //Use the split-collect method to do the projection
 extern "C"
 void DD3ProjHelical_3GPU(

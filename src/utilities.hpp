@@ -1155,36 +1155,36 @@ inline __host__ __device__ void calSV(T initX, T initY,const T& cosT,const T& si
 	SVA[2] = static_cast<T>(detIdx) + plusOne;
 }
 
-
-template <typename T>
-inline __host__ __device__ void calSVASVB(T* SVA, T* SVB, T* sour, const T& cosT, const T& sinT, const FanEAGeo& FanGeo, const Image& Img, cuint detIdx) {
-	T pangle = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp;
-	T initY = -cos(pangle) * FanGeo.m_S2D + FanGeo.m_S2O;
-	T initX = sin(pangle) * FanGeo.m_S2D;
-
-	calSV<T>(initX, initY, cosT, sinT, sour, SVA, detIdx, 0.0);
-
-	pangle = pangle + FanGeo.m_DetStp;
-	initY = -cos(pangle) * FanGeo.m_S2D + FanGeo.m_S2O;
-	initX = sin(pangle) * FanGeo.m_S2D;
-
-	calSV<T>(initX, initY, cosT, sinT, sour, SVB, detIdx, 1.0);
-}
-
-
-template<typename T>
-__host__ __device__ void calSVASVB(T* SVA, T* SVB, T* sour, const T& cosT, const T& sinT, const FanEDGeo& FanGeo, const Image& Img, cuint detIdx)
-{
-	T initX = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp;
-	T initY = -FanGeo.m_O2D;
-
-	calSV<T>(initX, initY, cosT, sinT, sour, SVA, detIdx, 0.0);
-
-	initX = (detIdx - FanGeo.m_DetCntIdx + 1) * FanGeo.m_DetStp;
-	initY = -FanGeo.m_O2D;
-
-	calSV<T>(initX, initY, cosT, sinT, sour, SVB, detIdx, 1.0);
-}
+//
+//template <typename T>
+//inline __host__ __device__ void calSVASVB(T* SVA, T* SVB, T* sour, const T& cosT, const T& sinT, const FanEAGeo& FanGeo, const Image& Img, cuint detIdx) {
+//	T pangle = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp;
+//	T initY = -cos(pangle) * FanGeo.m_S2D + FanGeo.m_S2O;
+//	T initX = sin(pangle) * FanGeo.m_S2D;
+//
+//	calSV<T>(initX, initY, cosT, sinT, sour, SVA, detIdx, 0.0);
+//
+//	pangle = pangle + FanGeo.m_DetStp;
+//	initY = -cos(pangle) * FanGeo.m_S2D + FanGeo.m_S2O;
+//	initX = sin(pangle) * FanGeo.m_S2D;
+//
+//	calSV<T>(initX, initY, cosT, sinT, sour, SVB, detIdx, 1.0);
+//}
+//
+//
+//template<typename T>
+//__host__ __device__ void calSVASVB(T* SVA, T* SVB, T* sour, const T& cosT, const T& sinT, const FanEDGeo& FanGeo, const Image& Img, cuint detIdx)
+//{
+//	T initX = (detIdx - FanGeo.m_DetCntIdx) * FanGeo.m_DetStp;
+//	T initY = -FanGeo.m_O2D;
+//
+//	calSV<T>(initX, initY, cosT, sinT, sour, SVA, detIdx, 0.0);
+//
+//	initX = (detIdx - FanGeo.m_DetCntIdx + 1) * FanGeo.m_DetStp;
+//	initY = -FanGeo.m_O2D;
+//
+//	calSV<T>(initX, initY, cosT, sinT, sour, SVB, detIdx, 1.0);
+//}
 
 template<typename T>
 __host__ __device__ void dev_swap(T& a, T& b) {
@@ -1518,313 +1518,313 @@ inline __host__ __device__ T ComputeCoefficient(const T(&Grid)[4][3], const T(&S
 
 
 
-
-// Generate projection matrix
-// Generate The projection matrix in AIM model
-template<typename T>
-void genProj_AIM(
-		std::vector<int>& rowIdx,
-		std::vector<int>& colIdx,
-		std::vector<T>& coeffs,
-		int angIdx, const T ang, const FanEDGeo FanGeo, const Image Img)
-{
-	int pubIdx = 0;
-	const T ScanR = FanGeo.m_S2O;
-
-	const int XN = Img.m_Reso.x;
-	const int YN = Img.m_Reso.y;
-	const int DN = FanGeo.m_DetN;
-
-	T* PosAry = new T[(XN + 1) * (YN + 1)];
-	for (pubIdx = 0; pubIdx != (XN + 1) * (YN + 1); ++pubIdx)
-	{
-		PosAry[pubIdx] = 0;
-	}
-	const T dx = Img.m_Step.x;
-	const T dy = Img.m_Step.y;
-	const T area = dx * dy;
-	const T DLen = FanGeo.m_DetSize;
-	const T dd = DLen / DN;
-	const T xctr = XN * 0.5;
-	const T yctr = YN * 0.5;
-	const T dctr = FanGeo.m_DetCntIdx;
-	const T cosAng = cos(ang);
-	const T sinAng = sin(ang);
-
-	T Ew[2]; T Ed[2];
-	Ew[0] = -cosAng;
-	Ew[1] = -sinAng;
-	Ed[0] = -sinAng;
-	Ed[1] = cosAng;
-	T SPoint[2];
-	SPoint[0] = ScanR * cosAng;
-	SPoint[1] = ScanR * sinAng;
-
-	int xi(0), yi(0);
-	T xcor(0), ycor(0), dcor(0);
-	T Grid[4][3];
-
-	for (yi = 0; yi <= YN; ++yi)
-	{
-		ycor = (yi - yctr) * dy - SPoint[1];
-		for (xi = 0; xi <= XN; ++xi)
-		{
-			xcor = (xi - xctr) * dx - SPoint[0];
-			dcor = ScanR * (xcor* Ed[0] + ycor * Ed[1]) / (xcor * Ew[0] + ycor * Ew[1]);
-			dcor = dcor / dd;
-			PosAry[yi* (XN + 1) + xi] = dcor + dctr;
-		}
-	}
-
-	int posim(0);
-	T pvalue(0);
-	T pcfun(0);
-	T pdist(0);
-	int MinBV(0);
-	int MaxBV(0);
-	T temp(0);
-	T SVA[3], SVB[3];
-	T pangle(0);
-	int di(0);
-	T coef(0);
-	for (yi = 0; yi < YN; ++yi) {
-		for (xi = 0; xi < XN; ++xi)	{
-			//Fetch the four points of the pixel and their projection positions
-			Grid[0][0] = (xi - xctr)*dx;
-			Grid[0][1] = (yi - yctr)*dy;
-			Grid[0][2] = PosAry[yi*(XN + 1) + xi];
-
-			Grid[1][0] = (xi - xctr + 1)*dx;
-			Grid[1][1] = (yi - yctr)*dy;
-			Grid[1][2] = PosAry[yi*(XN + 1) + xi + 1];
-
-			Grid[2][0] = (xi - xctr + 1)*dx;
-			Grid[2][1] = (yi - yctr + 1)*dy;
-			Grid[2][2] = PosAry[(yi + 1)*(XN + 1) + xi + 1];
-
-			Grid[3][0] = (xi - xctr)*dx;
-			Grid[3][1] = (yi - yctr + 1)*dy;
-			Grid[3][2] = PosAry[(yi + 1)*(XN + 1) + xi];
-
-			SortProjection<T>(Grid);//Sort the projection psotion
-
-			posim = yi*XN + xi;
-			pvalue = 0.0;
-			pdist = hypot((xi + 0.5 - xctr)*dx - SPoint[0], (yi + 0.5 - yctr) * dy - SPoint[1]);
-
-			MinBV = int(Grid[0][2] + 10) - 10;
-			MaxBV = int(Grid[3][2] + 10) - 9;
-			if (MinBV < 0)   MinBV = 0;
-			if (MaxBV > DN)  MaxBV = DN;
-			// Compute the directions of the two lines for the projections
-			for (di = MinBV; di < MaxBV; di++)
-			{
-				temp = (di - dctr) * dd;
-				SVA[0] = -temp * sinAng - SPoint[0];
-				SVA[1] = temp * cosAng - SPoint[1];
-				SVA[2] = di;
-				temp = hypot(SVA[0], SVA[1]); // sqrt(pow(SVA[0], 2) + pow(SVA[1], 2));
-				SVA[0] = SVA[0] / temp;
-				SVA[1] = SVA[1] / temp;
-
-				temp = (di - dctr + 1)*dd;
-				SVB[0] = -temp * sinAng - SPoint[0];
-				SVB[1] = temp * cosAng - SPoint[1];
-				SVB[2] = di + 1;
-				temp = hypot(SVB[0], SVB[1]); // sqrt(pow(SVB[0], 2) + pow(SVB[1], 2));
-				SVB[0] = SVB[0] / temp;
-				SVB[1] = SVB[1] / temp;
-
-				pangle = SVA[0] * SVB[0] + SVA[1] * SVB[1];
-				pangle = sqrt(1 - pow(pangle, 2));
-				//compute the weighting coefficient for a special projection data
-				coef = ComputeCoefficient<T>(Grid, SVA, SVB, SPoint, area);
-				coef = coef / (pdist*pangle);
-				//Main code to forward projection and back projection
-				rowIdx.push_back(angIdx * DN + di);
-				colIdx.push_back(posim);
-				coeffs.push_back(coef);
-			}
-		}
-	}
-	delete [] PosAry;
-}
-
-template<typename T>
-void genProj_AIM(std::vector<int>& rowIdx, std::vector<int>& colIdx, std::vector<T>& coeffs, int angIdx, const T ang, const FanEAGeo FanGeo, const Image Img)
-{
-	const T ScanR = FanGeo.m_S2O;
-	const T ObjR = Img.m_Size.x;
-
-	const int DN = FanGeo.m_DetN;
-	const int XN = Img.m_Reso.x;
-	const int YN = Img.m_Reso.y;
-	const T dx = Img.m_Step.x;
-	const T dy = Img.m_Step.y;
-	const T area = dx * dy;
-	const T xctr = XN * 0.5;
-	const T yctr = YN * 0.5;
-	const T dctr = FanGeo.m_DetCntIdx;
-	const T DtBeta = FanGeo.m_DetStp;
-	T coef;
-	T* PosAry = new T[(XN + 1) * (YN + 1)];
-	T* PBeta = new T[DN];
-	for (int i = 0; i != DN; ++i)
-	{
-		PBeta[i] = (i - dctr + 0.5) * DtBeta;
-	}
-	T Ew[2], Ed[2];
-	const T cosAng = cos(ang);
-	const T sinAng = sin(ang);
-	Ew[0] = -cosAng;
-	Ew[1] = -sinAng;
-	Ed[0] = -sinAng;
-	Ed[1] = cosAng;
-	T SPoint[2];
-	SPoint[0] = ScanR * cosAng;
-	SPoint[1] = ScanR * sinAng;
-	int xi(0), yi(0);
-
-	T xcor, ycor, dcor;
-	T pdist;
-	int di;
-	for (yi = 0; yi <= YN; ++yi)
-	{
-		ycor = (yi - yctr)*dy - SPoint[1];
-		for (xi = 0; xi <= XN; ++xi)
-		{
-			xcor = (xi - xctr)*dx - SPoint[0];
-			dcor = (xcor*Ed[0] + ycor*Ed[1]) / (xcor*Ew[0] + ycor*Ew[1]);
-			dcor = (atan(dcor) - PBeta[0]) / DtBeta;
-			PosAry[yi*(XN + 1) + xi] = dcor + 0.5;
-		}
-	}
-
-	T Grid[4][3];
-	int posim(0);
-	int MinBV(0);
-	int MaxBV(0);
-	T pangle, temp, SVA[3], SVB[3];
-	for (yi = 0; yi < YN; yi++)
-	{
-		for (xi = 0; xi < XN; xi++)
-		{
-			//Fetch the four points of the pixel and their projection positions
-			Grid[0][0] = (xi - xctr)*dx;
-			Grid[0][1] = (yi - yctr)*dy;
-			Grid[0][2] = PosAry[yi*(XN + 1) + xi];
-			Grid[1][0] = (xi - xctr + 1)*dx;
-			Grid[1][1] = (yi - yctr)*dy;
-			Grid[1][2] = PosAry[yi*(XN + 1) + xi + 1];
-			Grid[2][0] = (xi - xctr + 1)*dx;
-			Grid[2][1] = (yi - yctr + 1)*dy;
-			Grid[2][2] = PosAry[(yi + 1)*(XN + 1) + xi + 1];
-			Grid[3][0] = (xi - xctr)*dx;
-			Grid[3][1] = (yi - yctr + 1)*dy;
-			Grid[3][2] = PosAry[(yi + 1)*(XN + 1) + xi];
-			SortProjection<T>(Grid);//Sort the projection psotion
-
-			posim = yi*XN + xi;
-
-			//pvalue = Img[posim];
-			pdist = hypot((xi + 0.5 - xctr)*dx - SPoint[0], (yi + 0.5 - yctr)*dy - SPoint[1]); // sqrt(pow(, 2) + pow(, 2));
-
-			//Computer the weighting coefficient for every projection position
-			MinBV = int(Grid[0][2] + 10) - 10;
-			MaxBV = int(Grid[3][2] + 10) - 9;
-			if (MinBV < 0)   MinBV = 0;
-			if (MaxBV > DN)  MaxBV = DN;
-			//double total =0;
-			for (di = MinBV; di < MaxBV; di++)
-			{
-				// Compute the directions of the two lines for the projections
-				pangle = PBeta[di] - 0.5 * DtBeta;
-				temp = ang + PI - pangle;
-				SVA[0] = cos(temp);
-				SVA[1] = sin(temp);
-				SVA[2] = di;
-				// mexPrintf("di=%d,VA0=%10.8f,VA1=%10.8f,angle=%10.8f,Beta=%10.8f\n",di,SVA[0],SVA[1],temp,pangle);
-				pangle = PBeta[di] + 0.5 * DtBeta;
-				temp = ang + PI - pangle;
-				SVB[0] = cos(temp);
-				SVB[1] = sin(temp);
-				SVB[2] = di + 1;
-
-				//compute the weighting coefficient for a special projection data
-				coef = ComputeCoefficient(Grid, SVA, SVB, SPoint, area);
-				coef = coef / (pdist*abs(DtBeta));
-				rowIdx.push_back(angIdx * DN + di);
-				colIdx.push_back(posim);
-				coeffs.push_back(coef);
-
-			}
-		}
-	}
-
-	delete [] PosAry;
-	delete [] PBeta;
-}
-
-
-template<typename T, typename FanGeometry>
-void genProjectionMatrix_AIM_template_Impl(const FanGeometry FanGeo, const Image Img)
-{
-	unsigned int angIdx = 0;
-	std::vector < int> rowIdx;
-	std::vector < int > colIdx;
-	std::vector < T > coeffs;
-	T ang(0);
-	for (angIdx = 0; angIdx < FanGeo.m_ViwN; ++angIdx)
-	{
-		ang = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
-		genProj_AIM(rowIdx, colIdx, coeffs, angIdx, ang, FanGeo, Img);
-		std::cout << angIdx << std::endl;
-	}
-	int nonZ = rowIdx.size();
-	std::stringstream ss;
-	ss << nonZ;
-	std::string f1;
-	std::string f2;
-	std::string f3;
-	if (sizeof(T) == 4)
-	{
-		f1 = "prjAIM" + ss.str() + "f.row";
-		f2 = "prjAIM" + ss.str() + "f.col";
-		f3 = "prjAIM" + ss.str() + "f.cof";
-	}
-	else if (sizeof(T) == 8)
-	{
-		f1 = "prjAIM" + ss.str() + "d.row";
-		f2 = "prjAIM" + ss.str() + "d.col";
-		f3 = "prjAIM" + ss.str() + "d.cof";
-	}
-
-	std::ofstream rowFile(f1.c_str(), std::ios::binary);
-	std::ofstream colFile(f2.c_str(), std::ios::binary);
-	std::ofstream coeFile(f3.c_str(), std::ios::binary);
-	rowFile.write((char*)&(rowIdx[0]), sizeof(int) * rowIdx.size());
-	rowFile.close();
-	colFile.write((char*)&(colIdx[0]), sizeof(int) * colIdx.size());
-	colFile.close();
-	coeFile.write((char*)&(coeffs[0]), sizeof(T) * coeffs.size());
-	coeFile.close();
-
-	rowFile.close();
-	colFile.close();
-	coeFile.close();
-
-}
-
-template<typename T>
-void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img) {
-	genProjectionMatrix_AIM_template_Impl<T, FanEDGeo>(FanGeo, Img);
-}
-
-template<typename T>
-void genProjectionMatrix_AIM_template(const FanEAGeo FanGeo, const Image Img) {
-	genProjectionMatrix_AIM_template_Impl<T, FanEAGeo>(FanGeo, Img);
-}
-
+//
+//// Generate projection matrix
+//// Generate The projection matrix in AIM model
+//template<typename T>
+//void genProj_AIM(
+//		std::vector<int>& rowIdx,
+//		std::vector<int>& colIdx,
+//		std::vector<T>& coeffs,
+//		int angIdx, const T ang, const FanEDGeo FanGeo, const Image Img)
+//{
+//	int pubIdx = 0;
+//	const T ScanR = FanGeo.m_S2O;
+//
+//	const int XN = Img.m_Reso.x;
+//	const int YN = Img.m_Reso.y;
+//	const int DN = FanGeo.m_DetN;
+//
+//	T* PosAry = new T[(XN + 1) * (YN + 1)];
+//	for (pubIdx = 0; pubIdx != (XN + 1) * (YN + 1); ++pubIdx)
+//	{
+//		PosAry[pubIdx] = 0;
+//	}
+//	const T dx = Img.m_Step.x;
+//	const T dy = Img.m_Step.y;
+//	const T area = dx * dy;
+//	const T DLen = FanGeo.m_DetSize;
+//	const T dd = DLen / DN;
+//	const T xctr = XN * 0.5;
+//	const T yctr = YN * 0.5;
+//	const T dctr = FanGeo.m_DetCntIdx;
+//	const T cosAng = cos(ang);
+//	const T sinAng = sin(ang);
+//
+//	T Ew[2]; T Ed[2];
+//	Ew[0] = -cosAng;
+//	Ew[1] = -sinAng;
+//	Ed[0] = -sinAng;
+//	Ed[1] = cosAng;
+//	T SPoint[2];
+//	SPoint[0] = ScanR * cosAng;
+//	SPoint[1] = ScanR * sinAng;
+//
+//	int xi(0), yi(0);
+//	T xcor(0), ycor(0), dcor(0);
+//	T Grid[4][3];
+//
+//	for (yi = 0; yi <= YN; ++yi)
+//	{
+//		ycor = (yi - yctr) * dy - SPoint[1];
+//		for (xi = 0; xi <= XN; ++xi)
+//		{
+//			xcor = (xi - xctr) * dx - SPoint[0];
+//			dcor = ScanR * (xcor* Ed[0] + ycor * Ed[1]) / (xcor * Ew[0] + ycor * Ew[1]);
+//			dcor = dcor / dd;
+//			PosAry[yi* (XN + 1) + xi] = dcor + dctr;
+//		}
+//	}
+//
+//	int posim(0);
+//	T pvalue(0);
+//	T pcfun(0);
+//	T pdist(0);
+//	int MinBV(0);
+//	int MaxBV(0);
+//	T temp(0);
+//	T SVA[3], SVB[3];
+//	T pangle(0);
+//	int di(0);
+//	T coef(0);
+//	for (yi = 0; yi < YN; ++yi) {
+//		for (xi = 0; xi < XN; ++xi)	{
+//			//Fetch the four points of the pixel and their projection positions
+//			Grid[0][0] = (xi - xctr)*dx;
+//			Grid[0][1] = (yi - yctr)*dy;
+//			Grid[0][2] = PosAry[yi*(XN + 1) + xi];
+//
+//			Grid[1][0] = (xi - xctr + 1)*dx;
+//			Grid[1][1] = (yi - yctr)*dy;
+//			Grid[1][2] = PosAry[yi*(XN + 1) + xi + 1];
+//
+//			Grid[2][0] = (xi - xctr + 1)*dx;
+//			Grid[2][1] = (yi - yctr + 1)*dy;
+//			Grid[2][2] = PosAry[(yi + 1)*(XN + 1) + xi + 1];
+//
+//			Grid[3][0] = (xi - xctr)*dx;
+//			Grid[3][1] = (yi - yctr + 1)*dy;
+//			Grid[3][2] = PosAry[(yi + 1)*(XN + 1) + xi];
+//
+//			SortProjection<T>(Grid);//Sort the projection psotion
+//
+//			posim = yi*XN + xi;
+//			pvalue = 0.0;
+//			pdist = hypot((xi + 0.5 - xctr)*dx - SPoint[0], (yi + 0.5 - yctr) * dy - SPoint[1]);
+//
+//			MinBV = int(Grid[0][2] + 10) - 10;
+//			MaxBV = int(Grid[3][2] + 10) - 9;
+//			if (MinBV < 0)   MinBV = 0;
+//			if (MaxBV > DN)  MaxBV = DN;
+//			// Compute the directions of the two lines for the projections
+//			for (di = MinBV; di < MaxBV; di++)
+//			{
+//				temp = (di - dctr) * dd;
+//				SVA[0] = -temp * sinAng - SPoint[0];
+//				SVA[1] = temp * cosAng - SPoint[1];
+//				SVA[2] = di;
+//				temp = hypot(SVA[0], SVA[1]); // sqrt(pow(SVA[0], 2) + pow(SVA[1], 2));
+//				SVA[0] = SVA[0] / temp;
+//				SVA[1] = SVA[1] / temp;
+//
+//				temp = (di - dctr + 1)*dd;
+//				SVB[0] = -temp * sinAng - SPoint[0];
+//				SVB[1] = temp * cosAng - SPoint[1];
+//				SVB[2] = di + 1;
+//				temp = hypot(SVB[0], SVB[1]); // sqrt(pow(SVB[0], 2) + pow(SVB[1], 2));
+//				SVB[0] = SVB[0] / temp;
+//				SVB[1] = SVB[1] / temp;
+//
+//				pangle = SVA[0] * SVB[0] + SVA[1] * SVB[1];
+//				pangle = sqrt(1 - pow(pangle, 2));
+//				//compute the weighting coefficient for a special projection data
+//				coef = ComputeCoefficient<T>(Grid, SVA, SVB, SPoint, area);
+//				coef = coef / (pdist*pangle);
+//				//Main code to forward projection and back projection
+//				rowIdx.push_back(angIdx * DN + di);
+//				colIdx.push_back(posim);
+//				coeffs.push_back(coef);
+//			}
+//		}
+//	}
+//	delete [] PosAry;
+//}
+//
+//template<typename T>
+//void genProj_AIM(std::vector<int>& rowIdx, std::vector<int>& colIdx, std::vector<T>& coeffs, int angIdx, const T ang, const FanEAGeo FanGeo, const Image Img)
+//{
+//	const T ScanR = FanGeo.m_S2O;
+//	const T ObjR = Img.m_Size.x;
+//
+//	const int DN = FanGeo.m_DetN;
+//	const int XN = Img.m_Reso.x;
+//	const int YN = Img.m_Reso.y;
+//	const T dx = Img.m_Step.x;
+//	const T dy = Img.m_Step.y;
+//	const T area = dx * dy;
+//	const T xctr = XN * 0.5;
+//	const T yctr = YN * 0.5;
+//	const T dctr = FanGeo.m_DetCntIdx;
+//	const T DtBeta = FanGeo.m_DetStp;
+//	T coef;
+//	T* PosAry = new T[(XN + 1) * (YN + 1)];
+//	T* PBeta = new T[DN];
+//	for (int i = 0; i != DN; ++i)
+//	{
+//		PBeta[i] = (i - dctr + 0.5) * DtBeta;
+//	}
+//	T Ew[2], Ed[2];
+//	const T cosAng = cos(ang);
+//	const T sinAng = sin(ang);
+//	Ew[0] = -cosAng;
+//	Ew[1] = -sinAng;
+//	Ed[0] = -sinAng;
+//	Ed[1] = cosAng;
+//	T SPoint[2];
+//	SPoint[0] = ScanR * cosAng;
+//	SPoint[1] = ScanR * sinAng;
+//	int xi(0), yi(0);
+//
+//	T xcor, ycor, dcor;
+//	T pdist;
+//	int di;
+//	for (yi = 0; yi <= YN; ++yi)
+//	{
+//		ycor = (yi - yctr)*dy - SPoint[1];
+//		for (xi = 0; xi <= XN; ++xi)
+//		{
+//			xcor = (xi - xctr)*dx - SPoint[0];
+//			dcor = (xcor*Ed[0] + ycor*Ed[1]) / (xcor*Ew[0] + ycor*Ew[1]);
+//			dcor = (atan(dcor) - PBeta[0]) / DtBeta;
+//			PosAry[yi*(XN + 1) + xi] = dcor + 0.5;
+//		}
+//	}
+//
+//	T Grid[4][3];
+//	int posim(0);
+//	int MinBV(0);
+//	int MaxBV(0);
+//	T pangle, temp, SVA[3], SVB[3];
+//	for (yi = 0; yi < YN; yi++)
+//	{
+//		for (xi = 0; xi < XN; xi++)
+//		{
+//			//Fetch the four points of the pixel and their projection positions
+//			Grid[0][0] = (xi - xctr)*dx;
+//			Grid[0][1] = (yi - yctr)*dy;
+//			Grid[0][2] = PosAry[yi*(XN + 1) + xi];
+//			Grid[1][0] = (xi - xctr + 1)*dx;
+//			Grid[1][1] = (yi - yctr)*dy;
+//			Grid[1][2] = PosAry[yi*(XN + 1) + xi + 1];
+//			Grid[2][0] = (xi - xctr + 1)*dx;
+//			Grid[2][1] = (yi - yctr + 1)*dy;
+//			Grid[2][2] = PosAry[(yi + 1)*(XN + 1) + xi + 1];
+//			Grid[3][0] = (xi - xctr)*dx;
+//			Grid[3][1] = (yi - yctr + 1)*dy;
+//			Grid[3][2] = PosAry[(yi + 1)*(XN + 1) + xi];
+//			SortProjection<T>(Grid);//Sort the projection psotion
+//
+//			posim = yi*XN + xi;
+//
+//			//pvalue = Img[posim];
+//			pdist = hypot((xi + 0.5 - xctr)*dx - SPoint[0], (yi + 0.5 - yctr)*dy - SPoint[1]); // sqrt(pow(, 2) + pow(, 2));
+//
+//			//Computer the weighting coefficient for every projection position
+//			MinBV = int(Grid[0][2] + 10) - 10;
+//			MaxBV = int(Grid[3][2] + 10) - 9;
+//			if (MinBV < 0)   MinBV = 0;
+//			if (MaxBV > DN)  MaxBV = DN;
+//			//double total =0;
+//			for (di = MinBV; di < MaxBV; di++)
+//			{
+//				// Compute the directions of the two lines for the projections
+//				pangle = PBeta[di] - 0.5 * DtBeta;
+//				temp = ang + PI - pangle;
+//				SVA[0] = cos(temp);
+//				SVA[1] = sin(temp);
+//				SVA[2] = di;
+//				// mexPrintf("di=%d,VA0=%10.8f,VA1=%10.8f,angle=%10.8f,Beta=%10.8f\n",di,SVA[0],SVA[1],temp,pangle);
+//				pangle = PBeta[di] + 0.5 * DtBeta;
+//				temp = ang + PI - pangle;
+//				SVB[0] = cos(temp);
+//				SVB[1] = sin(temp);
+//				SVB[2] = di + 1;
+//
+//				//compute the weighting coefficient for a special projection data
+//				coef = ComputeCoefficient(Grid, SVA, SVB, SPoint, area);
+//				coef = coef / (pdist*abs(DtBeta));
+//				rowIdx.push_back(angIdx * DN + di);
+//				colIdx.push_back(posim);
+//				coeffs.push_back(coef);
+//
+//			}
+//		}
+//	}
+//
+//	delete [] PosAry;
+//	delete [] PBeta;
+//}
+//
+//
+//template<typename T, typename FanGeometry>
+//void genProjectionMatrix_AIM_template_Impl(const FanGeometry FanGeo, const Image Img)
+//{
+//	unsigned int angIdx = 0;
+//	std::vector < int> rowIdx;
+//	std::vector < int > colIdx;
+//	std::vector < T > coeffs;
+//	T ang(0);
+//	for (angIdx = 0; angIdx < FanGeo.m_ViwN; ++angIdx)
+//	{
+//		ang = FanGeo.m_ViwBeg + angIdx * FanGeo.m_ViwStp;
+//		genProj_AIM(rowIdx, colIdx, coeffs, angIdx, ang, FanGeo, Img);
+//		std::cout << angIdx << std::endl;
+//	}
+//	int nonZ = rowIdx.size();
+//	std::stringstream ss;
+//	ss << nonZ;
+//	std::string f1;
+//	std::string f2;
+//	std::string f3;
+//	if (sizeof(T) == 4)
+//	{
+//		f1 = "prjAIM" + ss.str() + "f.row";
+//		f2 = "prjAIM" + ss.str() + "f.col";
+//		f3 = "prjAIM" + ss.str() + "f.cof";
+//	}
+//	else if (sizeof(T) == 8)
+//	{
+//		f1 = "prjAIM" + ss.str() + "d.row";
+//		f2 = "prjAIM" + ss.str() + "d.col";
+//		f3 = "prjAIM" + ss.str() + "d.cof";
+//	}
+//
+//	std::ofstream rowFile(f1.c_str(), std::ios::binary);
+//	std::ofstream colFile(f2.c_str(), std::ios::binary);
+//	std::ofstream coeFile(f3.c_str(), std::ios::binary);
+//	rowFile.write((char*)&(rowIdx[0]), sizeof(int) * rowIdx.size());
+//	rowFile.close();
+//	colFile.write((char*)&(colIdx[0]), sizeof(int) * colIdx.size());
+//	colFile.close();
+//	coeFile.write((char*)&(coeffs[0]), sizeof(T) * coeffs.size());
+//	coeFile.close();
+//
+//	rowFile.close();
+//	colFile.close();
+//	coeFile.close();
+//
+//}
+//
+//template<typename T>
+//void genProjectionMatrix_AIM_template(const FanEDGeo FanGeo, const Image Img) {
+//	genProjectionMatrix_AIM_template_Impl<T, FanEDGeo>(FanGeo, Img);
+//}
+//
+//template<typename T>
+//void genProjectionMatrix_AIM_template(const FanEAGeo FanGeo, const Image Img) {
+//	genProjectionMatrix_AIM_template_Impl<T, FanEAGeo>(FanGeo, Img);
+//}
+//
 
 template<typename T>
 static void DD3Boundaries(int nrBoundaries, T*pCenters, T *pBoundaries)

@@ -9,6 +9,8 @@
  */
 #ifndef _DD3_GPU_PROJ_H_
 #define _DD3_GPU_PROJ_H_
+#include "Image.h"
+#include "Projection.h"
 #include <thrust/device_vector.h>
 
 using byte = unsigned char;
@@ -42,6 +44,9 @@ extern "C"
 void DD3Proj_gpu(float x0, float y0, float z0, int DNU, int DNV, float* xds, float* yds, float* zds,
 float imgXCenter, float imgYCenter, float imgZCenter, float* hangs, float* hzPos, int PN, 
 int XN, int YN, int ZN, float* hvol, float* hprj, float dx, float dz, byte* mask, int gpunum, int prjMode);
+
+extern "C"
+void Proj(Image & image, Projection & projection, byte * mask, int gpunum, int prjMode);
 
 /// \brief Projection interface in three GPUs
 /// 
