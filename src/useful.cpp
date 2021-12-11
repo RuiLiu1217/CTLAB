@@ -679,9 +679,3 @@
 //{
 //	genProjectionMatrix_AIM_template<double>(FanGeo, Img);
 //}
-//
-//
-//
-//
-//
-//

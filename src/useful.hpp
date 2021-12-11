@@ -18,99 +18,6 @@
 
 #include "utilities.hpp"
 
-/// \brief Read data in host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, thrust::host_vector<float>& inputData, cuint FileSize);
-/// \brief Read data in host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, thrust::host_vector<double>& inputData, cuint FileSize);
-/// \brief Read data in host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, std::vector<float>& inputData, cuint FileSize);
-/// \brief Read data in host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, std::vector<double>& inputData, cuint FileSize);
-/// \brief Read data in host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, float* inputData, cuint FileSize);
-/// \brief Read data in host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void readData_host(const std::string& FileName, double* inputData, cuint FileSize);
-
-/// \brief Write data from host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName, thrust::host_vector<float>& inputData, cuint FileSize);
-
-/// \brief Write data from host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName, thrust::host_vector<double>& inputData, cuint FileSize);
-/// \brief Write data from host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName, std::vector<float>& inputData, cuint FileSize);
-/// \brief Write data from host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName, std::vector<double>& inputData, cuint FileSize);
-/// \brief Write data from host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName, float* inputData, cuint FileSize);
-/// \brief Write data from host memory
-/// \param FileName File name to be stored
-/// \param inputData the data to be stored
-/// \param FileSize elements of number
-void writeData_host(const std::string& FileName, double* inputData, cuint FileSize);
-/// \brief Write data from device memory
-/// \param FileName File name to be stored
-/// \param data the data to be stored
-/// \param bytes elements of number
-void writeFileFromDeviceToDisk(const std::string& FileName, double* data, cuint bytes);
-/// \brief Write data from device memory
-/// \param FileName File name to be stored
-/// \param data the data to be stored
-/// \param bytes elements of number
-void writeFileFromDeviceToDisk(const std::string& FileName, float* data, cuint bytes);
-
-
-
-/// \brief Fast Matrix-Vector Multiplication;
-/// \param y = Ax, on host memory
-/// \param A matrix, on host memory
-/// \param x vector to be multiplied, on host memory
-/// \param m row number of the matrix
-/// \param n col number of the matrix
-void FMVM(float* y, float* A, float* x, int m, int n);
-/// \brief Fast Matrix-Vector Multiplication;
-/// \param d_y = Ax, on device memory
-/// \param d_A matrix, on device memory
-/// \param d_x vector to be multiplied, on device memory
-/// \param m row number of the matrix
-/// \param n col number of the matrix
-void FMVM_device(float* d_y, float* dA, float* d_x, int m, int n);
-
-/// \brief Test the Fast Matrix Vector Multiplication function
-void testFMVM();
-
 void generateModiPhantom(const std::string& FileName, const unsigned int& lenReso = 256, const unsigned int& widReso = 256, const unsigned int& heiReso = 256);
 
 void generateModiPhantom_d(const std::string& FileName, const unsigned int& lenReso = 256, const unsigned int& widReso = 256, const unsigned int& heiReso = 256);
@@ -185,35 +92,35 @@ double3 crossProduct(const double3& a, const double3& b);
 float3 crossProduct(const float3& a, const float3& b);
 
 
-
-
-/// \brief Generate the projection matrix in COO format with the given geometry configuration
-/// \param FanGeo The geometry configuration of the CT system with equal angular detector
-/// \param Img The Image parameters correspondingly
-void GenerateProjectionMatrix(const FanEAGeo& FanGeo, const Image& Img);
-/// \brief Generate the projection matrix in COO format with the given geometry configuration
-/// \param FanGeo The geometry configuration of the CT system with equal distance detector
-/// \param Img The Image parameters correspondingly
-void GenerateProjectionMatrix(const FanEDGeo& FanGeo, const Image& Img);
-
-
-//void GenerateProjectionMatrix_OPENMP(const FanEAGeo& FanGeo, const Image& Img, std::string FileName);
-//void GenerateProjectionMatrix_OPENMP(const FanEDGeo& FanGeo, const Image& Img, std::string FileName);
-
-
-/// \brief It combines the projection and backprojection processes in one function with the ray driven projection process and pixel driven backprojection process. This function will be modified in the future. The function combines \f$A^{T}\cdot A\f$ for Split-Bregman method
-/// \param dimg the image pointer in device memory
-/// \param dres the image be projected and then backprojection result
-/// \param FanGeo the Fan Beam geometry with equal angular detector
-/// \param Img the Image configuration
-void ProjectionThenBackProjection(float* dimg, float* dres, const FanEAGeo& FanGeo, const Image& Img);
-/// \brief It combines the projection and backprojection processes in one function with the ray driven projection process and pixel driven backprojection process. This function will be modified in the future. The function combines \f$A^{T}\cdot A\f$ for Split-Bregman method
-/// \param dimg the image pointer in device memory
-/// \param dres the image be projected and then backprojection result
-/// \param FanGeo the Fan Beam geometry with equal distance detector
-/// \param Img the Image configuration
-void ProjectionThenBackProjection(float* dimg, float* dres, const FanEDGeo& FanGeo, const Image& Img);
-
+//
+//
+///// \brief Generate the projection matrix in COO format with the given geometry configuration
+///// \param FanGeo The geometry configuration of the CT system with equal angular detector
+///// \param Img The Image parameters correspondingly
+//void GenerateProjectionMatrix(const FanEAGeo& FanGeo, const Image& Img);
+///// \brief Generate the projection matrix in COO format with the given geometry configuration
+///// \param FanGeo The geometry configuration of the CT system with equal distance detector
+///// \param Img The Image parameters correspondingly
+//void GenerateProjectionMatrix(const FanEDGeo& FanGeo, const Image& Img);
+//
+//
+////void GenerateProjectionMatrix_OPENMP(const FanEAGeo& FanGeo, const Image& Img, std::string FileName);
+////void GenerateProjectionMatrix_OPENMP(const FanEDGeo& FanGeo, const Image& Img, std::string FileName);
+//
+//
+///// \brief It combines the projection and backprojection processes in one function with the ray driven projection process and pixel driven backprojection process. This function will be modified in the future. The function combines \f$A^{T}\cdot A\f$ for Split-Bregman method
+///// \param dimg the image pointer in device memory
+///// \param dres the image be projected and then backprojection result
+///// \param FanGeo the Fan Beam geometry with equal angular detector
+///// \param Img the Image configuration
+//void ProjectionThenBackProjection(float* dimg, float* dres, const FanEAGeo& FanGeo, const Image& Img);
+///// \brief It combines the projection and backprojection processes in one function with the ray driven projection process and pixel driven backprojection process. This function will be modified in the future. The function combines \f$A^{T}\cdot A\f$ for Split-Bregman method
+///// \param dimg the image pointer in device memory
+///// \param dres the image be projected and then backprojection result
+///// \param FanGeo the Fan Beam geometry with equal distance detector
+///// \param Img the Image configuration
+//void ProjectionThenBackProjection(float* dimg, float* dres, const FanEDGeo& FanGeo, const Image& Img);
+//
 
 
 /// \brief Calculate the p norm of a device vector, it cannot be used for host pointer
@@ -450,287 +357,287 @@ float OptimizedW0(thrust::device_vector<float>& TVImg, const float& ObjTV);
 /// \param ObjTV the prior knowledge of the original image or an estimation
 double OptimizedW0(thrust::device_vector<double>& TVImg, const double& ObjTV);
 
-
-/// \brief OS-SART reconstruction algorithm
-/// \param himg the image in host device to be reconstructed
-/// \param hprj the raw projection
-/// \param himgWeg the back projection weighting
-/// \param hmask the image mask usually a circle or the all one matrix
-/// \param FanGeo the Equal angular detector
-/// \param Img the Image configuration
-/// \param iterNum the maximum iteration
-/// \param lambda the update coefficient
-/// \param subSetNum subset number for the reconstruction
-void OS_SART(float* himg, float* hprj, float* himgWeg, float* hmask, const FanEAGeo& FanGeo, const Image& Img,
-	cuint& iterNum, const float& lambda, const unsigned int subSetNum);
-
-/// \brief OS-SART reconstruction algorithm
-/// \param himg the image in host device to be reconstructed
-/// \param hprj the raw projection
-/// \param himgWeg the back projection weighting
-/// \param hmsk the image mask usually a circle or the all one matrix
-/// \param FanGeo the Equal angular detector
-/// \param Img the Image configuration
-/// \param iterNum the maximum iteration
-/// \param lambda the update coefficient
-void SART(thrust::host_vector<float>& himg,
-	thrust::host_vector<float>& hprj,
-	thrust::host_vector<float>& himgWeg,
-	thrust::host_vector<float>& hmsk,
-	const FanEAGeo& FanGeo, const Image& Img,
-	cuint iterNum, const float lambda);
-
-
-
-/// \brief OS-SART reconstruction algorithm with Steepest Descent of TV for CS
-/// \param himg the image in host device to be reconstructed
-/// \param hprj the projection data in host device for reconstruction
-/// \param himgWeg the image weighting with all one back-projections
-/// \param hmask the mask of the image for reconstruction, it is usually a circle or a all one matrix
-/// \param FanGeo the equal angular detector
-/// \param Img the Image configuration
-/// \param iterNum the maximum iteration number
-/// \param lambda the update coefficient
-/// \param subSetNum how many subsets are used for reconstruction
-/// \param initAlpha the initial alpha value for descent coefficient
-/// \param apa_s each time we need to decrease initAlpha = initAlpha * apa_s
-/// \param descentTime how many times for SD of TV
-void OS_SART_SD(float* himg, float* hprj, float* himgWeg, float* hmask, const FanEAGeo& FanGeo, const Image& Img,
-	cuint& iterNum, const float& lambda, const unsigned int subSetNum, float initAlpha, float apa_s, cuint descentTime);
-
-
-/// \brief OS-SART reconstruction algorithm with Steepest Descent of TV for CS
-/// \param himg the image in host device to be reconstructed
-/// \param hprj the projection data in host device for reconstruction
-/// \param hweg the image weighting with all one back-projections
-/// \param hmsk the mask of the image for reconstruction, it is usually a circle or a all one matrix
-/// \param FanGeo the equal angular detector
-/// \param Img the Image configuration
-/// \param iterNum the maximum iteration number
-/// \param subSetNum how many subsets are used for reconstruction
-/// \param updateCoef the update coefficient
-/// \param initAlpha the initial alpha value for descent coefficient
-/// \param apa_s each time we need to decrease initAlpha = initAlpha * apa_s
-/// \param descentTime how many times for SD of TV
-void OS_SART_SD(thrust::host_vector<float>& himg,
-	thrust::host_vector<float>& hprj,
-	thrust::host_vector<float>& hweg,
-	thrust::host_vector<float>& hmsk,
-	const FanEAGeo& FanGeo,
-	const Image& Img,
-	cuint& iterNum,
-	cuint subSetNum,
-	const float updateCoef,
-	const float initAlpha,
-	const float apa_s,
-	cuint descentTime);
-
-
-
-/// \brief OS-SART reconstruction algorithm with Soft Thresholding Filtering of TV for CS
-/// \param himg the image in host device to be reconstructed
-/// \param hprj the projection data in host device for reconstruction
-/// \param himgWeg the image weighting with all one back-projections
-/// \param hmask the mask of the image for reconstruction, it is usually a circle or a all one matrix
-/// \param FanGeo the equal angular detector
-/// \param Img the Image configuration
-/// \param iterNum the maximum iteration number
-/// \param lambda the update coefficient
-/// \param subSetNum how many subsets are used in reconstruction
-/// \param objTV the prior knowledge of the image
-void OS_SART_STF(float* himg, float* hprj, float* himgWeg, float* hmask, const FanEAGeo& FanGeo, const Image& Img,
-	cuint& iterNum, const float& lambda, const unsigned int subSetNum, const float objTV);
-
-/// \brief OS-SART reconstruction algorithm with Soft Thresholding Filtering of TV for CS
-/// \param himg the image in host device to be reconstructed
-/// \param hprj the projection data in host device for reconstruction
-/// \param hweg the image weighting with all one back-projections
-/// \param hmsk the mask of the image for reconstruction, it is usually a circle or a all one matrix
-/// \param FanGeo the equal angular detector
-/// \param Img the Image configuration
-/// \param iterNum the maximum iteration number
-/// \param subSetNum how many subsets are used in reconstruction
-/// \param objTV the prior knowledge of the image
-/// \param updateCoef the update coefficient
-void OS_SART_STF(thrust::host_vector<float>& himg,
-	thrust::host_vector<float>& hprj,
-	thrust::host_vector<float>& hweg,
-	thrust::host_vector<float>& hmsk,
-	const FanEAGeo& FanGeo, const Image& Img,
-	cuint& iterNum, const unsigned int subSetNum,
-	const float objTV, const float updateCoef);
-
-
-/// \brief The initial version of EM algorithm. 
-/// \param hprj projection data in host memory for reconstruction
-/// \param himg the image to be reconstructed
-/// \param FanGeo Fan beam geometrical in equil angle detector
-/// \param Img the image configuration
-/// \param iterNum the maximum iteration number
-void EM(float* hprj, float* himg, const FanEAGeo& FanGeo, const Image& Img, cuint iterNum);
-
-
-/// \brief The Conjugate Gradient method for reconstruction, but it seems that this algorithm doesn't coverge
-/// \param himg the host image to be reconstructed
-/// \param hprj the projection data for reconstruction
-/// \param FanGeo the Fan beam geometry with equil angular detector
-/// \param Img the image configuration
-/// \param IterNum the maximum iteration number
-void CG_recon(float* himg, float* hprj, const FanEAGeo& FanGeo, const Image& Img, cuint IterNum);
-
-/// \brief The conjugate gradient method for reconstruction, This algorithm is based on AIM model and executed in GPU
-/// \param img Image to be reconstructed in main memory
-/// \param prj Projection data in main memory
-/// \param FanGeo FanEAGeo configuration
-/// \param Img Image configuration
-/// \param maxIter maximum iteration limit
-/// \param err stop criteria
-/// \param cases which beta updating method will be applied, details can be get from 
-void CG_recon_AIM(thrust::host_vector<float>& img, thrust::host_vector<float>& prj, const FanEAGeo& FanGeo, const Image& Img, cuint maxIter, float err, cuint cases);
-/// \brief The conjugate gradient method for reconstruction, This algorithm is based on AIM model and executed in GPU
-/// \param img Image to be reconstructed in main memory
-/// \param prj Projection data in main memory
-/// \param FanGeo FanEAGeo configuration
-/// \param Img Image configuration
-/// \param maxIter maximum iteration limit
-/// \param err stop criteria
-/// \param cases which beta updating method will be applied, details can be get from 
-void CG_recon_AIM(thrust::host_vector<double>& img, thrust::host_vector<double>& prj, const FanEAGeo& FanGeo, const Image& Img, cuint maxIter, double err, cuint cases);
-
-
-/// \brief Generate the projection matrix with area integral model (AIM), it generates the model very slow, please be patient.
-/// \param FanGeo FanEAGeo configuration
-/// \param Img Image configuration
-/// \param FileName The file name for storing the matrix
-/// \param coeff non zero coefficients in the projection matrix
-/// \param rowIdx non zero coefficients row Index in the matrix begin with 0
-/// \param colIdx non zero coefficients column index in the matrix begin with 0
-void GenerateProjectionMatrixf_AIM(const FanEAGeo& FanGeo, const Image& Img, const std::string& FileName);
-
-/// \brief Generate the projection matrix with area integral model (AIM), it generates the model very slow, please be patient.
-/// \param FanGeo FanEAGeo configuration
-/// \param Img Image configuration
-/// \param FileName The file name for storing the matrix
-/// \param coeff non zero coefficients in the projection matrix
-/// \param rowIdx non zero coefficients row Index in the matrix begin with 0
-/// \param colIdx non zero coefficients column index in the matrix begin with 0
-void GenerateProjectionMatrixd_AIM(const FanEAGeo& FanGeo, const Image& Img, const std::string& FileName);
-
-/// \brief Generate the projection matrix with area integral model (AIM), it generates the model very slow, please be patient. This method use OpenMP to accelerate your program. The threads number is 30, so the projection number should be better the multiple of 30
-/// \param FanGeo FanEAGeo configuration
-/// \param Img Image configuration
-/// \param FileName The file name for storing the matrix
-void GenerateMatrix_OpenMP_AIM_float(const FanEAGeo& FanGeo, const Image& Img, const std::string& FileName);
-/// \brief Generate the projection matrix with area integral model (AIM), it generates the model very slow, please be patient. This method use OpenMP to accelerate your program. The threads number is 30, so the projection number should be better the multiple of 30
-/// \param FanGeo FanEAGeo configuration
-/// \param Img Image configuration
-/// \param FileName The file name for storing the matrix
-void GenerateMatrix_OpenMP_AIM_double(const FanEAGeo& FanGeo, const Image& Img, const std::string& FileName);
-
-/// \brief Generate the projection matrix with area integral model (AIM), it is a new version in single float format
-/// \param FanGeo The FanEDGeo configuration;
-/// \param Img The Image configuration;
-void genProjectionMatrix_AIMf(const FanEDGeo FanGeo, const Image Img);
-/// \brief Generate the projection matrix with area integral model (AIM), it is a new version in double float format
-/// \param FanGeo The FanEDGeo configuration;
-/// \param Img The Image configuration;
-void genProjectionMatrix_AIMd(const FanEDGeo FanGeo, const Image Img);
-
-/// \brief Generate the projection matrix with area integral model (AIM), it is a new version in single float format
-/// \param FanGeo The FanEAGeo configuration;
-/// \param Img The Image configuration;
-void genProjectionMatrix_AIMf(const FanEAGeo FanGeo, const Image Img);
-/// \brief Generate the projection matrix with area integral model (AIM), it is a new version in double float format
-/// \param FanGeo The FanEAGeo configuration;
-/// \param Img The Image configuration;
-void genProjectionMatrix_AIMd(const FanEAGeo FanGeo, const Image Img);
-
-
-
-void genProjectionMatrix_Siddonf(const FanEDGeo FanGeo, const Image Img);
-void genProjectionMatrix_Siddond(const FanEDGeo FanGeo, const Image Img);
-
-/// \brief This is the DEMO for Conjugate Gradient reconstruction, but it is wrong!
-void DEMO12();
-
-/// \brief The Demo of OS-SART
-void DEMO1();
-
-/// \brief The demo of OS-SART
-/// \param FanGeo The equal angular detector based CT system geometry
-/// \param Img the image configuration
-/// \param FileName the projection file for reconstruction
-/// \param WegName the all one backprojection file
-/// \param MaskName the mask file for reconstruction
-/// \param FouName The file that will store the reconstructed image
-/// \param iterNum the maximum iterations
-/// \param lambda the update coefficient 
-/// \param subSetNum the subset number 
-void DEMO1_1(const FanEAGeo& FanGeo, const Image& Img,
-	const std::string& FileName,
-	const std::string& WegName,
-	const std::string& MaskName,
-	const std::string& FouName,
-	cuint iterNum,
-	const float lambda,
-	cuint subSetNum);
-
-
-/// \brief This is the demo of OS-SART + SD
-void DEMO2();
-
-/// \brief This is the demo of OS-SART + SD
-/// \param FanGeo The CT configuration with equal angle detector system
-/// \param Img the image configuration
-/// \param FileName the projection data for reconstruction
-/// \param WegName the weighting of all one back projection
-/// \param MaskName the mask image
-/// \param FouName the output image
-/// \param iterNum the maximum iteration for reconstruction
-/// \param lambda updating coefficient
-/// \param subSetNum how many subsets are used
-/// \param initAlpha the SD step size
-/// \param apa_s initAlpha = initAlpha * apa_s for each decreasing step
-/// \param descentTime for each iteration, how many descent steps are used
-void DEMO2_1(const FanEAGeo& FanGeo, const Image& Img,
-	const std::string& FileName,
-	const std::string& WegName,
-	const std::string& MaskName,
-	const std::string& FouName,
-	cuint iterNum,
-	const float lambda,
-	cuint subSetNum,
-	const float initAlpha,
-	const float apa_s,
-	cuint descentTime);
-
-
-/// \brief the demo of OS-SART + STF
-void DEMO3();
-
-
-/// \brief The demo of OS-SART + STF
-/// \param FanGeo the fan beam configuration with equil angle detector
-/// \param Img the Image configuration
-/// \param FileName the projection file
-/// \param WegName the all one backprojection for weighting
-/// \param MaskName the mask with a circle or all one matrix
-/// \param FouName The output image
-/// \param iterNum the maximum iterations
-/// \param lambda updating coefficient
-/// \param subSetNum the subsets number for OS
-/// \param objTV the prior knowledge to the image
-void DEMO3_1(const FanEAGeo& FanGeo, const Image& Img,
-	const std::string& FileName,
-	const std::string& WegName,
-	const std::string& MaskName,
-	const std::string& FouName,
-	cuint iterNum,
-	const float lambda,
-	cuint subSetNum,
-	const float objTV);
-
-
+//
+///// \brief OS-SART reconstruction algorithm
+///// \param himg the image in host device to be reconstructed
+///// \param hprj the raw projection
+///// \param himgWeg the back projection weighting
+///// \param hmask the image mask usually a circle or the all one matrix
+///// \param FanGeo the Equal angular detector
+///// \param Img the Image configuration
+///// \param iterNum the maximum iteration
+///// \param lambda the update coefficient
+///// \param subSetNum subset number for the reconstruction
+//void OS_SART(float* himg, float* hprj, float* himgWeg, float* hmask, const FanEAGeo& FanGeo, const Image& Img,
+//	cuint& iterNum, const float& lambda, const unsigned int subSetNum);
+//
+///// \brief OS-SART reconstruction algorithm
+///// \param himg the image in host device to be reconstructed
+///// \param hprj the raw projection
+///// \param himgWeg the back projection weighting
+///// \param hmsk the image mask usually a circle or the all one matrix
+///// \param FanGeo the Equal angular detector
+///// \param Img the Image configuration
+///// \param iterNum the maximum iteration
+///// \param lambda the update coefficient
+//void SART(thrust::host_vector<float>& himg,
+//	thrust::host_vector<float>& hprj,
+//	thrust::host_vector<float>& himgWeg,
+//	thrust::host_vector<float>& hmsk,
+//	const FanEAGeo& FanGeo, const Image& Img,
+//	cuint iterNum, const float lambda);
+//
+//
+//
+///// \brief OS-SART reconstruction algorithm with Steepest Descent of TV for CS
+///// \param himg the image in host device to be reconstructed
+///// \param hprj the projection data in host device for reconstruction
+///// \param himgWeg the image weighting with all one back-projections
+///// \param hmask the mask of the image for reconstruction, it is usually a circle or a all one matrix
+///// \param FanGeo the equal angular detector
+///// \param Img the Image configuration
+///// \param iterNum the maximum iteration number
+///// \param lambda the update coefficient
+///// \param subSetNum how many subsets are used for reconstruction
+///// \param initAlpha the initial alpha value for descent coefficient
+///// \param apa_s each time we need to decrease initAlpha = initAlpha * apa_s
+///// \param descentTime how many times for SD of TV
+//void OS_SART_SD(float* himg, float* hprj, float* himgWeg, float* hmask, const FanEAGeo& FanGeo, const Image& Img,
+//	cuint& iterNum, const float& lambda, const unsigned int subSetNum, float initAlpha, float apa_s, cuint descentTime);
+//
+//
+///// \brief OS-SART reconstruction algorithm with Steepest Descent of TV for CS
+///// \param himg the image in host device to be reconstructed
+///// \param hprj the projection data in host device for reconstruction
+///// \param hweg the image weighting with all one back-projections
+///// \param hmsk the mask of the image for reconstruction, it is usually a circle or a all one matrix
+///// \param FanGeo the equal angular detector
+///// \param Img the Image configuration
+///// \param iterNum the maximum iteration number
+///// \param subSetNum how many subsets are used for reconstruction
+///// \param updateCoef the update coefficient
+///// \param initAlpha the initial alpha value for descent coefficient
+///// \param apa_s each time we need to decrease initAlpha = initAlpha * apa_s
+///// \param descentTime how many times for SD of TV
+//void OS_SART_SD(thrust::host_vector<float>& himg,
+//	thrust::host_vector<float>& hprj,
+//	thrust::host_vector<float>& hweg,
+//	thrust::host_vector<float>& hmsk,
+//	const FanEAGeo& FanGeo,
+//	const Image& Img,
+//	cuint& iterNum,
+//	cuint subSetNum,
+//	const float updateCoef,
+//	const float initAlpha,
+//	const float apa_s,
+//	cuint descentTime);
+//
+//
+//
+///// \brief OS-SART reconstruction algorithm with Soft Thresholding Filtering of TV for CS
+///// \param himg the image in host device to be reconstructed
+///// \param hprj the projection data in host device for reconstruction
+///// \param himgWeg the image weighting with all one back-projections
+///// \param hmask the mask of the image for reconstruction, it is usually a circle or a all one matrix
+///// \param FanGeo the equal angular detector
+///// \param Img the Image configuration
+///// \param iterNum the maximum iteration number
+///// \param lambda the update coefficient
+///// \param subSetNum how many subsets are used in reconstruction
+///// \param objTV the prior knowledge of the image
+//void OS_SART_STF(float* himg, float* hprj, float* himgWeg, float* hmask, const FanEAGeo& FanGeo, const Image& Img,
+//	cuint& iterNum, const float& lambda, const unsigned int subSetNum, const float objTV);
+//
+///// \brief OS-SART reconstruction algorithm with Soft Thresholding Filtering of TV for CS
+///// \param himg the image in host device to be reconstructed
+///// \param hprj the projection data in host device for reconstruction
+///// \param hweg the image weighting with all one back-projections
+///// \param hmsk the mask of the image for reconstruction, it is usually a circle or a all one matrix
+///// \param FanGeo the equal angular detector
+///// \param Img the Image configuration
+///// \param iterNum the maximum iteration number
+///// \param subSetNum how many subsets are used in reconstruction
+///// \param objTV the prior knowledge of the image
+///// \param updateCoef the update coefficient
+//void OS_SART_STF(thrust::host_vector<float>& himg,
+//	thrust::host_vector<float>& hprj,
+//	thrust::host_vector<float>& hweg,
+//	thrust::host_vector<float>& hmsk,
+//	const FanEAGeo& FanGeo, const Image& Img,
+//	cuint& iterNum, const unsigned int subSetNum,
+//	const float objTV, const float updateCoef);
+//
+//
+///// \brief The initial version of EM algorithm. 
+///// \param hprj projection data in host memory for reconstruction
+///// \param himg the image to be reconstructed
+///// \param FanGeo Fan beam geometrical in equil angle detector
+///// \param Img the image configuration
+///// \param iterNum the maximum iteration number
+//void EM(float* hprj, float* himg, const FanEAGeo& FanGeo, const Image& Img, cuint iterNum);
+//
+//
+///// \brief The Conjugate Gradient method for reconstruction, but it seems that this algorithm doesn't coverge
+///// \param himg the host image to be reconstructed
+///// \param hprj the projection data for reconstruction
+///// \param FanGeo the Fan beam geometry with equil angular detector
+///// \param Img the image configuration
+///// \param IterNum the maximum iteration number
+//void CG_recon(float* himg, float* hprj, const FanEAGeo& FanGeo, const Image& Img, cuint IterNum);
+//
+///// \brief The conjugate gradient method for reconstruction, This algorithm is based on AIM model and executed in GPU
+///// \param img Image to be reconstructed in main memory
+///// \param prj Projection data in main memory
+///// \param FanGeo FanEAGeo configuration
+///// \param Img Image configuration
+///// \param maxIter maximum iteration limit
+///// \param err stop criteria
+///// \param cases which beta updating method will be applied, details can be get from 
+//void CG_recon_AIM(thrust::host_vector<float>& img, thrust::host_vector<float>& prj, const FanEAGeo& FanGeo, const Image& Img, cuint maxIter, float err, cuint cases);
+///// \brief The conjugate gradient method for reconstruction, This algorithm is based on AIM model and executed in GPU
+///// \param img Image to be reconstructed in main memory
+///// \param prj Projection data in main memory
+///// \param FanGeo FanEAGeo configuration
+///// \param Img Image configuration
+///// \param maxIter maximum iteration limit
+///// \param err stop criteria
+///// \param cases which beta updating method will be applied, details can be get from 
+//void CG_recon_AIM(thrust::host_vector<double>& img, thrust::host_vector<double>& prj, const FanEAGeo& FanGeo, const Image& Img, cuint maxIter, double err, cuint cases);
+//
+//
+///// \brief Generate the projection matrix with area integral model (AIM), it generates the model very slow, please be patient.
+///// \param FanGeo FanEAGeo configuration
+///// \param Img Image configuration
+///// \param FileName The file name for storing the matrix
+///// \param coeff non zero coefficients in the projection matrix
+///// \param rowIdx non zero coefficients row Index in the matrix begin with 0
+///// \param colIdx non zero coefficients column index in the matrix begin with 0
+//void GenerateProjectionMatrixf_AIM(const FanEAGeo& FanGeo, const Image& Img, const std::string& FileName);
+//
+///// \brief Generate the projection matrix with area integral model (AIM), it generates the model very slow, please be patient.
+///// \param FanGeo FanEAGeo configuration
+///// \param Img Image configuration
+///// \param FileName The file name for storing the matrix
+///// \param coeff non zero coefficients in the projection matrix
+///// \param rowIdx non zero coefficients row Index in the matrix begin with 0
+///// \param colIdx non zero coefficients column index in the matrix begin with 0
+//void GenerateProjectionMatrixd_AIM(const FanEAGeo& FanGeo, const Image& Img, const std::string& FileName);
+//
+///// \brief Generate the projection matrix with area integral model (AIM), it generates the model very slow, please be patient. This method use OpenMP to accelerate your program. The threads number is 30, so the projection number should be better the multiple of 30
+///// \param FanGeo FanEAGeo configuration
+///// \param Img Image configuration
+///// \param FileName The file name for storing the matrix
+//void GenerateMatrix_OpenMP_AIM_float(const FanEAGeo& FanGeo, const Image& Img, const std::string& FileName);
+///// \brief Generate the projection matrix with area integral model (AIM), it generates the model very slow, please be patient. This method use OpenMP to accelerate your program. The threads number is 30, so the projection number should be better the multiple of 30
+///// \param FanGeo FanEAGeo configuration
+///// \param Img Image configuration
+///// \param FileName The file name for storing the matrix
+//void GenerateMatrix_OpenMP_AIM_double(const FanEAGeo& FanGeo, const Image& Img, const std::string& FileName);
+//
+///// \brief Generate the projection matrix with area integral model (AIM), it is a new version in single float format
+///// \param FanGeo The FanEDGeo configuration;
+///// \param Img The Image configuration;
+//void genProjectionMatrix_AIMf(const FanEDGeo FanGeo, const Image Img);
+///// \brief Generate the projection matrix with area integral model (AIM), it is a new version in double float format
+///// \param FanGeo The FanEDGeo configuration;
+///// \param Img The Image configuration;
+//void genProjectionMatrix_AIMd(const FanEDGeo FanGeo, const Image Img);
+//
+///// \brief Generate the projection matrix with area integral model (AIM), it is a new version in single float format
+///// \param FanGeo The FanEAGeo configuration;
+///// \param Img The Image configuration;
+//void genProjectionMatrix_AIMf(const FanEAGeo FanGeo, const Image Img);
+///// \brief Generate the projection matrix with area integral model (AIM), it is a new version in double float format
+///// \param FanGeo The FanEAGeo configuration;
+///// \param Img The Image configuration;
+//void genProjectionMatrix_AIMd(const FanEAGeo FanGeo, const Image Img);
+//
+//
+//
+//void genProjectionMatrix_Siddonf(const FanEDGeo FanGeo, const Image Img);
+//void genProjectionMatrix_Siddond(const FanEDGeo FanGeo, const Image Img);
+//
+///// \brief This is the DEMO for Conjugate Gradient reconstruction, but it is wrong!
+//void DEMO12();
+//
+///// \brief The Demo of OS-SART
+//void DEMO1();
+//
+///// \brief The demo of OS-SART
+///// \param FanGeo The equal angular detector based CT system geometry
+///// \param Img the image configuration
+///// \param FileName the projection file for reconstruction
+///// \param WegName the all one backprojection file
+///// \param MaskName the mask file for reconstruction
+///// \param FouName The file that will store the reconstructed image
+///// \param iterNum the maximum iterations
+///// \param lambda the update coefficient 
+///// \param subSetNum the subset number 
+//void DEMO1_1(const FanEAGeo& FanGeo, const Image& Img,
+//	const std::string& FileName,
+//	const std::string& WegName,
+//	const std::string& MaskName,
+//	const std::string& FouName,
+//	cuint iterNum,
+//	const float lambda,
+//	cuint subSetNum);
+//
+//
+///// \brief This is the demo of OS-SART + SD
+//void DEMO2();
+//
+///// \brief This is the demo of OS-SART + SD
+///// \param FanGeo The CT configuration with equal angle detector system
+///// \param Img the image configuration
+///// \param FileName the projection data for reconstruction
+///// \param WegName the weighting of all one back projection
+///// \param MaskName the mask image
+///// \param FouName the output image
+///// \param iterNum the maximum iteration for reconstruction
+///// \param lambda updating coefficient
+///// \param subSetNum how many subsets are used
+///// \param initAlpha the SD step size
+///// \param apa_s initAlpha = initAlpha * apa_s for each decreasing step
+///// \param descentTime for each iteration, how many descent steps are used
+//void DEMO2_1(const FanEAGeo& FanGeo, const Image& Img,
+//	const std::string& FileName,
+//	const std::string& WegName,
+//	const std::string& MaskName,
+//	const std::string& FouName,
+//	cuint iterNum,
+//	const float lambda,
+//	cuint subSetNum,
+//	const float initAlpha,
+//	const float apa_s,
+//	cuint descentTime);
+//
+//
+///// \brief the demo of OS-SART + STF
+//void DEMO3();
+//
+//
+///// \brief The demo of OS-SART + STF
+///// \param FanGeo the fan beam configuration with equil angle detector
+///// \param Img the Image configuration
+///// \param FileName the projection file
+///// \param WegName the all one backprojection for weighting
+///// \param MaskName the mask with a circle or all one matrix
+///// \param FouName The output image
+///// \param iterNum the maximum iterations
+///// \param lambda updating coefficient
+///// \param subSetNum the subsets number for OS
+///// \param objTV the prior knowledge to the image
+//void DEMO3_1(const FanEAGeo& FanGeo, const Image& Img,
+//	const std::string& FileName,
+//	const std::string& WegName,
+//	const std::string& MaskName,
+//	const std::string& FouName,
+//	cuint iterNum,
+//	const float lambda,
+//	cuint subSetNum,
+//	const float objTV);
+//
+//
 
 
 /// \brief test once projection and then back projection result
@@ -769,17 +676,17 @@ void DEMO13();
 
 /// \brief Demo for generating the projection matrix in AIM model;
 void DEMO14();
-/// \brief Demo for generating the projection matrix in AIM model, you can specify the file name and the configuration
-/// \param FileName the file name you want to store the matrix in your disk
-/// \param FanGeo FanEAGeo configuration
-/// \param Img Image configuration
-void DEMO14f(const std::string& FileName, const FanEAGeo& FanGeo, const Image& Img);
-/// \brief Demo for generating the projection matrix in AIM model, you can specify the file name and the configuration
-/// \param FileName the file name you want to store the matrix in your disk
-/// \param FanGeo FanEAGeo configuration
-/// \param Img Image configuration
-void DEMO14d(const std::string& FileName, const FanEAGeo& FanGeo, const Image& Img);
-
+///// \brief Demo for generating the projection matrix in AIM model, you can specify the file name and the configuration
+///// \param FileName the file name you want to store the matrix in your disk
+///// \param FanGeo FanEAGeo configuration
+///// \param Img Image configuration
+//void DEMO14f(const std::string& FileName, const FanEAGeo& FanGeo, const Image& Img);
+///// \brief Demo for generating the projection matrix in AIM model, you can specify the file name and the configuration
+///// \param FileName the file name you want to store the matrix in your disk
+///// \param FanGeo FanEAGeo configuration
+///// \param Img Image configuration
+//void DEMO14d(const std::string& FileName, const FanEAGeo& FanGeo, const Image& Img);
+//
 
 
 /// \brief Demo for testing the time for several projection processes
@@ -788,32 +695,32 @@ void DEMO15();
 /// \brief Multi slices simultaneously recosntructed in three GPUs
 void DEMO16();
 
-
-/// \brief Reconstruct the multi-features phantom with two GPUs, one is applied for storing the projection 
-/// and the other is applied for reconstruction.
-void DEMO17();
-/// \brief The generalized version
-void DEMO17(
-	const ConeEDGeo& ConeGeo,
-	const Volume& Vol,
-	const std::string& projectionFileName,
-	const std::string& weightingFileName,
-	const std::string& reconstFileName,
-	const std::vector<int>& subsetNumberSeries,
-	const int iterNum);
-
-/// \brief Reconstruct the mouse species with 400 angles with two GPUs, one is applied for storing the projection
-/// and the other is applied for reconstruction.
-void DEMO18();
-
-void DEMO18(
-	const ConeEDGeo& ConeGeo,
-	const Volume& Vol,
-	const std::string& projectionFileName,
-	const std::string& weightingFileName,
-	const std::string& reconstrctFileName,
-	const std::vector < int >& subSetNumSeries,
-	const int iterNum);
+//
+///// \brief Reconstruct the multi-features phantom with two GPUs, one is applied for storing the projection 
+///// and the other is applied for reconstruction.
+//void DEMO17();
+///// \brief The generalized version
+//void DEMO17(
+//	const ConeEDGeo& ConeGeo,
+//	const Volume& Vol,
+//	const std::string& projectionFileName,
+//	const std::string& weightingFileName,
+//	const std::string& reconstFileName,
+//	const std::vector<int>& subsetNumberSeries,
+//	const int iterNum);
+//
+///// \brief Reconstruct the mouse species with 400 angles with two GPUs, one is applied for storing the projection
+///// and the other is applied for reconstruction.
+//void DEMO18();
+//
+//void DEMO18(
+//	const ConeEDGeo& ConeGeo,
+//	const Volume& Vol,
+//	const std::string& projectionFileName,
+//	const std::string& weightingFileName,
+//	const std::string& reconstrctFileName,
+//	const std::vector < int >& subSetNumSeries,
+//	const int iterNum);
 
 /// \brief The same as Reconstruction but with 2024x2024 sized projection data
 void DEMO18v2();

@@ -63,10 +63,6 @@
 #include <thrust/device_vector.h>
 
 
-#include "FanEAGeo.h"
-#include "FanEDGeo.h"
-#include "ConeEAGeo.h"
-#include "ConeEDGeo.h"
 #include "Image.h"
 #include "Volume.h"
 

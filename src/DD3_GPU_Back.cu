@@ -1,7 +1,6 @@
 #include "projModelUtilities.h"
 #include "DD3_GPU_Back.h"
 #include "CTLAB.h"
-#include "Geometry.h"
 #include <cassert>
 #include "TextureObjectProvider.h"
 
@@ -2552,28 +2551,4 @@ void DD3Back_multiGPU(
 			dx, dz, mask, startVOL, gpuNum);
 		break;
 	}
-}
-
-
-
-
-
-void CT::Back(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, const std::string& backModel)
-{
-	std::vector<float> xds = geo.getXds();
-	std::vector<float> yds = geo.getYds();
-	std::vector<float> zds = geo.getZds();
-	std::vector<float> hangs = geo.getAllAngles();
-	std::vector<float> hzPos = geo.getAllZPoses();
-	
-	std::vector<unsigned char> mask(geo.getObjDimX() * geo.getObjDimY(), 1);
-	DD3Back_gpu(0, geo.getSourToObj(), 0,
-		geo.getDetNumWidth(), geo.getDetNumHeight(),
-		&xds[0], &yds[0], &zds[0],
-		geo.getObjCtrCoordX(), geo.getObjCtrCoordY(), geo.getObjCtrCoordZ(),
-		&hangs[0], &hzPos[0], geo.getViewNumber(),
-		geo.getObjDimX(), geo.getObjDimY(), geo.getObjDimZ(),
-		&hvol[0], &hprj[0],
-		geo.getVoxelSizeX(), geo.getVoxelSizeZ(),
-		&mask[0], 0, 0, 0);
 }

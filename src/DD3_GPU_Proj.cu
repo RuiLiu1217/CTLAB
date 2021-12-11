@@ -3,7 +3,6 @@
 #include "utilities.cuh"
 #include "DD3_GPU_Proj.h"
 #include "CTLAB.h"
-#include "Geometry.h"
 #include "TextureObjectProvider.h"
 #include "GenerateSummedAreaTable.h"
 #include "cudaCheckReturner.h"
@@ -1954,23 +1953,6 @@ void DD3Proj_gpu(
 	}
 }
 
-void Proj(Image& image, float x0, float y0, float z0, int DNU, int DNV, float* xds, float* yds, float* zds,
-	float* hangs, float* hzPos, int PN, float* hprj, byte* mask, int gpunum, int prjMode) {
-	const float imgXCenter = image.getCentX();
-	const float imgYCenter = image.getCentY();
-	const float imgZCenter = image.getCentZ();
-	const int XN = image.getResoX();
-	const int YN = image.getResoY();
-	const int ZN = image.getResoZ();
-	const float dx = image.getDx();
-	const float dz = image.getDz();
-	float* hvol = image.getDataPtr();
-	
-	DD3Proj_gpu(x0, y0, z0, DNU, DNV, xds, yds, zds,
-		imgXCenter, imgYCenter, imgZCenter, hangs, hzPos, PN,
-		XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum, prjMode);
-}
-
 
 void Proj(Image& image, Projection& projection, byte* mask, int gpunum, int prjMode) {
 	const float imgXCenter = image.getCentX();
@@ -2000,6 +1982,71 @@ void Proj(Image& image, Projection& projection, byte* mask, int gpunum, int prjM
 		imgXCenter, imgYCenter, imgZCenter, hangs, hzPos, PN,
 		XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum, prjMode);
 }
+
+
+void Proj(Image& image, Projection& projection, ProjectionConfiguration& projConfig) {
+	const float imgXCenter = image.getCentX();
+	const float imgYCenter = image.getCentY();
+	const float imgZCenter = image.getCentZ();
+	const int XN = image.getResoX();
+	const int YN = image.getResoY();
+	const int ZN = image.getResoZ();
+	const float dx = image.getDx();
+	const float dz = image.getDz();
+	float* hvol = image.getDataPtr();
+
+	float* hprj = projection.getDataPtr();
+	int DNU = projection.getDNU();
+	int DNV = projection.getDNV();
+	int PN = projection.getPN();
+	float x0 = projection.getX0();
+	float y0 = projection.getY0();
+	float z0 = projection.getZ0();
+	float* xds = projection.getXdsPtr();
+	float* yds = projection.getYdsPtr();
+	float* zds = projection.getZdsPtr();
+	float* hangs = projection.getAnglePtr();
+	float* hzPos = projection.getZPosPtr();
+	unsigned char* mask = image.getMaskPtr();
+
+	//switch (projConfig.method) {
+	//	case ProjectionConfiguration::BRANCHLESS:
+	//		DD3_gpu_proj_branchless_sat2d(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
+	//			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
+	//		break;
+	//	case ProjectionConfiguration::VOLUME_RENDERING: // Todo: incorrect
+	//		DD3_gpu_proj_volumerendering(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
+	//			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
+	//		break;
+	//	case 2: // Todo: incorrect
+	//		DD3_gpu_proj_doubleprecisionbranchless(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
+	//			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
+	//	case ProjectionConfiguration::PSEUDO_DISTANCE_DRIVEN:
+	//		DD3_gpu_proj_pseudodistancedriven(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
+	//			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
+	//		break;
+	//	case ProjectionConfiguration::SIDDON: // Todo: incorrect
+	//		DD3ProjSiddon_gpu(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
+	//			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
+	//		break;
+	//	case ProjectionConfiguration::BRANCHES_DISTANCE_DRIVEN:
+	//		DD3Proj_branches(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
+	//			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
+	//		break;
+	//	default:
+	//		DD3_gpu_proj_branchless_sat2d(x0, y0, z0, DNU, DNV, xds, yds, zds, imgXCenter, imgYCenter, imgZCenter,
+	//			hangs, hzPos, PN, XN, YN, ZN, hvol, hprj, dx, dz, mask, gpunum);
+	//		break;
+	//}
+
+
+	
+	// Todo: add the method to use projConfig
+	DD3Proj_gpu(x0, y0, z0, DNU, DNV, xds, yds, zds,
+		imgXCenter, imgYCenter, imgZCenter, hangs, hzPos, PN,
+		XN, YN, ZN, hvol, hprj, dx, dz, mask, 0, 0);
+}
+
 
 
 
@@ -2672,25 +2719,4 @@ void DD3Proj_multiGPU(
 		break;
 
 	}
-}
-
-void CT::Proj(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, const std::string& projModel)
-{
-	std::vector<unsigned char> mask(geo.getObjDimX() * geo.getObjDimY(), 1);
-	std::vector<float> xds = geo.getXds();
-	std::vector<float> yds = geo.getYds();
-	std::vector<float> zds = geo.getZds();
-	std::vector<float> hangs = geo.getAllAngles();
-	std::vector<float> hzPos = geo.getAllZPoses();
-
-	DD3Proj_gpu(0, geo.getSourToObj(), 0,
-		geo.getDetNumWidth(), geo.getDetNumHeight(),
-		&xds[0], &yds[0], &zds[0],
-		geo.getObjCtrCoordX(), geo.getObjCtrCoordY(), geo.getObjCtrCoordZ(),
-		&hangs[0], &hzPos[0],
-		geo.getViewNumber(),
-		geo.getObjDimX(), geo.getObjDimY(), geo.getObjDimZ(),
-		&hvol[0], &hprj[0],
-		geo.getVoxelSizeX(), geo.getVoxelSizeZ(),
-		&mask[0], 0, 0);
 }

@@ -12,7 +12,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "lib/RelWithDebInfo/CTLAB.lib"
+			"path" : "lib/MinSizeRel/CTLAB.lib"
 		}
 	],
 	"backtrace" : 2,
@@ -38,7 +38,7 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 152,
+				"line" : 145,
 				"parent" : 0
 			},
 			{
@@ -50,7 +50,7 @@
 			{
 				"command" : 2,
 				"file" : 1,
-				"line" : 144,
+				"line" : 137,
 				"parent" : 0
 			},
 			{
@@ -73,7 +73,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc  -openmp /MD /Zi /O2 /Ob1 /DNDEBUG"
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc  -openmp /MD /O1 /Ob1 /DNDEBUG"
 				}
 			],
 			"includes" : 
@@ -97,19 +97,15 @@
 				24,
 				26,
 				29,
-				30,
-				32,
+				31,
 				33,
+				34,
 				35,
+				36,
 				37,
 				38,
 				39,
-				40,
-				41,
-				42,
-				43,
-				44,
-				45
+				41
 			]
 		}
 	],
@@ -180,25 +176,25 @@
 				38,
 				39,
 				40,
-				41,
-				42,
-				43,
-				44,
-				45
+				41
 			]
 		},
 		{
 			"name" : "",
 			"sourceIndexes" : 
 			[
-				46,
-				62
+				42,
+				57
 			]
 		},
 		{
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
+				43,
+				44,
+				45,
+				46,
 				47,
 				48,
 				49,
@@ -209,11 +205,11 @@
 				54,
 				55,
 				56,
-				57,
 				58,
 				59,
 				60,
 				61,
+				62,
 				63,
 				64,
 				65,
@@ -222,13 +218,7 @@
 				68,
 				69,
 				70,
-				71,
-				72,
-				73,
-				74,
-				75,
-				76,
-				77
+				71
 			]
 		}
 	],
@@ -291,12 +281,6 @@
 		{
 			"backtrace" : 2,
 			"isGenerated" : true,
-			"path" : "build/bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_genModifiedPhantom.cu.obj",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 2,
-			"isGenerated" : true,
 			"path" : "build/bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_multiSlices_ker.cu.obj",
 			"sourceGroupIndex" : 0
 		},
@@ -310,6 +294,12 @@
 			"backtrace" : 2,
 			"isGenerated" : true,
 			"path" : "build/bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_VolumeToTextures.cu.obj",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"isGenerated" : true,
+			"path" : "build/bin/CMakeFiles/CTLAB.dir/$(Configuration)/CTLAB_generated_PhantomCreator.cu.obj",
 			"sourceGroupIndex" : 0
 		},
 		{
@@ -395,30 +385,7 @@
 		},
 		{
 			"backtrace" : 2,
-			"path" : "src/genModifiedPhantom.cu",
-			"sourceGroupIndex" : 1
-		},
-		{
-			"backtrace" : 2,
-			"compileGroupIndex" : 0,
-			"path" : "src/genSheppLoganProjection.cpp",
-			"sourceGroupIndex" : 1
-		},
-		{
-			"backtrace" : 2,
-			"compileGroupIndex" : 0,
-			"path" : "src/genSysMatrix.cpp",
-			"sourceGroupIndex" : 1
-		},
-		{
-			"backtrace" : 2,
 			"path" : "src/multiSlices_ker.cu",
-			"sourceGroupIndex" : 1
-		},
-		{
-			"backtrace" : 2,
-			"compileGroupIndex" : 0,
-			"path" : "src/Geometry.cpp",
 			"sourceGroupIndex" : 1
 		},
 		{
@@ -441,30 +408,6 @@
 		{
 			"backtrace" : 2,
 			"path" : "src/VolumeToTextures.cu",
-			"sourceGroupIndex" : 1
-		},
-		{
-			"backtrace" : 2,
-			"compileGroupIndex" : 0,
-			"path" : "src/FanEAGeo.cpp",
-			"sourceGroupIndex" : 1
-		},
-		{
-			"backtrace" : 2,
-			"compileGroupIndex" : 0,
-			"path" : "src/FanEDGeo.cpp",
-			"sourceGroupIndex" : 1
-		},
-		{
-			"backtrace" : 2,
-			"compileGroupIndex" : 0,
-			"path" : "src/ConeEAGeo.cpp",
-			"sourceGroupIndex" : 1
-		},
-		{
-			"backtrace" : 2,
-			"compileGroupIndex" : 0,
-			"path" : "src/ConeEDGeo.cpp",
 			"sourceGroupIndex" : 1
 		},
 		{
@@ -495,6 +438,29 @@
 			"backtrace" : 2,
 			"compileGroupIndex" : 0,
 			"path" : "src/XraySource.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/ProjectionConfiguration.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/BackProjectionConfiguration.cpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/PhantomCreator.cu",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/SinogramCreator.cpp",
 			"sourceGroupIndex" : 1
 		},
 		{
@@ -574,18 +540,8 @@
 		},
 		{
 			"backtrace" : 2,
-			"path" : "src/genSysMatrix.hpp",
-			"sourceGroupIndex" : 3
-		},
-		{
-			"backtrace" : 2,
 			"path" : "src/multiSlices_ker.cuh",
 			"sourceGroupIndex" : 2
-		},
-		{
-			"backtrace" : 2,
-			"path" : "src/Geometry.h",
-			"sourceGroupIndex" : 3
 		},
 		{
 			"backtrace" : 2,
@@ -614,26 +570,6 @@
 		},
 		{
 			"backtrace" : 2,
-			"path" : "src/FanEAGeo.h",
-			"sourceGroupIndex" : 3
-		},
-		{
-			"backtrace" : 2,
-			"path" : "src/FanEDGeo.h",
-			"sourceGroupIndex" : 3
-		},
-		{
-			"backtrace" : 2,
-			"path" : "src/ConeEAGeo.h",
-			"sourceGroupIndex" : 3
-		},
-		{
-			"backtrace" : 2,
-			"path" : "src/ConeEDGeo.h",
-			"sourceGroupIndex" : 3
-		},
-		{
-			"backtrace" : 2,
 			"path" : "src/Image.h",
 			"sourceGroupIndex" : 3
 		},
@@ -655,6 +591,26 @@
 		{
 			"backtrace" : 2,
 			"path" : "src/XraySource.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/ProjectionConfiguration.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/BackprojectionConfiguration.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/PhantomCreator.h",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/SinogramCreator.h",
 			"sourceGroupIndex" : 3
 		}
 	],

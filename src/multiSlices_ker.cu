@@ -17,12 +17,9 @@ typedef unsigned char byte;
 #define BLKY 8
 #define BLKZ 1
 
-namespace DD2
-{
-	struct CosSinFunctor
-	{
-		__host__ __device__ float2 operator()(float ang)
-		{
+namespace DD2 {
+	struct CosSinFunctor {
+		__host__ __device__ float2 operator()(float ang) {
 			return make_float2(cos(ang),sin(ang));
 		}
 	};
@@ -33,34 +30,28 @@ namespace DD2
 			thrust::host_vector<thrust::host_vector<float2> >& subCossin,
 			float* proj, thrust::host_vector<float2>& cossin,
 			const int SLN, const int DNU, const int PN,
-			thrust::host_vector<int> sSLN, const int gpuNum)
-	{
+			thrust::host_vector<int> sSLN, const int gpuNum) {
 		int psum = 0;
-		for(int i = 0; i != gpuNum; ++i)
-		{
+		for(int i = 0; i != gpuNum; ++i) {
 			subProj[i].resize(sSLN[i] * DNU * PN);
 			subCossin[i].resize(sSLN[i] * PN);
 			int curPos = sSLN[i];
-			for(int p = 0; p != DNU * PN; ++p)
-			{
-				for(int s = 0; s != sSLN[i]; ++s)
-				{
+
+			for(int p = 0; p != DNU * PN; ++p) {
+				for(int s = 0; s != sSLN[i]; ++s) {
 					int subPos = p * sSLN[i] + s;
 					int totPos = p * SLN + (s + psum);
 					subProj[i][subPos] = proj[totPos];
 				}
 			}
 
-			for(int p = 0; p != PN; ++p)
-			{
-				for(int s = 0; s != sSLN[i]; ++s)
-				{
+			for(int p = 0; p != PN; ++p) {
+				for(int s = 0; s != sSLN[i]; ++s) {
 					int subPos = p * sSLN[i] + s;
 					int totPos = p * SLN + (s + psum);
 					subCossin[i][subPos] = cossin[totPos];
 				}
 			}
-
 			psum += sSLN[i];
 		}
 	}
@@ -261,12 +252,7 @@ namespace DD2
 			}
 		}
 	}
-
-
-
 }
-
-
 
 __global__  void MultiSlices_DDPROJ_ker(
 	cudaTextureObject_t volTex1,

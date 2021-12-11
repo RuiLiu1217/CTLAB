@@ -19,31 +19,10 @@
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\spectralCTscan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSheppLoganProjection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSysMatrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Geometry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\CTLAB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\TextureObjectProvider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\FanEAGeo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\FanEDGeo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ConeEAGeo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ConeEDGeo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Image.cpp">
@@ -59,6 +38,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\XraySource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ProjectionConfiguration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\BackProjectionConfiguration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\SinogramCreator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -105,12 +93,6 @@
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\readwrite.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genSysMatrix.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Geometry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\CTLAB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -126,18 +108,6 @@
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\VolumeToTextures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\FanEAGeo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\FanEDGeo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ConeEAGeo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ConeEDGeo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\Image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -151,6 +121,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\XraySource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ProjectionConfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\BackprojectionConfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\PhantomCreator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\SinogramCreator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -182,9 +164,6 @@
     <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\spectralCTscan.cu">
       <Filter>Source Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\genModifiedPhantom.cu">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\multiSlices_ker.cu">
       <Filter>Source Files</Filter>
     </CustomBuild>
@@ -192,6 +171,9 @@
       <Filter>Source Files</Filter>
     </CustomBuild>
     <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\VolumeToTextures.cu">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\PhantomCreator.cu">
       <Filter>Source Files</Filter>
     </CustomBuild>
     <CustomBuild Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\CMakeLists.txt" />
@@ -228,9 +210,6 @@
     <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_spectralCTscan.cu.obj">
       <Filter>Object Files</Filter>
     </Object>
-    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_genModifiedPhantom.cu.obj">
-      <Filter>Object Files</Filter>
-    </Object>
     <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_multiSlices_ker.cu.obj">
       <Filter>Object Files</Filter>
     </Object>
@@ -238,6 +217,9 @@
       <Filter>Object Files</Filter>
     </Object>
     <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_VolumeToTextures.cu.obj">
+      <Filter>Object Files</Filter>
+    </Object>
+    <Object Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\bin\CMakeFiles\CTLAB.dir\$(Configuration)\CTLAB_generated_PhantomCreator.cu.obj">
       <Filter>Object Files</Filter>
     </Object>
   </ItemGroup>

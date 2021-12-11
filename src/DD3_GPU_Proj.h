@@ -11,6 +11,8 @@
 #define _DD3_GPU_PROJ_H_
 #include "Image.h"
 #include "Projection.h"
+#include "ProjectionConfiguration.h"
+
 #include <thrust/device_vector.h>
 
 using byte = unsigned char;

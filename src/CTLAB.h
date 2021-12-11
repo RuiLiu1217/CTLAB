@@ -41,11 +41,11 @@ extern "C" { // Tested
 std::vector<float> calculateProjection(
 	const float sid, const float sdd, const int DNU, std::vector<float> angs, const float col_size, const float col_offset);
 
-class Geometry;
-
-class CT
-{
-public:
-	static void Proj(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, const std::string& projModel);
-	static void Back(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, const std::string& backModel);
-};
+// class Geometry;
+//
+//class CT
+//{
+//public:
+//	static void Proj(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, const std::string& projModel);
+//	static void Back(std::vector<float>& hvol, std::vector<float>& hprj, Geometry geo, const std::string& backModel);
+//};

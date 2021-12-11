@@ -50,9 +50,14 @@ Image::Image() {
 	dz = dx;
 
 	data.resize(resoX * resoY * resoZ);
-	for (int i = 0; i < 512 * 512 * 512; ++i) {
+	for (int i = 0; i < resoX * resoY * resoZ; ++i) {
 		data[i] = 1.0f;
 	}
+
+	mask.resize(resoX * resoY);
+	for (int i = 0; i < resoX * resoY; ++i) {
+        mask[i] = 1;
+    }
 }
 
 Image::Image(std::string fileName) {}
@@ -93,4 +98,8 @@ float* Image::getDataPtr() {
 
 void Image::saveRaw(std::string fileName) {
 	writeData<float>(data, fileName);
+}
+
+unsigned char* Image::getMaskPtr() {
+	return &(mask[0]);
 }

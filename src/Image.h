@@ -44,6 +44,7 @@ public:
 	float getCentZ() const;
 
 	float* getDataPtr();
+	unsigned char* getMaskPtr();
 
 	void save(std::string fileName) {
 		// Todo: not implemented yet
@@ -64,6 +65,7 @@ private:
 	float centZ;
 
 	std::vector<float> data;
+	std::vector<unsigned char> mask;
 };
 
 #endif
