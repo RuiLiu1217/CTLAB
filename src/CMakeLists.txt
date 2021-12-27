@@ -44,7 +44,6 @@ SET(CTLAB_HEADERS
 	spectralCTscan.hpp      # The interface of spectral CT projection simulation
 	#DD3_demo.hpp	# The interface of the demo of the Branchless DD
 	readwrite.hpp           # Read and write the raw data (in GPU or CPU) from/to disk
-	# FastMatrixVectorMultiplication.hpp # Fast Matrix-Vector multiplication function in GPU
 	multiSlices_ker.cuh     # multi slices based projection and backprojection
 	CTLAB.h
 	TextureObjectProvider.h
@@ -60,8 +59,8 @@ SET(CTLAB_HEADERS
 	BackprojectionConfiguration.h
 	PhantomCreator.h
 	SinogramCreator.h
-	# DD3_GPU_doublePrecisonBranchless.h
-	
+	CPUThreadPool/ThreadPoolForPhantomCreator.h	
+	CPUThreadPool/SafeQueue.h
 )
 
 SET(CTLAB_SRC 
@@ -81,7 +80,6 @@ SET(CTLAB_SRC
 	spectralCTscan.cpp 	# The spectral CT projection simulation in CPU
 	spectralCTscan.cu 	# The spectral CT projection simulation in GPU
 #	DD3_demo.cu	# The interface of the demo of the Branchless DD
-	# FastMatrixVectorMultiplication.cu # Fast Matrix-Vector multiplication function in GPU
 	multiSlices_ker.cu      # multi slices based projection and backprojection
 	CTLAB.cpp
 	GenerateSummedAreaTable.cu
@@ -96,7 +94,7 @@ SET(CTLAB_SRC
 	BackprojectionConfiguration.cpp
 	PhantomCreator.cu
 	SinogramCreator.cpp
-	# DD3_GPU_doublePrecisonBranchless.cu
+	CPUThreadPool/ThreadPoolForPhantomCreator.cpp
 )
 
 
@@ -123,16 +121,6 @@ else (WIN32)
   endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 endif (WIN32)
 
-# Copy DLLs
-if (WIN32)
-  if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    #file(COPY $ENV{CUDA_SDK_ROOT_DIR}/Bin/win64/Release/freeglut.dll DESTINATION ${CMAKE_BINARY_DIR}) 
-    #file(COPY $ENV{CUDA_SDK_ROOT_DIR}/Bin/win64/Release/${GLEW_NAME}.dll DESTINATION ${CMAKE_BINARY_DIR}) 
-  else( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    #file(COPY $ENV{CUDA_SDK_ROOT_DIR}/Bin/win32/Release/freeglut.dll DESTINATION ${CMAKE_BINARY_DIR}) 
-    #file(COPY $ENV{CUDA_SDK_ROOT_DIR}/Bin/win32/Release/${GLEW_NAME}.dll DESTINATION ${CMAKE_BINARY_DIR}) 
-  endif( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-endif (WIN32)
 
 include_directories($ENV{CUDA_SDK_ROOT_DIR}/common/inc)
 

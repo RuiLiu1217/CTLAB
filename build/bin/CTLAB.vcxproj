@@ -1338,6 +1338,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\ProjectionConfiguration.cpp" />
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\BackProjectionConfiguration.cpp" />
     <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\SinogramCreator.cpp" />
+    <ClCompile Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\CPUThreadPool\ThreadPoolForPhantomCreator.cpp" />
     <None Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\utilities.cuh">
     </None>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\utilities.hpp" />
@@ -1370,6 +1371,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\BackprojectionConfiguration.h" />
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\PhantomCreator.h" />
     <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\SinogramCreator.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\CPUThreadPool\ThreadPoolForPhantomCreator.h" />
+    <ClInclude Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\src\CPUThreadPool\SafeQueue.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\liuru\Dropbox\MyWebsite\CTLAB\build\ZERO_CHECK.vcxproj">
